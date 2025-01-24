@@ -9,6 +9,7 @@ const MovieList = () => {
 
   const itemWidth = Dimensions.get('window').width * 0.8;
   const spacing = Dimensions.get('window').width * 0.1;
+  const noRatingCase = 'N/A';
 
   const addToWatchlist = async (title, director, year, posterPath, description, rating) => {
     if (await FilmInWatchlist(title, director, year, userId)) {
@@ -229,7 +230,7 @@ const MovieList = () => {
                 </Text>
                 <View style={styles.ratingContainer}>
                   <Text style={styles.cardText}>
-                    Rating: <Text style={[styles.bold, styles.cardText]}>{item.rating}</Text>
+                    Rating: <Text style={[styles.bold, styles.cardText]}>{item.rating ? item.rating : noRatingCase}</Text>
                   </Text>
                   <Image style={styles.imdbLogo} source={imdb}></Image>
                 </View>
@@ -287,12 +288,12 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 16,
-    marginVertical: 5,
+    marginVertical: 2,
     textAlign: 'center',
   },
   descriptionText: {
     fontSize: 15, 
-    marginVertical: 7,
+    marginVertical: 10,
     textAlign: 'left',
     padding: 5,
     borderWidth: 1,
