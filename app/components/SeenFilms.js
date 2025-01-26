@@ -32,6 +32,7 @@ const SeenFilms = () => {
 
     const renderFilm = ({ item }) => (
         <TouchableOpacity style={styles.gridItem} onPress={() => {
+            // console.log(item);
             setStaticMovie(item);
             updatePage("Static Movie")}} 
         >
@@ -101,13 +102,13 @@ const styles = StyleSheet.create({
     },
     poster: {
         marginTop: 5,
-        width: Dimensions.get('window').width / 3 - 15, // Match the width of the grid item
-        height: Dimensions.get('window').width / 3 + 15, // Keep square dimensions
+        width: Dimensions.get('window').width / 3 - 15, 
+        height: Dimensions.get('window').width / 3 + 15, 
         resizeMode: 'contain',
     },
     placeholder: {
         width: Dimensions.get('window').width / 3 - 15,
-        height: Dimensions.get('window').width / 3 + 15, // Match poster size
+        height: Dimensions.get('window').width / 3 + 15,
         backgroundColor: '#ccc',
         justifyContent: 'center',
         alignItems: 'center',
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
     },
     title: {
         padding: 5,
-        fontSize: 14, // Adjust font size for smaller items
+        fontSize: 14,
         fontWeight: 'bold',
         textAlign: 'center',
     },

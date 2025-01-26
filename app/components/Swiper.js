@@ -345,15 +345,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   imdbLogo: {
-    width: 40, // Adjust logo size as needed
+    width: 40,
     height: 20,
     marginLeft: 5,
     resizeMode: 'contain',
   },
   ratingContainer: {
-    flexDirection: 'row', // Arrange items horizontally
-    justifyContent: 'center', // Center horizontally
-    alignItems: 'center', // Align vertically
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   }
 });
 
