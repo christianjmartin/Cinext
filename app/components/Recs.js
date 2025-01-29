@@ -46,11 +46,11 @@ export default function Recs() {
             if (detailedMovie) {
               detailedMovies.push(detailedMovie);
             } else {
-              detailedMovies.push({ title: movie.trim(), error: true }); // Add default for missing data
+              detailedMovies.push({ Title: movie.trim(), error: true }); // Add default for missing data
             }
           } catch (error) {
             console.error(`Error fetching details for ${movie}:`, error);
-            detailedMovies.push({ title: movie.trim(), error: true }); // Add default for errors
+            detailedMovies.push({ Title: movie.trim(), error: true }); // Add default for errors
           }
         }
   

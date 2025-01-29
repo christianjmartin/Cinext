@@ -1,17 +1,23 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Text, View, FlatList, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { Text, View, FlatList, Image, StyleSheet, Keyboard, Dimensions, TouchableWithoutFeedback, TouchableOpacity, TextInput } from 'react-native';
 import { supabase } from '../services/supabase'; 
 import PageContext from '../context/PageContext';
+import { searchMovies } from '../services/tmdbApi';
+import { fetchMovieCredits } from '../services/tmdbApi';
 
 const SeenFilms = () => {
     const { userId, setStaticMovie, updatePage } = useContext(PageContext);
     const [seenFilms, setSeenFilms] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searching, setSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
 
     const getFilms = async () => {
         try {
             const { data, error } = await supabase
                 .from('SeenFilms')
-                .select('Title, PosterPath, Director, Year, Rating, Description')
+                .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+                .order('id', { ascending: false })
                 .eq('UserID', userId);
 
             if (error) {
@@ -25,17 +31,46 @@ const SeenFilms = () => {
         }
     };
 
-    // run once (mount)
     useEffect(() => {
         getFilms();
     }, []);
 
+    const handleSearch = async (query) => {
+        setSearchQuery(query);
+        if (query.trim() === '') {
+            setSearching(false);
+            setSearchResults([]);
+            return;
+        }
+        setSearching(true);
+
+        try {
+            const results = await searchMovies(query); // Fetch from TMDB
+            setSearchResults(results);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+            setSearchResults([]); // Fallback in case of API failure
+        }
+    };
+
+
     const renderFilm = ({ item }) => (
-        <TouchableOpacity style={styles.gridItem} onPress={() => {
-            // console.log(item);
+        <TouchableOpacity style={styles.gridItem} onPress={async () => {
+            // get the director (need for if searched for from component)
+            if (!item.Director) {
+                try {
+                    if (item.tmdbID) {
+                        const directors = await fetchMovieCredits(item.tmdbID);
+                        item.Director = directors; // add the director(s) to the film object 
+                    }
+                } catch (error) {
+                    console.error('Error fetching directors:', error);
+                    item.Director = 'Unknown';
+                }
+            }
             setStaticMovie(item);
-            updatePage("Static Movie")}} 
-        >
+            updatePage("Static Movie");
+        }}>
             {item.PosterPath ? (
                 <Image 
                     source={{ uri: `https://image.tmdb.org/t/p/w500${item.PosterPath}` }} 
@@ -51,18 +86,26 @@ const SeenFilms = () => {
     );
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Movies I've Seen</Text>
-            <FlatList
-                data={seenFilms}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={renderFilm}
-                numColumns={3} // Number of columns for the grid
-                horizontal={false}
-                scrollEnabled={true}
-                columnWrapperStyle={styles.row} // Styling for the row
-            />
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Text style={styles.header}>Movies I've Seen</Text>
+                <TextInput
+                    style={styles.searchBar}
+                    placeholder="Search for movies to add..."
+                    value={searchQuery}
+                    onChangeText={handleSearch}
+                />
+                <FlatList
+                    data={searching ? searchResults : seenFilms}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderFilm}
+                    numColumns={3}
+                    horizontal={false}
+                    scrollEnabled={true}
+                    columnWrapperStyle={styles.row}
+                />
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -83,12 +126,22 @@ const styles = StyleSheet.create({
         padding: 7,
         width: Dimensions.get('window').width * 1,
     },
+    searchBar: {
+        width: Dimensions.get('window').width * 0.95,
+        height: 40,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        backgroundColor: '#fff',
+    },
     row: {
-        justifyContent: 'flex-start', // Align items to the left
+        justifyContent: 'flex-start',
         marginBottom: 10,
     },
     gridItem: {
-        width: Dimensions.get('window').width / 3 - 15, // Ensure consistent width for 4 columns
+        width: Dimensions.get('window').width / 3 - 15,
         margin: 3,
         backgroundColor: '#fff',
         borderRadius: 7,
@@ -124,4 +177,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
+
 export default SeenFilms;

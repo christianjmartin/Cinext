@@ -1,41 +1,76 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Text, View, FlatList, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { Text, View, FlatList, Image, StyleSheet, Keyboard, Dimensions, TouchableWithoutFeedback, TouchableOpacity, TextInput } from 'react-native';
 import { supabase } from '../services/supabase'; 
 import PageContext from '../context/PageContext';
+import { searchMovies } from '../services/tmdbApi';
+import { fetchMovieCredits } from '../services/tmdbApi';
 
 const Watchlist = () => {
-    const { userId, updatePage, setStaticMovie } = useContext(PageContext);
+    const { userId, setStaticMovie, updatePage } = useContext(PageContext);
     const [watchlist, setWatchlist] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searching, setSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
 
     const getFilms = async () => {
         try {
             const { data, error } = await supabase
                 .from('Watchlist')
-                .select('Title, PosterPath, Director, Year, Rating, Description')
+                .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+                .order('id', { ascending: false })
                 .eq('UserID', userId);
 
             if (error) {
-                console.error('Error fetching watchlist:', error.message);
+                console.error('Error fetching Watchlist:', error.message);
             } else {
-                console.log('Fetched from watchlist:', data);
-                setWatchlist(data || []); // Ensure `data` is not null
+                console.log('Fetched from Watchlist:', data);
+                setWatchlist(data || []);
             }
         } catch (error) {
             console.error('Unexpected error:', error); 
         }
     };
 
-    // Run getFilms when the component mounts
     useEffect(() => {
         getFilms();
     }, []);
 
-    // Define the render item for the grid
+    const handleSearch = async (query) => {
+        setSearchQuery(query);
+        if (query.trim() === '') {
+            setSearching(false);
+            setSearchResults([]);
+            return;
+        }
+        setSearching(true);
+
+        try {
+            const results = await searchMovies(query); // Fetch from TMDB
+            setSearchResults(results);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+            setSearchResults([]); // Fallback in case of API failure
+        }
+    };
+
+
     const renderFilm = ({ item }) => (
-        <TouchableOpacity style={styles.gridItem} onPress={() => {
+        <TouchableOpacity style={styles.gridItem} onPress={async () => {
+            // get the director (need for if searched for from component)
+            if (!item.Director) {
+                try {
+                    if (item.tmdbID) {
+                        const directors = await fetchMovieCredits(item.tmdbID);
+                        item.Director = directors; // add the director(s) to the film object 
+                    }
+                } catch (error) {
+                    console.error('Error fetching directors:', error);
+                    item.Director = 'Unknown';
+                }
+            }
             setStaticMovie(item);
-            updatePage("Static Movie")}} 
-        >
+            updatePage("Static Movie");
+        }}>
             {item.PosterPath ? (
                 <Image 
                     source={{ uri: `https://image.tmdb.org/t/p/w500${item.PosterPath}` }} 
@@ -51,18 +86,26 @@ const Watchlist = () => {
     );
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>My Watchlist</Text>
-            <FlatList
-                data={watchlist}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={renderFilm}
-                numColumns={3} // Number of columns for the grid
-                horizontal={false}
-                scrollEnabled={true}
-                columnWrapperStyle={styles.row} // Styling for the row
-            />
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Text style={styles.header}>My Watchlist</Text>
+                <TextInput
+                    style={styles.searchBar}
+                    placeholder="Search for movies to add..."
+                    value={searchQuery}
+                    onChangeText={handleSearch}
+                />
+                <FlatList
+                    data={searching ? searchResults : watchlist}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderFilm}
+                    numColumns={3}
+                    horizontal={false}
+                    scrollEnabled={true}
+                    columnWrapperStyle={styles.row}
+                />
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -83,12 +126,22 @@ const styles = StyleSheet.create({
         padding: 7,
         width: Dimensions.get('window').width * 1,
     },
+    searchBar: {
+        width: Dimensions.get('window').width * 0.95,
+        height: 40,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        backgroundColor: '#fff',
+    },
     row: {
-        justifyContent: 'flex-start', // Align items to the left
+        justifyContent: 'flex-start',
         marginBottom: 10,
     },
     gridItem: {
-        width: Dimensions.get('window').width / 3 - 15, // Ensure consistent width for 4 columns
+        width: Dimensions.get('window').width / 3 - 15,
         margin: 3,
         backgroundColor: '#fff',
         borderRadius: 7,
@@ -102,13 +155,13 @@ const styles = StyleSheet.create({
     },
     poster: {
         marginTop: 5,
-        width: Dimensions.get('window').width / 3 - 15, // Match the width of the grid item
-        height: Dimensions.get('window').width / 3 + 15, // Keep square dimensions
+        width: Dimensions.get('window').width / 3 - 15, 
+        height: Dimensions.get('window').width / 3 + 15, 
         resizeMode: 'contain',
     },
     placeholder: {
         width: Dimensions.get('window').width / 3 - 15,
-        height: Dimensions.get('window').width / 3 + 15, // Match poster size
+        height: Dimensions.get('window').width / 3 + 15,
         backgroundColor: '#ccc',
         justifyContent: 'center',
         alignItems: 'center',
@@ -119,9 +172,10 @@ const styles = StyleSheet.create({
     },
     title: {
         padding: 5,
-        fontSize: 14, // Adjust font size for smaller items
+        fontSize: 14,
         fontWeight: 'bold',
         textAlign: 'center',
     },
 });
+
 export default Watchlist;

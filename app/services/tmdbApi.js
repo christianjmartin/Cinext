@@ -39,19 +39,76 @@ export const fetchMovieDetails = async (query) => {
 
     console.log("Directors:", directors);
 
-  
-
-
     return {
-      title: movie.title || 'Unknown',
-      director: directors.join(', ') || 'Unknown',
-      posterPath: movie.poster_path || null,
-      releaseDate: movie.release_date ? movie.release_date.slice(0, 4) : 'Unknown',
-      rating: movie.vote_average ? movie.vote_average.toFixed(1) : null,
-      description: movie.overview || 'No description avaliable',
+      tmdbID: movie.id || null,
+      Title: movie.title || 'Unknown',
+      Director: directors.join(', ') || 'Unknown',
+      PosterPath: movie.poster_path || null,
+      Year: movie.release_date ? movie.release_date.slice(0, 4) : 'Unknown',
+      Rating: movie.vote_average ? movie.vote_average.toFixed(1) : null,
+      Description: movie.overview || 'No description avaliable',
     };
   } catch (error) {
     console.error('Error fetching movie details:', error.message);
     throw error;
+  }
+};
+
+
+
+
+
+export const searchMovies = async (query) => {
+  try {
+    // Call TMDB's search API
+    const searchResponse = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
+      params: {
+        api_key: TMDB_API_KEY,
+        query: query.trim(), // Trim whitespace from the search query
+      },
+    });
+
+    const movies = searchResponse.data.results;
+
+    if (!movies || movies.length === 0) {
+      return []; // Return an empty array if no results are found
+    }
+
+    // Map over the movies to extract only the basic details
+    return movies.map(movie => ({
+      tmdbID: movie.id,
+      Title: movie.title || 'Unknown',
+      PosterPath: movie.poster_path || null,
+      Year: movie.release_date ? movie.release_date.slice(0, 4) : 'Unknown',
+      Rating: movie.vote_average ? movie.vote_average.toFixed(1) : null,
+      Description: movie.overview || 'No description available',
+    }));
+  } catch (error) {
+    console.error('Error searching movies:', error.message);
+    throw error;
+  }
+};
+
+
+
+
+
+
+export const fetchMovieCredits = async (tmdbID) => {
+  console.log("FANUM TAXXXX")
+  try {
+    const creditsResponse = await axios.get(`${TMDB_BASE_URL}/movie/${tmdbID}/credits`, {
+      params: { api_key: TMDB_API_KEY },
+    });
+
+    const directors = creditsResponse.data.crew
+      .filter(person => person.job === 'Director')
+      .map(director => director.name);
+
+    console.log(directors.join(', '));
+    return directors.join(', '); // Combine director names into a single string
+  } catch (error) {
+    console.error('Error fetching credits:', error.message);
+    return 'Unknown';
   }
 };

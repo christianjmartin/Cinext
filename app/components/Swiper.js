@@ -11,8 +11,8 @@ const MovieList = () => {
   const spacing = Dimensions.get('window').width * 0.1;
   const noRatingCase = 'N/A';
 
-  const addToWatchlist = async (title, director, year, posterPath, description, rating) => {
-    if (await FilmInWatchlist(title, director, year, userId)) {
+  const addToWatchlist = async (title, director, year, posterPath, description, rating, tmdbID) => {
+    if (await FilmInWatchlist(title, director, year, userId, tmdbID)) {
       // Delete the movie first, then add it again so it goes to the top of the list
       try {
         const { data, error } = await supabase
@@ -21,6 +21,7 @@ const MovieList = () => {
           .eq('Title', title)
           .eq('Director', director)
           .eq('Year', year)
+          .eq('tmdbID', tmdbID)
           .eq('UserID', userId)
           .select();
     
@@ -38,7 +39,7 @@ const MovieList = () => {
     try {
       const { data, error } = await supabase
         .from('Watchlist')
-        .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating }])
+        .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating, tmdbID: tmdbID}])
         .select();
   
       if (error) {
@@ -51,8 +52,8 @@ const MovieList = () => {
     }
   };
   
-  const addToSeen = async (title, director, year, posterPath, description, rating) => {
-    if (await alreadySeen(title, director, year, userId)) {
+  const addToSeen = async (title, director, year, posterPath, description, rating, tmdbID) => {
+    if (await alreadySeen(title, director, year, userId, tmdbID)) {
       // Delete the movie first, then add it again so it goes to the top of the list
       try {
         const { data, error } = await supabase
@@ -61,6 +62,7 @@ const MovieList = () => {
           .eq('Title', title)
           .eq('Director', director)
           .eq('Year', year)
+          .eq('tmdbID', tmdbID)
           .eq('UserID', userId)
           .select();
     
@@ -75,7 +77,7 @@ const MovieList = () => {
     }
 
     // if the movie is in the watchlist, delete it because they just saw it 
-    if (await FilmInWatchlist(title, director, year, userId)) {
+    if (await FilmInWatchlist(title, director, year, userId, tmdbID)) {
       try {
         const { data, error } = await supabase
           .from('Watchlist')
@@ -83,6 +85,7 @@ const MovieList = () => {
           .eq('Title', title)
           .eq('Director', director)
           .eq('Year', year)
+          .eq('tmdbID', tmdbID)
           .eq('UserID', userId)
           .select();
     
@@ -100,7 +103,7 @@ const MovieList = () => {
     try {
       const { data, error } = await supabase
         .from('SeenFilms')
-        .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating }])
+        .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating, tmdbID: tmdbID}])
         .select();
   
       if (error) {
@@ -116,7 +119,7 @@ const MovieList = () => {
 
 
 
-  const alreadySeen = async (title, director, year, userId) => {
+  const alreadySeen = async (title, director, year, userId, tmdbID) => {
     try {
       const { data, error } = await supabase
         .from('SeenFilms')
@@ -124,6 +127,7 @@ const MovieList = () => {
         .eq('Title', title)
         .eq('Director', director)
         .eq('Year', year)
+        .eq('tmdbID', tmdbID)
         .eq('UserID', userId) // Ensure user-specific query
 
       if (error) {
@@ -145,7 +149,7 @@ const MovieList = () => {
     }
   };
 
-  const FilmInWatchlist = async (title, director, year, userId) => {
+  const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
     try {
       const { data, error } = await supabase
         .from('Watchlist')
@@ -153,6 +157,7 @@ const MovieList = () => {
         .eq('Title', title)
         .eq('Director', director)
         .eq('Year', year)
+        .eq('tmdbID', tmdbID)
         .eq('UserID', userId)
 
   
@@ -215,34 +220,34 @@ const MovieList = () => {
             <View style={[styles.card, { width: itemWidth, marginRight: spacing }]}>
               {/* Scrollable Content */}
               <ScrollView style={styles.cardContent}>
-                <Text style={styles.cardTextTitle}>{item.title}</Text>
-                {item.posterPath && (
+                <Text style={styles.cardTextTitle}>{item.Title}</Text>
+                {item.PosterPath && (
                   <Image
-                    source={{ uri: `https://image.tmdb.org/t/p/w500${item.posterPath}` }}
+                    source={{ uri: `https://image.tmdb.org/t/p/w500${item.PosterPath}` }}
                     style={styles.poster}
                   />
                 )}
                 <Text style={styles.cardText}>
-                  Directed by: <Text style={[styles.bold, styles.cardText]}>{item.director}</Text>
+                  Directed by: <Text style={[styles.bold, styles.cardText]}>{item.Director}</Text>
                 </Text>
                 <Text style={styles.cardText}>
-                  Released: <Text style={[styles.bold, styles.cardText]}>{item.releaseDate}</Text>
+                  Released: <Text style={[styles.bold, styles.cardText]}>{item.Year}</Text>
                 </Text>
                 <View style={styles.ratingContainer}>
                   <Text style={styles.cardText}>
-                    Rating: <Text style={[styles.bold, styles.cardText]}>{item.rating ? item.rating : noRatingCase}</Text>
+                    Rating: <Text style={[styles.bold, styles.cardText]}>{item.Rating ? item.Rating : noRatingCase}</Text>
                   </Text>
                   <Image style={styles.imdbLogo} source={imdb}></Image>
                 </View>
-                <Text style={styles.descriptionText}>{item.description}</Text>
+                <Text style={styles.descriptionText}>{item.Description}</Text>
               </ScrollView>
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.seenButton} onPress={() => addToSeen(item.title, item.director, item.releaseDate, item.posterPath, item.description, item.rating)}>
+                <TouchableOpacity style={styles.seenButton} onPress={() => addToSeen(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
                   <Text style={styles.buttonText}>I've Seen This</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.watchlistButton} onPress={() => addToWatchlist(item.title, item.director, item.releaseDate, item.posterPath, item.description, item.rating)}>
+                <TouchableOpacity style={styles.watchlistButton} onPress={() => addToWatchlist(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
                   <Text style={styles.buttonText}>Add to Watchlist</Text>
                 </TouchableOpacity>
               </View>

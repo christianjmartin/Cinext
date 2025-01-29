@@ -21,7 +21,7 @@ export const PageProvider = ({ children }) => {
   }, []);
 
   const updatePage = (newPage) => {
-    console.log("page updating");
+    console.log("page updating to", newPage);
     setPreviousPage(page);
     setPage(newPage);
   };

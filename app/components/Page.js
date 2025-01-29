@@ -9,6 +9,7 @@ import Header from './Header';
 import MovieSwiper from './Swiper';
 import SeenFilms from './SeenFilms';
 import StaticMovie from './StaticMovie';
+import Settings from './Settings';
 
 export default function Page() {
   const { page, updatePage } = useContext(PageContext);
@@ -25,6 +26,7 @@ export default function Page() {
         {page === "Seen Films" ? <SeenFilms/> : null}
         {page === "Show Swiper" ? <MovieSwiper/> : null}
         {page === "Static Movie" ? <StaticMovie/> : null}
+        {page === "Settings" ? <Settings/> : null}
       </View>
 
       <View style={styles.navBar}>

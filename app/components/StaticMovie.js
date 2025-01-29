@@ -12,8 +12,8 @@ const StaticMovie = () => {
 
 
 
-    const addToWatchlist = async (title, director, year, posterPath, description, rating) => {
-        if (await FilmInWatchlist(title, director, year, userId)) {
+    const addToWatchlist = async (title, director, year, posterPath, description, rating, tmdbID) => {
+        if (await FilmInWatchlist(title, director, year, userId, tmdbID)) {
           // Delete the movie first, then add it again so it goes to the top of the list
           try {
             const { data, error } = await supabase
@@ -22,6 +22,7 @@ const StaticMovie = () => {
               .eq('Title', title)
               .eq('Director', director)
               .eq('Year', year)
+              .eq('tmdbID', tmdbID)
               .eq('UserID', userId)
               .select();
         
@@ -39,7 +40,7 @@ const StaticMovie = () => {
         try {
           const { data, error } = await supabase
             .from('Watchlist')
-            .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating }])
+            .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating, tmdbID: tmdbID }])
             .select();
       
           if (error) {
@@ -52,8 +53,8 @@ const StaticMovie = () => {
         }
       };
       
-      const addToSeen = async (title, director, year, posterPath, description, rating) => {
-        if (await alreadySeen(title, director, year, userId)) {
+      const addToSeen = async (title, director, year, posterPath, description, rating, tmdbID) => {
+        if (await alreadySeen(title, director, year, userId, tmdbID)) {
           // Delete the movie first, then add it again so it goes to the top of the list
           try {
             const { data, error } = await supabase
@@ -62,6 +63,7 @@ const StaticMovie = () => {
               .eq('Title', title)
               .eq('Director', director)
               .eq('Year', year)
+              .eq('tmdbID', tmdbID)
               .eq('UserID', userId)
               .select();
         
@@ -76,7 +78,7 @@ const StaticMovie = () => {
         }
     
         // if the movie is in the watchlist, delete it because they just saw it 
-        if (await FilmInWatchlist(title, director, year, userId)) {
+        if (await FilmInWatchlist(title, director, year, userId, tmdbID)) {
           try {
             const { data, error } = await supabase
               .from('Watchlist')
@@ -84,6 +86,7 @@ const StaticMovie = () => {
               .eq('Title', title)
               .eq('Director', director)
               .eq('Year', year)
+              .eq('tmdbID', tmdbID)
               .eq('UserID', userId)
               .select();
         
@@ -101,7 +104,7 @@ const StaticMovie = () => {
         try {
           const { data, error } = await supabase
             .from('SeenFilms')
-            .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating }])
+            .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating, tmdbID: tmdbID }])
             .select();
       
           if (error) {
@@ -117,7 +120,7 @@ const StaticMovie = () => {
     
     
     
-      const alreadySeen = async (title, director, year, userId) => {
+      const alreadySeen = async (title, director, year, userId, tmdbID) => {
         try {
           const { data, error } = await supabase
             .from('SeenFilms')
@@ -125,6 +128,7 @@ const StaticMovie = () => {
             .eq('Title', title)
             .eq('Director', director)
             .eq('Year', year)
+            .eq('tmdbID', tmdbID)
             .eq('UserID', userId) // Ensure user-specific query
     
           if (error) {
@@ -146,7 +150,7 @@ const StaticMovie = () => {
         }
       };
     
-      const FilmInWatchlist = async (title, director, year, userId) => {
+      const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
         try {
           const { data, error } = await supabase
             .from('Watchlist')
@@ -154,6 +158,7 @@ const StaticMovie = () => {
             .eq('Title', title)
             .eq('Director', director)
             .eq('Year', year)
+            .eq('tmdbID', tmdbID)
             .eq('UserID', userId)
     
       
@@ -223,10 +228,10 @@ const StaticMovie = () => {
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.seenButton} onPress={() => addToSeen(staticMovie.Title, staticMovie.Director, staticMovie.Year, staticMovie.PosterPath, staticMovie.Description, staticMovie.Rating)}>
+                <TouchableOpacity style={styles.seenButton} onPress={() => addToSeen(staticMovie.Title, staticMovie.Director, staticMovie.Year, staticMovie.PosterPath, staticMovie.Description, staticMovie.Rating, staticMovie.tmdbID)}>
                   <Text style={styles.buttonText}>I've Seen This</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.watchlistButton} onPress={() => addToWatchlist(staticMovie.Title, staticMovie.Director, staticMovie.Year, staticMovie.PosterPath, staticMovie.Description, staticMovie.Rating)}>
+                <TouchableOpacity style={styles.watchlistButton} onPress={() => addToWatchlist(staticMovie.Title, staticMovie.Director, staticMovie.Year, staticMovie.PosterPath, staticMovie.Description, staticMovie.Rating, staticMovie.tmdbID)}>
                   <Text style={styles.buttonText}>Add to Watchlist</Text>
                 </TouchableOpacity>
               </View>
