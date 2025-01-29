@@ -53,6 +53,8 @@ const styles = StyleSheet.create({
       backgroundColor: "#6C100F",
       paddingLeft: 7,
       paddingRight: 7,
+      paddingTop: 2,
+      paddingBottom: 2,
       borderRadius: 50,
     },
     buttonText: {
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
     },
     btnIcon: {
       width: 70,
-      height: 40,
+      height: 37,
       marginTop: 5,
       marginBottom: 5,
       resizeMode: 'contain'
