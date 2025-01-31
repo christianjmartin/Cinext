@@ -4,9 +4,10 @@ import { supabase } from '../services/supabase';
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { fetchMovieCredits } from '../services/tmdbApi';
+import theme from '../services/theme';
 
 const SeenFilms = () => {
-    const { userId, setStaticMovie, updatePage } = useContext(PageContext);
+    const { userId, setStaticMovie, updatePage, colorMode } = useContext(PageContext);
     const [seenFilms, setSeenFilms] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
@@ -14,6 +15,7 @@ const SeenFilms = () => {
     const [selectedMovies, setSelectedMovies] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const [editModeAvailable, setEditModeAvailable] = useState(true);
+    const currentTheme = theme[colorMode];
 
     const getFilms = async () => {
         try {
@@ -36,6 +38,8 @@ const SeenFilms = () => {
 
     useEffect(() => {
         getFilms();
+        // console.log("color mode is", colorMode);
+        // console.log(currentTheme.background);
     }, []);
 
     const handleSearch = async (query) => {
@@ -104,7 +108,7 @@ const SeenFilms = () => {
 
 
     const renderFilm = ({ item }) => (
-        <TouchableOpacity style={styles.gridItem} onPress={async () => {
+        <TouchableOpacity style={[styles.gridItem, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border}]} onPress={async () => {
             // get the director (need for if searched for from component)
             if (!item.Director) {
                 try {
@@ -131,7 +135,7 @@ const SeenFilms = () => {
                     <Text style={styles.placeholderText}>No Image</Text>
                 </View>
             )}
-            <Text style={styles.title}>{item.Title}</Text>
+            <Text style={[styles.title, {color: currentTheme.textColor}]}>{item.Title}</Text>
 
             {editMode && ( // Show X button when editing
                 <TouchableOpacity 
@@ -148,15 +152,15 @@ const SeenFilms = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <View style={styles.headerContainer}>
-                    <Text style={styles.header}>Movies I've Seen</Text>
+                    <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]}>Movies I've Seen</Text>
                     {/* make the edit button appear only when the user is NOT searching for something */}
                     {editModeAvailable && 
-                    (<TouchableOpacity style={styles.editButton} onPress={handleEditMode}>
+                    (<TouchableOpacity style={[styles.editButton, {backgroundColor: currentTheme.editBtn}]} onPress={handleEditMode}>
                         <Text>{getEditButtonText()}</Text>
                     </TouchableOpacity>)}
                     </View>
                 <TextInput
-                    style={styles.searchBar}
+                    style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
                     placeholder="Search for movies to add..."
                     placeholderTextColor="#888"
                     value={searchQuery}
@@ -171,6 +175,7 @@ const SeenFilms = () => {
                     scrollEnabled={true}
                     columnWrapperStyle={styles.row}
                 />
+                <View style={styles.bottomSpacer}></View>
             </View>
         </TouchableWithoutFeedback>
     );
@@ -188,10 +193,11 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         marginBottom: 10,
+        // marginTop: -0.4,
     },
     header: {
         fontSize: 20,
-        backgroundColor: '#f5f5f5',
+        // backgroundColor: '#f5f5f5',
         fontWeight: 'bold',
         textAlign: 'center',
         padding: 7,
@@ -201,7 +207,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
         width: Dimensions.get('window').width * 0.95,
         height: 40,
-        marginBottom: 12,
+        marginBottom: 8,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 15,
@@ -215,12 +221,14 @@ const styles = StyleSheet.create({
     gridItem: {
         width: Dimensions.get('window').width / 3 - 15,
         margin: 3,
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
         borderRadius: 7,
-        overflow: 'hidden',
-        shadowColor: '#000',
+        borderWidth: 1,
+        // borderColor: "#FFFFFF",
+        // overflow: 'hidden',
+        // shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.15,
         shadowRadius: 5,
         elevation: 3,
         marginBottom: -3,
@@ -254,9 +262,9 @@ const styles = StyleSheet.create({
         right: 4,
         padding: 7,
         textAlign: 'center',
-        backgroundColor: '#d8d8d8',
-        borderWidth: 1,
-        borderColor: '#aeaeae',
+        // backgroundColor: '#d8d8d8',
+        borderWidth: 0.7,
+        borderColor: '#888888',
         borderRadius: 5,
     },
     deleteButton: {
@@ -274,6 +282,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FFFFFF',
         fontSize: 15,
+    },
+    bottomSpacer: {
+        marginTop: 15,
     }
 });
 

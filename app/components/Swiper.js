@@ -3,10 +3,12 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions
 import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
 import { supabase } from '../services/supabase'; 
+import theme from '../services/theme';
 
 const MovieList = () => {
-  const { movieList, updatePage, userId } = useContext(PageContext);
+  const { movieList, updatePage, userId, colorMode} = useContext(PageContext);
 
+  const currentTheme = theme[colorMode];
   const itemWidth = Dimensions.get('window').width * 0.8;
   const spacing = Dimensions.get('window').width * 0.1;
   const noRatingCase = 'N/A';
@@ -184,7 +186,7 @@ const MovieList = () => {
   if (movieList[0] === 'This is a special error case !@#$') {
     return (
       <>
-      <View style={styles.container}>
+      <View style={[styles.container, {backgroundColor: currentTheme.swiperBackground}]}>
       <TouchableOpacity
           style={styles.exitButton}
           onPress={() => updatePage("Recs")}
@@ -197,7 +199,7 @@ const MovieList = () => {
   }
   else {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {backgroundColor: currentTheme.swiperBackground}]}>
         {/* Exit Button */}
         <TouchableOpacity
           style={styles.exitButton}
@@ -217,29 +219,29 @@ const MovieList = () => {
           snapToInterval={itemWidth + spacing}
           snapToAlignment="start"
           renderItem={({ item }) => (
-            <View style={[styles.card, { width: itemWidth, marginRight: spacing }]}>
+            <View style={[styles.card, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border, width: itemWidth, marginRight: spacing }]}>
               {/* Scrollable Content */}
               <ScrollView style={styles.cardContent}>
-                <Text style={styles.cardTextTitle}>{item.Title}</Text>
+                <Text style={[styles.cardTextTitle, {color: currentTheme.movieTitle}]}>{item.Title}</Text>
                 {item.PosterPath && (
                   <Image
                     source={{ uri: `https://image.tmdb.org/t/p/w500${item.PosterPath}` }}
                     style={styles.poster}
                   />
                 )}
-                <Text style={styles.cardText}>
-                  Directed by: <Text style={[styles.bold, styles.cardText]}>{item.Director}</Text>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                  Directed by: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Director}</Text>
                 </Text>
-                <Text style={styles.cardText}>
-                  Released: <Text style={[styles.bold, styles.cardText]}>{item.Year}</Text>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                  Released: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Year}</Text>
                 </Text>
                 <View style={styles.ratingContainer}>
-                  <Text style={styles.cardText}>
-                    Rating: <Text style={[styles.bold, styles.cardText]}>{item.Rating ? item.Rating : noRatingCase}</Text>
+                  <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                    Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Rating ? item.Rating : noRatingCase}</Text>
                   </Text>
                   <Image style={styles.imdbLogo} source={imdb}></Image>
                 </View>
-                <Text style={styles.descriptionText}>{item.Description}</Text>
+                <Text style={[styles.descriptionText, {color: currentTheme.textColorSecondary, borderColor: currentTheme.border, backgroundColor: currentTheme.description}]}>{item.Description}</Text>
               </ScrollView>
           
               {/* Buttons at the Bottom */}
@@ -263,7 +265,7 @@ const MovieList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor: '#f5f5f5',
     marginTop: 40,
     width: Dimensions.get('window').width * 0.9,
   },
@@ -274,14 +276,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#ea2121",
     padding: 7,
     borderRadius: 5,
-    borderWidth: 2,
+    borderWidth: 0.7,
     borderColor: "#681212",
     zIndex: 10, 
     paddingHorizontal: 15,
   },
   card: {
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     shadowColor: '#000',
@@ -290,6 +292,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     marginTop: 50,
+    borderWidth: 2,
   },
   cardText: {
     fontSize: 16,
@@ -300,11 +303,12 @@ const styles = StyleSheet.create({
     fontSize: 15, 
     marginVertical: 10,
     textAlign: 'left',
-    padding: 5,
+    padding: 7,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#d5d5d5",
+    // borderColor: "#d5d5d5",
     borderRadius: 5,
-    backgroundColor: '#f0f0f0',
+    // backgroundColor: '#f0f0f0',
   },
   bold: {
     fontWeight: 'bold',

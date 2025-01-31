@@ -6,7 +6,7 @@ const TMDB_API_KEY = CONFIG.TMDB_API_KEY;
 
 export const fetchMovieDetails = async (query) => {
   const [movieTitle, year] = query.split('^').map(part => part.trim()); 
-  console.log("Year:", year);
+  // console.log("Year:", year);
 
   try {
     // Search for the movie by title and year
@@ -37,7 +37,7 @@ export const fetchMovieDetails = async (query) => {
       .filter(person => person.job === 'Director')
       .map(director => director.name); 
 
-    console.log("Directors:", directors);
+    // console.log("Directors:", directors);
 
     return {
       tmdbID: movie.id || null,

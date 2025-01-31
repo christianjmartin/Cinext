@@ -10,12 +10,15 @@ import MovieSwiper from './Swiper';
 import SeenFilms from './SeenFilms';
 import StaticMovie from './StaticMovie';
 import Settings from './Settings';
+import theme from '../services/theme';
 
 export default function Page() {
-  const { page, updatePage } = useContext(PageContext);
+  const { page, updatePage, colorMode } = useContext(PageContext);
+  const currentTheme = theme[colorMode];
+  
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
       <View style={styles.header}>
         <Header />
       </View>
@@ -42,7 +45,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
-    backgroundColor: '#F4EDEC',
+    // backgroundColor: '#F4EDEC',
   },
   header: {
     position: 'absolute',

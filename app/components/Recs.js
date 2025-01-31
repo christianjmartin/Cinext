@@ -3,73 +3,143 @@ import PageContext from '../context/PageContext';
 import { View, Text, StyleSheet, TextInput, FlatList, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';  
 import { fetchLLMResponse } from '../services/geminiapi';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
+import { supabase } from '../services/supabase.js';
 import Swiper from 'react-native-swiper';
+import theme from '../services/theme.js';
 
 export default function Recs() {
-  const { page, updatePage, updateMovieList, userId} = useContext(PageContext);  
+  const { page, updatePage, updateMovieList, userId, colorMode} = useContext(PageContext);  
   const [text, setText] = useState('');  
-  // const [response, setResponse] = useState('');  
-  // const [movieList, setMovieList] = useState([]);  
   const [loading, setLoading] = useState(false);  
+  const currentTheme = theme[colorMode];
 
   const handleSubmit = async () => {
-    console.log('Submitted:', text);
+    console.log(`Fetching movie recommendations...`);
     setLoading(true);
-    // setResponse('');
-    // setMovieList([]); // Clear previous movie list
-  
-    const prePromptText =
-      "Provide a list of 10 movies, in the form 1. title ^ year 2. title ^ year... (DO NOT provide any other information and do not deviate from the format I specified, and if there is an error or unfufillment case of any kind please start the response with error777 so I can parse) from the following sentiment: ";
-    const finalPrompt = prePromptText + text;
-  
+
     try {
-      // Fetch the response from the LLM
-      const result = await fetchLLMResponse(finalPrompt);
-      const responseText = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
-      console.log(responseText);
-      // console.log(result);
-  
-      // Extract movie list from the response
-      const movies = extractMovieList(responseText);
-  
-      if (movies.length === 0) {
-        // setResponse('Sorry, this request cannot be fulfilled, please try another prompt!');
-        updateMovieList(['This is a special error case !@#$']);
-      } else {
-        // setResponse(responseText);
-  
-        // Fetch detailed data for each movie from the backend
-        const detailedMovies = [];
-        for (const movie of movies) {
-          try {
-            const detailedMovie = await fetchMovieDetails(movie.trim());
-            if (detailedMovie) {
-              detailedMovies.push(detailedMovie);
-            } else {
-              detailedMovies.push({ Title: movie.trim(), error: true }); // Add default for missing data
-            }
-          } catch (error) {
-            console.error(`Error fetching details for ${movie}:`, error);
-            detailedMovies.push({ Title: movie.trim(), error: true }); // Add default for errors
-          }
+        // fetch everythign this user has already seen
+        const { data, error } = await supabase
+            .from('SeenFilms')
+            .select('tmdbID')
+            .eq('UserID', userId);
+
+        const { data: watchlistData, error: watchlistError } = await supabase
+            .from('Watchlist')
+            .select('tmdbID')
+            .eq('UserID', userId);
+        
+        if (error || watchlistError) {
+            console.error('Error fetching movies:', error || watchlistError);
+            return;
         }
-  
-        // Update movieList with detailed movie data
-        console.log(detailedMovies[0]);
-        updateMovieList(detailedMovies);
-      }
+
+        // get the tmdbIDs of the movies the user has already seen or in watchlist (GENERAL / ALL)
+        const alreadyInListsMovieIDs = new Set([...data.map(m => m.tmdbID), ...watchlistData.map(m => m.tmdbID)]);
+        console.log(alreadyInListsMovieIDs);
+
+        // get 10 movies based on the sentiment
+        let firstPrompt = `Provide a list of 50 movies, in the form 1. title ^ year 2. title ^ year...
+        (DO NOT provide any other information and do not deviate from the format I specified. 
+        If there is an error or unfufillment case, start the response with error777.)
+        from the following sentiment: ${text}`;
+
+        const result1 = await fetchLLMResponse(firstPrompt);
+        const responseText1 = result1?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
+
+        // raw response from the api
+        console.log("The user said: ", text);
+        console.log(responseText1);
+
+        let movies1 = extractMovieList(responseText1);
+        if (movies1.length === 0) {
+            updateMovieList(['This is a special error case !@#$']);
+            return;
+        }
+
+        // extract the information from the TMDB API for the UI (detailedMovies) object
+        let detailedMovies = [];
+        for (const movie of movies1) {
+            try {
+                const detailedMovie = await fetchMovieDetails(movie.trim());
+                detailedMovies.push(detailedMovie || { Title: movie.trim(), error: true });
+            } catch (error) {
+                console.error(`Error fetching details for ${movie}:`, error);
+                detailedMovies.push({ Title: movie.trim(), error: true });
+            }
+        }
+
+        // The movies the user has NOT seen yet KEEP EM!!!
+        // unique movies contains the whole object of each 
+        let uniqueMovies = detailedMovies.filter(movie => !alreadyInListsMovieIDs.has(movie.tmdbID));
+
+        // Get list of excluded movies (movies the user HAS seen from the first prompt)
+        let excludeList = new Set(detailedMovies.filter(movie => alreadyInListsMovieIDs.has(movie.tmdbID)).map(m => m.Title));
+
+        let excludeListLength = excludeList.size;
+        console.log("The number of films user has seen from the list:", excludeListLength);
+        console.log("The number of films displayed:", uniqueMovies.length);
+
+        // if there arent enough unqiue movies after filtering, try again
+        if (uniqueMovies.length < 5) { 
+            console.log("Too many seen movies. Fetching another batch...");
+
+            // prompt AI API again, explicity telling to not include movies the user has seen 
+            let finalPrompt = `Provide a list of 10 movies, in the form 1. title ^ year 2. title ^ year...
+            DO NOT include these movies: ${Array.from(excludeList).join(', ')}
+            (DO NOT provide any other information and do not deviate from the format I specified.)... 
+            choose from the following sentiment and try to think outside the box: ${text}`;
+
+            const result2 = await fetchLLMResponse(finalPrompt);
+            const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
+
+            // raw second response
+            console.log(responseText2);
+
+            let movies2 = extractMovieList(responseText2);
+            if (movies2.length > 0) {
+                let detailedMovies2 = [];
+                for (const movie of movies2) {
+                    try {
+                        const detailedMovie = await fetchMovieDetails(movie.trim());
+                        detailedMovies2.push(detailedMovie || { Title: movie.trim(), error: true });
+                    } catch (error) {
+                        console.error(`Error fetching details for ${movie}:`, error);
+                        detailedMovies2.push({ Title: movie.trim(), error: true });
+                    }
+                }
+
+                // merge old list, containing fully unique, with new, containing a mixed bag
+
+                // IF WANT FULLY UNIQUE, UNCOMMENT BELOW --> however sometimes the user will get literally nothing 
+                // const newUniqueMovies = detailedMovies2.filter(movie => !alreadyInListsMovieIDs.has(movie.tmdbID));
+                uniqueMovies = [...uniqueMovies, ...detailedMovies2];
+            }
+        }
+    
+        //CONSDIER USING THIS BECAUSE COULD MAKE IT HARDER FOR USERS TO SPAM THEIR LISTS, THEN USE SAME PROMPT WITH MORE UNIQUE SUGGESTIONS
+        if (uniqueMovies.length > 30) {
+          let cutoffAmount = uniqueMovies.length % 30;
+          uniqueMovies = uniqueMovies.slice(0, -cutoffAmount);
+          console.log("The number of films actually displayed (it was over 30):", uniqueMovies.length);
+        }
+       
+
+        // update the movieList for context
+        updateMovieList(uniqueMovies);
+
     } catch (error) {
-      console.error('Error:', error);
-      // setResponse('Error fetching response.');
+        console.error('Error:', error);
     } finally {
-      console.log("FINALLY");
-      updatePage("Show Swiper");
-      setLoading(false);
+        console.log("FINALLY");
+        updatePage("Show Swiper");
+        setLoading(false);
+        setText('');
+        Keyboard.dismiss();
     }
-  
-    setText('');
-    Keyboard.dismiss();
   };
+
+
 
   const extractMovieList = (text) => {
     // const listPattern = /(\d{1,2})\.\s+([^\n]+)/g;  
@@ -93,56 +163,20 @@ export default function Recs() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
-          <Text style={styles.subtitle}>Enter what kind of movie you want to see next, then let us do the rest</Text>
+          <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>
           {/* <Text>Hi - {userId}</Text> */}
 
           <TextInput
-            style={styles.textInputBox}
+            style={[styles.textInputBox, {backgroundColor: currentTheme.searchBar}]}
             placeholder="Create a prompt..."
+            placeholderTextColor="#888"
             value={text}
             onChangeText={setText}
           />
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loading}>
+          <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.border2}]} onPress={handleSubmit} disabled={loading}>
             <Text style={styles.submitButtonText}>{loading ? 'Submitting...' : 'Submit'}</Text>
           </TouchableOpacity>
-
-          {/* Display the Gemini response */}
-          {/* {response && (
-            <View style={styles.responseContainer}>
-              <Text style={styles.responseText}>{response}</Text>
-            </View>
-          )} */}
-
-          {/* If movieList has items, render the swiper component */}
-          {/* {movieList.length > 0 && (
-            <FlatList
-              data={movieList}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={styles.responseContainer}
-              renderItem={({ item }) => (
-                <View style={styles.card}>
-                  {item.error ? (
-                    <Text style={styles.cardText}>Error: {item.error}</Text>
-                  ) : (
-                    <>
-                      <Text style={styles.cardText}>Title: {item.title}</Text>
-                      <Text style={styles.cardText}>Director: {item.director}</Text>
-                      {item.posterPath && (
-                        <Image
-                          source={{ uri: `https://image.tmdb.org/t/p/w500${item.posterPath}` }}
-                          style={styles.poster}
-                        />
-                      )}
-                    </>
-                  )}
-                </View>
-              )}
-            />
-          )} */}
-          
-
-          
 
         </View>
       </TouchableWithoutFeedback>
@@ -172,19 +206,20 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     width: 300,
-    backgroundColor: '#F5F5F5',
+    // backgroundColor: '#F5F5F5',
     borderRadius: 15,
     paddingLeft: 8,
     marginBottom: 20,
   },
   submitButton: {
-    backgroundColor: '#6C100F',
+    backgroundColor: '#A44443',
     padding: 12,
     width: '80%',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
     borderRadius: 7,
+    borderWidth: 1,
   },
   submitButtonText: {
     fontSize: 18,

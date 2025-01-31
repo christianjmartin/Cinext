@@ -9,6 +9,7 @@ export const PageProvider = ({ children }) => {
   const [movieList, setList] = useState([]);
   const [userId, setUserId] = useState(null);
   const [staticMovie, setStaticMovie] = useState(null);
+  const [colorMode, setColorMode] = useState("light");
 
   // Initialize userId when the context is created
   useEffect(() => {
@@ -31,8 +32,16 @@ export const PageProvider = ({ children }) => {
     setList(newList);
   };
 
+  const updateColorMode = () => {
+    // prob gonna want to update this for the user so it holds, like storage or supabase
+    if (colorMode === "light") {
+      setColorMode("dark");
+    }
+    else { setColorMode("light") };
+  }
+
   return (
-    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie }}>
+    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode }}>
       {children}
     </PageContext.Provider>
   );

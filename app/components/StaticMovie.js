@@ -4,9 +4,13 @@ import { supabase } from '../services/supabase';
 import imdb from '../assets/IMDB.svg.png';
 import PageContext from '../context/PageContext';
 import arrow from '../assets/arrow.webp';
+import arrow2 from '../assets/arrow2.png';
+import theme from '../services/theme';
+
 
 const StaticMovie = () => {
-    const { staticMovie, previousPage, updatePage, userId } = useContext(PageContext);
+    const { staticMovie, previousPage, updatePage, userId, colorMode} = useContext(PageContext);
+    const currentTheme = theme[colorMode];
 
     let noRating = 'N/A';
 
@@ -199,31 +203,32 @@ const StaticMovie = () => {
                 style={styles.exitButton}
                 onPress={() => updatePage(previousPage)}
                 >
-                <Image source={arrow} style={styles.backBtn}></Image>
+                {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
+                : <Image source={arrow} style={styles.backBtn}></Image>}
             </TouchableOpacity>
-            <View style={styles.card}>
+            <View style={[styles.card, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border}]}>
               {/* Scrollable Content */}
               <ScrollView style={styles.cardContent}>
-                <Text style={styles.cardTextTitle}>{staticMovie.Title}</Text>
+                <Text style={[styles.cardTextTitle, {color: currentTheme.movieTitle}]}>{staticMovie.Title}</Text>
                 {staticMovie.PosterPath && (
                   <Image
                     source={{ uri: `https://image.tmdb.org/t/p/w500${staticMovie.PosterPath}` }}
                     style={styles.poster}
                   />
                 )}
-                <Text style={styles.cardText}>
-                  Directed by: <Text style={[styles.bold, styles.cardText]}>{staticMovie.Director}</Text>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                  Directed by: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{staticMovie.Director}</Text>
                 </Text>
-                <Text style={styles.cardText}>
-                  Released: <Text style={[styles.bold, styles.cardText]}>{staticMovie.Year}</Text>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                  Released: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{staticMovie.Year}</Text>
                 </Text>
                 <View style={styles.ratingContainer}>
-                  <Text style={styles.cardText}>
-                    Rating: <Text style={[styles.bold, styles.cardText]}>{staticMovie.Rating ? staticMovie.Rating : noRating}</Text>
+                  <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                    Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{staticMovie.Rating ? staticMovie.Rating : noRating}</Text>
                   </Text>
                   <Image style={styles.imdbLogo} source={imdb}></Image>
                 </View>
-                <Text style={styles.descriptionText}>{staticMovie.Description}</Text>
+                <Text style={[styles.descriptionText, {color: currentTheme.textColorSecondary, borderColor: currentTheme.border, backgroundColor: currentTheme.description}]}>{staticMovie.Description}</Text>
               </ScrollView>
           
               {/* Buttons at the Bottom */}
@@ -242,7 +247,9 @@ const StaticMovie = () => {
 }
 
 const styles = StyleSheet.create({
-    // container: {},
+    container: {
+      marginBottom: 35,
+    },
     exitButton: {
       position: 'absolute',
       top: 52,
@@ -250,15 +257,15 @@ const styles = StyleSheet.create({
       zIndex: 10, 
     },
     backBtn: {
-        width: 40,
-        height: 40,
-        resizeMode: 'contain',
-        opacity: 0.35,
-        borderRadius: 20,
+      width: 40,
+      height: 40,
+      resizeMode: 'contain',
+      opacity: 0.42,
+      borderRadius: 20,
     },
     card: {
       justifyContent: 'center',
-      backgroundColor: '#fff',
+      // backgroundColor: '#fff',
       borderRadius: 10,
       padding: 10,
       shadowColor: '#000',
@@ -267,6 +274,8 @@ const styles = StyleSheet.create({
       shadowRadius: 3.84,
       elevation: 5,
       marginTop: 50,
+      borderWidth: 2,
+      // marginBottom: 50,
     },
     cardText: {
       fontSize: 16,
@@ -277,11 +286,12 @@ const styles = StyleSheet.create({
       fontSize: 15, 
       marginVertical: 10,
       textAlign: 'left',
-      padding: 5,
+      padding: 7,
+      paddingHorizontal: 10,
       borderWidth: 1,
-      borderColor: "#d5d5d5",
+      // borderColor: "#d5d5d5",
       borderRadius: 5,
-      backgroundColor: '#f0f0f0',
+      // backgroundColor: '#f0f0f0',
     },
     bold: {
       fontWeight: 'bold',
@@ -291,7 +301,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginVertical: 5,
       textAlign: 'center',
-      color: '#580000',
+      // color: '#580000',
       paddingHorizontal: 20,
     },
     poster: {
@@ -304,7 +314,8 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       justifyContent: 'center',
       padding: 15,
-      paddingBottom: 35,
+      // paddingBottom: 35,
+      paddingBottom: 5,
     },
     seenButton: {
       backgroundColor: "#8EE357",

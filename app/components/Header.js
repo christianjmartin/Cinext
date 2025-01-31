@@ -5,15 +5,17 @@ import PageContext from '../context/PageContext';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
 
 export default function Header() {
-    const {updatePage} = useContext(PageContext);
+    const {updatePage, page} = useContext(PageContext);
     return (
         <View style={styles.headerContainer}>
             <Image source={camera} style={styles.image} /> 
             <Text style={styles.title}>MovieNext</Text>
             <View style={styles.spacer}></View>
+            {page != "Show Swiper" ? 
             <TouchableOpacity onPress={() => updatePage("Settings")}>
                 <Image source={settings} style={[styles.image, styles.settings]}></Image>
             </TouchableOpacity>
+            : null }
         </View>
     );
 };
