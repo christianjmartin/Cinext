@@ -135,7 +135,7 @@ const SeenFilms = () => {
                     <Text style={styles.placeholderText}>No Image</Text>
                 </View>
             )}
-            <Text style={[styles.title, {color: currentTheme.textColor}]}>{item.Title}</Text>
+            <Text style={[styles.title, {color: currentTheme.textColor}]}>{item.Title.length > 25 ? item.Title.slice(0, 25) + '...' : item.Title}</Text>
 
             {editMode && ( // Show X button when editing
                 <TouchableOpacity 

@@ -24,7 +24,7 @@ const theme = {
         movieTitle: "#f4edec",
         searchBar: "#ededed",
         headerColor: "#000000",
-        shadowColor: "#ffffff",
+        shadowColor: "#000000",
         gridItemColor: "#444444", // general cards
         swiperBackground: '#171717',
         editBtn: "#888888",
