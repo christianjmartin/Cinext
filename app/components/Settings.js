@@ -1,7 +1,9 @@
 import React, { useContext } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Dimensions } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import PageContext from '../context/PageContext';
+import vader from '../assets/vader.png';
+import yoda from '../assets/yoda.png';
 
 const Settings = () => {
     const { colorMode, updateColorMode } = useContext(PageContext);
@@ -19,7 +21,7 @@ const Settings = () => {
     return (
         <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
             <Animated.View style={[styles.toggleCircle, animatedStyle]}>
-                <Text style={styles.emoji}>{colorMode === 'dark' ? '🌙' : '🌞'}</Text>
+                <Text style={styles.emoji}>{colorMode === 'dark' ? <Image source={vader} style={styles.colorIcon}></Image>: <Image source={yoda} style={styles.colorIcon}></Image>}</Text>
             </Animated.View>
         </TouchableOpacity>
     );
@@ -48,6 +50,11 @@ const styles = StyleSheet.create({
     emoji: {
         fontSize: 40, // Adjust emoji size
     },
+    colorIcon: {
+        height: 70,
+        width: 70,
+        resizeMode: 'contain',
+    }
 });
 
 export default Settings;

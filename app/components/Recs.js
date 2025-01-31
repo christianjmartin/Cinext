@@ -39,10 +39,14 @@ export default function Recs() {
         console.log(alreadyInListsMovieIDs);
 
         // get 10 movies based on the sentiment
-        let firstPrompt = `Provide a list of 50 movies, in the form 1. title ^ year 2. title ^ year...
-        (DO NOT provide any other information and do not deviate from the format I specified. 
-        If there is an error or unfufillment case, start the response with error777.)
-        from the following sentiment: ${text}`;
+        let firstPrompt = `Provide a list of 40 movies in this exact format:
+        1. title ^ year
+        2. title ^ year
+        ...
+        (Strictly follow this format—no extra information, no deviations.)
+        Ensure there are no repeats.
+        If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
+        Choose from the following sentiment: ${text}`;
 
         const result1 = await fetchLLMResponse(firstPrompt);
         const responseText1 = result1?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
@@ -85,10 +89,15 @@ export default function Recs() {
             console.log("Too many seen movies. Fetching another batch...");
 
             // prompt AI API again, explicity telling to not include movies the user has seen 
-            let finalPrompt = `Provide a list of 10 movies, in the form 1. title ^ year 2. title ^ year...
-            DO NOT include these movies: ${Array.from(excludeList).join(', ')}
-            (DO NOT provide any other information and do not deviate from the format I specified.)... 
-            choose from the following sentiment and try to think outside the box: ${text}`;
+            let finalPrompt = `Provide a list of 20 movies in this exact format:
+            1. title ^ year
+            2. title ^ year
+            ...
+            (Strictly follow this format—no extra information, no deviations.)
+            DO NOT include these movies: ${Array.from(excludeList).join(', ')}. 
+            Ensure there are no repeats.
+            If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
+            Choose from the following sentiment and think outside the box: ${text}`;
 
             const result2 = await fetchLLMResponse(finalPrompt);
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
@@ -108,12 +117,37 @@ export default function Recs() {
                         detailedMovies2.push({ Title: movie.trim(), error: true });
                     }
                 }
+                const newUniqueMovies = [];
+                let counter = 0;
+                let skipLimitReached = false;
+
+                for (const movie of detailedMovies2) {
+                    if (!alreadyInListsMovieIDs.has(movie.tmdbID)) {
+                        //Only add unique movies while skipping first 10 seen movies
+                        if (!skipLimitReached) {
+                            newUniqueMovies.push(movie);
+                        }
+                    } else {
+                        //first 10 seen / watchlist movies
+                        if (counter < 10) {
+                            counter++;
+                            continue;
+                        }
+                        // after skipping first 10 seen, just push everything
+                        skipLimitReached = true;
+                    }
+
+                    // once skipping is done, push everything
+                    if (skipLimitReached) {
+                        newUniqueMovies.push(movie);
+                    }
+                }
 
                 // merge old list, containing fully unique, with new, containing a mixed bag
 
                 // IF WANT FULLY UNIQUE, UNCOMMENT BELOW --> however sometimes the user will get literally nothing 
                 // const newUniqueMovies = detailedMovies2.filter(movie => !alreadyInListsMovieIDs.has(movie.tmdbID));
-                uniqueMovies = [...uniqueMovies, ...detailedMovies2];
+                uniqueMovies = [...uniqueMovies, ...newUniqueMovies];
             }
         }
     
