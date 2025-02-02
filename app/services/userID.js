@@ -7,7 +7,7 @@ export const getOrCreateUserId = async () => {
 
     if (!userId) {
       // Generates new user ID if none exist
-      userId = uuid.v4(); // SECURE THIS 
+      userId = uuid.v4(); 
       await AsyncStorage.setItem('userId', userId);
       console.log('Generated new User ID:', userId);
     } else {

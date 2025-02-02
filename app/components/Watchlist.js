@@ -15,9 +15,9 @@ const Watchlist = () => {
     const [selectedMovies, setSelectedMovies] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const [editModeAvailable, setEditModeAvailable] = useState(true);
-
     const currentTheme = theme[colorMode];
 
+    // gets all of the films the user has put in their watchlist
     const getFilms = async () => {
         try {
             const { data, error } = await supabase
@@ -37,12 +37,14 @@ const Watchlist = () => {
         }
     };
 
+    // call "getFilms" on mount
     useEffect(() => {
         getFilms();
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
     }, []);
 
+    // if searching, update the UI to display search 
     const handleSearch = async (query) => {
         setEditMode(false);
         setEditModeAvailable(false);
@@ -56,7 +58,8 @@ const Watchlist = () => {
         setSearching(true);
 
         try {
-            const results = await searchMovies(query); // Fetch from TMDB
+             // Fetch from TMDB what the user puts in the search box 
+            const results = await searchMovies(query);
             setSearchResults(results);
         } catch (error) {
             console.error('Error fetching search results:', error);
@@ -64,13 +67,18 @@ const Watchlist = () => {
         }
     };
 
+    // edit mode where the user can choose which movies they want to delete 
+    // if selectedMovies > 0 and this function was called, that means there are movies to delete
     const handleEditMode = async () => {
         if (editMode) {
             setEditMode(false);
-            console.log(selectedMovies);
+            // console.log(selectedMovies);
+
+            // selectedMovies holding the TMDB ID's of films the user has selected
             if (selectedMovies.length > 0) {
                 for (const tmdbID of selectedMovies) {
                     try {
+                        // delete the films they have selected
                         const { data, error } = await supabase
                             .from('Watchlist')
                             .delete()
@@ -80,12 +88,13 @@ const Watchlist = () => {
                         if (error) {
                             console.error('Error deleting from Watchlist:', error.message);
                         } else {
-                            console.log('Deleted from Watchlist:', data);
+                            // console.log('Deleted from Watchlist:', data);
                         }
                     } catch (error) {
                         console.error('Unexpected error:', error); 
                     }
                 }
+                // call getFilms again to update the UI as they delete films
                 getFilms();
             }
             setSelectedMovies([]);
@@ -95,6 +104,7 @@ const Watchlist = () => {
         }
     }
 
+    // button will be -> "edit", "cancel" OR "delete(COUNT)"
     const getEditButtonText = () => {
         if (!editMode) return "Edit"; // Not edit mode
         return selectedMovies.length > 0 ? `Delete (${selectedMovies.length})` : "Cancel"; // In edit mode
@@ -107,10 +117,10 @@ const Watchlist = () => {
         );
     }
 
-
+    // render a film card
     const renderFilm = ({ item }) => (
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border}]} onPress={async () => {
-            // get the director (need for if searched for from component)
+            // make sure it holds director so when user clicks it to go to static movie page, necessary info is there
             if (!item.Director) {
                 try {
                     if (item.tmdbID) {
@@ -124,8 +134,8 @@ const Watchlist = () => {
             }
             setStaticMovie(item);
             updatePage("Static Movie");
-        }}>
-            
+        }}>  
+            {/* handle a case where a movie doesnt have a poster gracefully  */}
             {item.PosterPath ? (
                 <Image 
                     source={{ uri: `https://image.tmdb.org/t/p/w500${item.PosterPath}` }} 
@@ -150,6 +160,7 @@ const Watchlist = () => {
     );
 
     return (
+        // Watchlist screen
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <View style={styles.headerContainer}>
@@ -194,11 +205,9 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         marginBottom: 10,
-        // marginTop: -0.4,
     },
     header: {
         fontSize: 20,
-        // backgroundColor: '#f5f5f5',
         fontWeight: 'bold',
         textAlign: 'center',
         padding: 7,
@@ -222,12 +231,8 @@ const styles = StyleSheet.create({
     gridItem: {
         width: Dimensions.get('window').width / 3 - 15,
         margin: 3,
-        // backgroundColor: '#fff',
         borderRadius: 7,
         borderWidth: 1,
-        // borderColor: "#FFFFFF",
-        // overflow: 'hidden',
-        // shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
         shadowRadius: 5,
@@ -263,7 +268,6 @@ const styles = StyleSheet.create({
         right: 4,
         padding: 7,
         textAlign: 'center',
-        // backgroundColor: '#d8d8d8',
         borderWidth: 0.7,
         borderColor: '#888888',
         borderRadius: 5,

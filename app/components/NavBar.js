@@ -5,8 +5,9 @@ import bulb from '../assets/lightbulb.png';
 import eyeball from '../assets/eyeball.png';
 import PageContext from '../context/PageContext';
 
+// navigation bar at the bottom, main pages of the app 
 export default function NavBar() {
-    const {page, updatePage} = useContext(PageContext);
+    const {updatePage} = useContext(PageContext);
     
     return (
         <View>
@@ -56,11 +57,6 @@ const styles = StyleSheet.create({
       paddingTop: 2,
       paddingBottom: 2,
       borderRadius: 50,
-    },
-    buttonText: {
-      fontSize: 15,
-      color: "#fff",
-      fontWeight: 'bold',
     },
     btnIcon: {
       width: 70,

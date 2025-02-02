@@ -9,6 +9,7 @@ const Settings = () => {
     const { colorMode, updateColorMode } = useContext(PageContext);
     const togglePosition = useSharedValue(colorMode === 'dark' ? 105 : 5);
 
+    // toggles between light and dark mode, calling updateColorMode from context 
     const toggleTheme = () => {
         togglePosition.value = withTiming(colorMode === 'dark' ? 5 : 105, { duration: 250 });
         updateColorMode(); 
@@ -29,10 +30,10 @@ const Settings = () => {
 
 const styles = StyleSheet.create({
     toggleContainer: {
-        width: 200, // Width of toggle
+        width: 200,
         height: 100,
-        backgroundColor: '#ccc', // Light grey background
-        borderRadius: 50, // Rounded edges
+        backgroundColor: '#ccc',
+        borderRadius: 50,
         flexDirection: 'row',
         alignItems: 'center',
         padding: 2,
@@ -41,14 +42,14 @@ const styles = StyleSheet.create({
     toggleCircle: {
         width: 90,
         height: 90,
-        borderRadius: 45, // Makes it circular
-        backgroundColor: 'white', // Circle color
+        borderRadius: 45,
+        backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
     },
     emoji: {
-        fontSize: 40, // Adjust emoji size
+        fontSize: 40,
     },
     colorIcon: {
         height: 70,
