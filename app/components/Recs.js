@@ -57,6 +57,8 @@ export default function Recs() {
         (Strictly follow this format—no extra information, no deviations.)
         Ensure there are no repeats.
         If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
+        Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot. 
+        Remember absolutely no repeating movies.
         If there are not 40 movies available given the sentiment, give as many as you can but no repeats.
         Choose from the following sentiment: ${text}`;
 
@@ -112,7 +114,9 @@ export default function Recs() {
             DO NOT include these movies: ${Array.from(excludeList).join(', ')}.
             If that list included everything possible, don't give me anything, that is okay. Just fill in the blanks if there are any. the 20 movies is just the max, it could be 0, 1, 5 or 20...
             Ensure there are no repeats.
-            If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.`;
+            If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
+            Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot.
+            Remember absolutely no repeating movies.`;
 
             const result2 = await fetchLLMResponse(finalPrompt);
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';

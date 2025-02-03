@@ -4,6 +4,9 @@ import {CONFIG} from '../../config.js';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3'; 
 const TMDB_API_KEY = CONFIG.TMDB_API_KEY; 
 
+
+// searches for a movie by the title and year from TMDB API 
+// returns the FIRST movie in the results 
 export const fetchMovieDetails = async (query) => {
   const [movieTitle, year] = query.split('^').map(part => part.trim()); 
   // console.log("Year:", year);
@@ -56,8 +59,8 @@ export const fetchMovieDetails = async (query) => {
 
 
 
-
-
+// searches for a movie via the user's query 
+// returns all movies in the result
 export const searchMovies = async (query) => {
   try {
     // Call TMDB's search API
@@ -91,9 +94,7 @@ export const searchMovies = async (query) => {
 
 
 
-
-
-
+// gets the directors, given a tmdbID
 export const fetchMovieCredits = async (tmdbID) => {
   console.log("FANUM TAXXXX")
   try {

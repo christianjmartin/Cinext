@@ -3,6 +3,7 @@ import {CONFIG} from '../../config.js';
 
 const API_KEY = CONFIG.GEMINI_API_KEY;
 
+// fetches the response from the gemini API, passing in a full prompt for getting film reccomendations
 export const fetchLLMResponse = async (text) => {
   try {
     const response = await axios.post(

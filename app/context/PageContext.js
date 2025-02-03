@@ -11,7 +11,7 @@ export const PageProvider = ({ children }) => {
   const [staticMovie, setStaticMovie] = useState(null);
   const [colorMode, setColorMode] = useState("light");
 
-  // Initialize userId when the context is created
+  // initialize userId when the context is created
   useEffect(() => {
     const initializeUserId = async () => {
       const id = await getOrCreateUserId();
@@ -21,6 +21,10 @@ export const PageProvider = ({ children }) => {
     initializeUserId();
   }, []);
 
+
+
+  // this function handles updating components for page views
+  // sets previous page for easy back button logic 
   const updatePage = (newPage) => {
     console.log("page updating to", newPage);
     setPreviousPage(page);
@@ -32,6 +36,7 @@ export const PageProvider = ({ children }) => {
     setList(newList);
   };
 
+  // updates the colorMode variable for toggling dark vs light mode 
   const updateColorMode = () => {
     // prob gonna want to update this for the user so it holds, like storage or supabase
     if (colorMode === "light") {
