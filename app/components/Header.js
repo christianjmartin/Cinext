@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import camera4 from '../assets/camera4.png';
+import camera5 from '../assets/camera5.png';
 import settings from '../assets/settings-2.png';
 import PageContext from '../context/PageContext';  
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
@@ -10,6 +11,7 @@ export default function Header() {
     return (
         <View style={styles.headerContainer}>
             <Image source={camera4} style={styles.logo} /> 
+            <View style={styles.invisiblePadding}></View>
             {/* <Text style={styles.title}>MovieNext</Text> */}
             <View style={styles.spacer}></View>
 
@@ -36,6 +38,9 @@ const styles = StyleSheet.create ({
         fontWeight: 'bold',
         color: '#FFFFFF',
     },
+    invisiblePadding: {
+        padding: 20,
+    },
     image: {
         width: 40,
         height: 40,
@@ -43,7 +48,7 @@ const styles = StyleSheet.create ({
     logo: {
         width: 40,
         height: '100%',
-        marginLeft: 10,
+        marginLeft: 8,
     },
     settings: {
         marginRight: 5,

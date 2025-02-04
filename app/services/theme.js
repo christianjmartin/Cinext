@@ -10,6 +10,7 @@ const theme = {
         searchBar: "#ffffff",
         headerColor: "#f5f5f5",
         shadowColor: "#000000",
+        shadowColor: "#000000",
         gridItemColor: "#FFFFFF", // general cards 
         swiperBackground: '#f5f5f5',
         editBtn: "#d8d8d8",
@@ -25,6 +26,7 @@ const theme = {
         searchBar: "#ededed",
         headerColor: "#000000",
         shadowColor: "#000000",
+        shadowColor2: "#999999",
         gridItemColor: "#444444", // general cards
         swiperBackground: '#171717',
         editBtn: "#888888",

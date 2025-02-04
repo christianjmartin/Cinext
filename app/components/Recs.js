@@ -107,7 +107,6 @@ export default function Recs() {
       Alert.alert("cmon crode", "you done typed way too much lmao");
       return;
     }
-    console.log("Input length:", text.length);
     console.log(`Fetching movie recommendations...`);
     setLoading(true);
 
@@ -296,12 +295,12 @@ export default function Recs() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.inner}>
-          {isTyping ? <View style={styles.invisiblePadding}></View> : <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>}
-
+        <View style={[styles.inner, {backgroundColor: currentTheme.background, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
+          {/* {isTyping ? <View style={styles.invisiblePadding}></View> : <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>} */}
+          <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>
           {/* <Text>Hi - {userId}</Text> */}
 
           <TextInput
@@ -321,15 +320,15 @@ export default function Recs() {
 
         </View>
       </TouchableWithoutFeedback>
-      <View style={styles.box}>
-        <Text style={{color: '#FFF'}}>Movie of the day</Text>
-        <Text style={{color: '#FFF'}}>title: {movieOTD.Title}</Text>
-        <Text style={{color: '#FFFFFF'}}>directed by: {movieOTD.Director}</Text>
-        <Text style={{color: '#FFFFFF'}}>poster url: {movieOTD.PosterPath}</Text>
-        <Text style={{color: '#FFFFFF'}}>rating: {movieOTD.Rating}</Text>
-        <Text style={{color: '#FFFFFF'}}>year: {movieOTD.Year}</Text>
-        <Text style={{color: '#FFFFFF'}}>tmdbID: {movieOTD.tmdbID}</Text>
-        <Text style={{color: '#FFFFFF'}}>todays date: {movieOTD.Date}</Text>
+      <View style={[styles.box, {backgroundColor: currentTheme.background, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
+        <Text style={{color: currentTheme.textColorSecondary}}>Movie of the day</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>title: {movieOTD.Title}</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>directed by: {movieOTD.Director}</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>poster url: {movieOTD.PosterPath}</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>rating: {movieOTD.Rating}</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>year: {movieOTD.Year}</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>tmdbID: {movieOTD.tmdbID}</Text>
+        <Text style={{color: currentTheme.textColorSecondary}}>todays date: {movieOTD.Date}</Text>
       </View>
     </KeyboardAvoidingView>
   );
@@ -338,22 +337,33 @@ export default function Recs() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 70,
+    marginTop: 55,
     justifyContent: 'top',
     alignItems: 'center',
   },
   box: {
-    // position: "absolute",
-    backgroundColor: '#000',
     marginTop: 20,
-    borderRadius: 10,
-    height: Dimensions.get('window').height * 0.45,
+    height: Dimensions.get('window').height * 0.48,
     width: Dimensions.get('window').width * 0.9,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    padding: 10,
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   inner: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
+    width: Dimensions.get('window').width * 0.9,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    padding: 10,
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   subtitle: {
     fontSize: 20,
@@ -372,11 +382,10 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: '#A44443',
-    padding: 12,
-    width: '80%',
+    padding: 10,
+    width: '42%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
     borderRadius: 7,
     borderWidth: 1,
   },
@@ -386,6 +395,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   invisiblePadding: {
-    padding: 40,
+    padding: 20,
   }
 });
