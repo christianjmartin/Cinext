@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import camera from '../assets/camera.png';
+import camera4 from '../assets/camera4.png';
 import settings from '../assets/settings-2.png';
 import PageContext from '../context/PageContext';  
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
@@ -9,8 +9,8 @@ export default function Header() {
     const {updatePage, page} = useContext(PageContext);
     return (
         <View style={styles.headerContainer}>
-            <Image source={camera} style={styles.image} /> 
-            <Text style={styles.title}>MovieNext</Text>
+            <Image source={camera4} style={styles.logo} /> 
+            {/* <Text style={styles.title}>MovieNext</Text> */}
             <View style={styles.spacer}></View>
 
             {/* only allow user to leave reccomendation screen by exit button, since theres no going back wihtout re-entry */}
@@ -39,6 +39,11 @@ const styles = StyleSheet.create ({
     image: {
         width: 40,
         height: 40,
+    },
+    logo: {
+        width: 40,
+        height: '100%',
+        marginLeft: 10,
     },
     settings: {
         marginRight: 5,

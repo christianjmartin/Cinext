@@ -1,17 +1,90 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PageContext from '../context/PageContext';  
-import { View, Text, StyleSheet, TextInput, FlatList, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';  
+import { View, Alert, Text, StyleSheet, TextInput, FlatList, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';  
 import { fetchLLMResponse } from '../services/geminiapi';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
+import MOTD from '../services/MOTD.json'
 import Swiper from 'react-native-swiper';
 import theme from '../services/theme.js';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD} = useContext(PageContext);  
   const [text, setText] = useState('');  
   const [loading, setLoading] = useState(false);  
+  const [isTyping, setIsTyping] = useState(false);
+  // const [movieOTD, setMovieOTD] = useState({});
   const currentTheme = theme[colorMode];
+ 
+  // gets the film of the day and updates it in context api "movieOTD" object
+  const getMOTD = async (formattedDate) => {
+    const motd = MOTD[formattedDate].title;
+    // console.log(motd);
+    try {
+      const { data, error } = await supabase
+        .from('MovieOfTheDay')
+        .select('Date, Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+        .eq('Date', formattedDate);
+
+      if (error) {
+          console.error('Error fetching SeenFilms:', error.message);
+      } else {
+          // nothing exists in the database for this day 
+          if (data.length === 0) {
+            const movieOfTheDay = await fetchMovieDetails(motd);
+            console.log("movie of the day is:", movieOfTheDay);
+            const { data2, error2 } = await supabase
+              .from('MovieOfTheDay')
+              .insert([{ Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }])
+              .select();
+        
+            if (error2) {
+              console.error('Error adding to Movie of the Day:', error2.message);
+            } else {
+              const updateContext = { Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }
+              setMovieOTD(updateContext);
+              console.log('Added a new film to the Movie of the Day table');
+            }
+          }
+          // something was there, update context for movieoftheday
+          else {
+            const movieOfTheDay = data[0];
+            setMovieOTD(movieOfTheDay);
+          }
+      }
+    } catch (error) {
+        console.error('Unexpected error:', error); 
+    }
+  }
+
+  useEffect(() => {
+    const fetchMOTD = async () => {
+      const today = new Date();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const formattedDate = `${month}-${day}`;
+  
+      // first, check if today's movie is already in context
+      if (Object.keys(movieOTD).length > 0) {
+        if (movieOTD?.Date === formattedDate) {
+          console.log("movie exists in context and is up to date.");
+          return;
+        } else {
+          console.log("new day -> fetching today's motd...");
+          await getMOTD(formattedDate);
+          return;
+        }
+      }
+      else {
+        console.log("ts was not in context, it better be in the DB");
+        await getMOTD(formattedDate);
+        return; 
+      }
+    };
+  
+    fetchMOTD();
+  }, []);
+  
 
   // this function does the following
   // fetches the films that are in the user's lists (Seen and Watchlist) and creates a Set of their respective ID's from TMDB
@@ -26,6 +99,15 @@ export default function Recs() {
   // if this list is over 30 entries long, it is cut down to 30.
   // finally, the list of 30 or less films is updated in context into the movieList object via the "updateMovieList" function from context.
   const handleSubmit = async () => {
+    if (text === '') {
+      Alert.alert("Missing Input", "Enter text to get recommendations.");
+      return;
+    }
+    else if (text.length > 200) {
+      Alert.alert("cmon crode", "you done typed way too much lmao");
+      return;
+    }
+    console.log("Input length:", text.length);
     console.log(`Fetching movie recommendations...`);
     setLoading(true);
 
@@ -59,6 +141,7 @@ export default function Recs() {
         If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
         Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot. 
         Remember absolutely no repeating movies.
+        Make sure there are no contraversial picks unless specifically asked for.
         If there are not 40 movies available given the sentiment, give as many as you can but no repeats.
         Choose from the following sentiment: ${text}`;
 
@@ -116,7 +199,8 @@ export default function Recs() {
             Ensure there are no repeats.
             If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
             Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot.
-            Remember absolutely no repeating movies.`;
+            Remember absolutely no repeating movies.
+            Make sure there are no contraversial picks unless specifically asked for.`;
 
             const result2 = await fetchLLMResponse(finalPrompt);
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
@@ -216,7 +300,8 @@ export default function Recs() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
-          <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>
+          {isTyping ? <View style={styles.invisiblePadding}></View> : <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>}
+
           {/* <Text>Hi - {userId}</Text> */}
 
           <TextInput
@@ -225,6 +310,9 @@ export default function Recs() {
             placeholderTextColor="#888"
             value={text}
             onChangeText={setText}
+            maxLength={200}
+            onFocus={() => setIsTyping(true)}
+            onBlur={() => setIsTyping(false)}
           />
 
           <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.border2}]} onPress={handleSubmit} disabled={loading}>
@@ -233,6 +321,16 @@ export default function Recs() {
 
         </View>
       </TouchableWithoutFeedback>
+      <View style={styles.box}>
+        <Text style={{color: '#FFF'}}>Movie of the day</Text>
+        <Text style={{color: '#FFF'}}>title: {movieOTD.Title}</Text>
+        <Text style={{color: '#FFFFFF'}}>directed by: {movieOTD.Director}</Text>
+        <Text style={{color: '#FFFFFF'}}>poster url: {movieOTD.PosterPath}</Text>
+        <Text style={{color: '#FFFFFF'}}>rating: {movieOTD.Rating}</Text>
+        <Text style={{color: '#FFFFFF'}}>year: {movieOTD.Year}</Text>
+        <Text style={{color: '#FFFFFF'}}>tmdbID: {movieOTD.tmdbID}</Text>
+        <Text style={{color: '#FFFFFF'}}>todays date: {movieOTD.Date}</Text>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -240,8 +338,17 @@ export default function Recs() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    marginTop: 70,
+    justifyContent: 'top',
     alignItems: 'center',
+  },
+  box: {
+    // position: "absolute",
+    backgroundColor: '#000',
+    marginTop: 20,
+    borderRadius: 10,
+    height: Dimensions.get('window').height * 0.45,
+    width: Dimensions.get('window').width * 0.9,
   },
   inner: {
     justifyContent: 'center',
@@ -278,4 +385,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  invisiblePadding: {
+    padding: 40,
+  }
 });
