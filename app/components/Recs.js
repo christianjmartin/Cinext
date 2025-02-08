@@ -1,20 +1,23 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PageContext from '../context/PageContext';  
-import { View, Alert, Text, StyleSheet, TextInput, FlatList, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';  
+import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';  
 import { fetchLLMResponse } from '../services/geminiapi';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
+import imdb from '../assets/IMDB.svg.png';
 import MOTD from '../services/MOTD.json'
 import Swiper from 'react-native-swiper';
 import theme from '../services/theme.js';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie} = useContext(PageContext);  
   const [text, setText] = useState('');  
   const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
   // const [movieOTD, setMovieOTD] = useState({});
   const currentTheme = theme[colorMode];
+  let noRating = 'N/A';
+
  
   // gets the film of the day and updates it in context api "movieOTD" object
   const getMOTD = async (formattedDate) => {
@@ -63,6 +66,9 @@ export default function Recs() {
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const day = String(today.getDate()).padStart(2, '0');
       const formattedDate = `${month}-${day}`;
+
+      // FOR TESTING
+      // const formattedDate = "12-09";
   
       // first, check if today's movie is already in context
       if (Object.keys(movieOTD).length > 0) {
@@ -290,6 +296,29 @@ export default function Recs() {
     return movies;  
   };
 
+  const extractStringDate = (date) => {
+    const month = date.slice(0,2);
+    const day = date.slice(3);
+    // console.log(date);
+    
+    switch (month) {
+        case "01": return `January ${day}`;
+        case "02": return `February ${day}`;
+        case "03": return `March ${day}`;
+        case "04": return `April ${day}`;
+        case "05": return `May ${day}`;
+        case "06": return `June ${day}`;
+        case "07": return `July ${day}`;
+        case "08": return `August ${day}`;
+        case "09": return `September ${day}`;
+        case "10": return `October ${day}`;
+        case "11": return `November ${day}`;
+        case "12": return `December ${day}`;
+        default: return "Invalid month"; // Handle unexpected input
+    }
+};
+
+
   
 
   return (
@@ -298,6 +327,7 @@ export default function Recs() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={[styles.inner, {backgroundColor: currentTheme.background, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
           {/* {isTyping ? <View style={styles.invisiblePadding}></View> : <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>} */}
           <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>
@@ -314,22 +344,50 @@ export default function Recs() {
             onBlur={() => setIsTyping(false)}
           />
 
+          {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
           <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.border2}]} onPress={handleSubmit} disabled={loading}>
-            <Text style={styles.submitButtonText}>{loading ? 'Submitting...' : 'Submit'}</Text>
-          </TouchableOpacity>
+            <Text style={styles.submitButtonText}> Submit</Text>
+          </TouchableOpacity>}
 
         </View>
-      </TouchableWithoutFeedback>
+      
       <View style={[styles.box, {backgroundColor: currentTheme.background, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
-        <Text style={{color: currentTheme.textColorSecondary}}>Movie of the day</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>title: {movieOTD.Title}</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>directed by: {movieOTD.Director}</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>poster url: {movieOTD.PosterPath}</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>rating: {movieOTD.Rating}</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>year: {movieOTD.Year}</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>tmdbID: {movieOTD.tmdbID}</Text>
-        <Text style={{color: currentTheme.textColorSecondary}}>todays date: {movieOTD.Date}</Text>
-      </View>
+          <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>Today in film</Text>
+          <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>{movieOTD.Date ? extractStringDate(movieOTD.Date) : null}, {movieOTD.Year ? movieOTD.Year : null}</Text>
+
+
+    
+                <TouchableOpacity style={styles.margin} onPress={() => {
+                      setStaticMovie(movieOTD);
+                      updatePage("Static Movie");
+                    }}>
+                    <Image
+                      source={{ uri: `https://image.tmdb.org/t/p/w500${movieOTD.PosterPath}` }}
+                      style={styles.poster}
+                    ></Image>
+                </TouchableOpacity>
+
+            <View style={[styles.row, styles.centered]}>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                  Directed by: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Director}</Text>
+                </Text>
+            </View>
+
+            <View style={styles.spaceAround}>
+                <View style={styles.ratingContainer}>
+                    <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                      Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Rating ? movieOTD.Rating : noRating}</Text>
+                    </Text>
+                    <Image style={styles.imdbLogo} source={imdb}></Image>
+                </View>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                  Released: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Year}</Text>
+                </Text>
+            </View>
+            
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
@@ -337,21 +395,18 @@ export default function Recs() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 55,
+    marginTop: 43,
     justifyContent: 'top',
     alignItems: 'center',
+    width: Dimensions.get('window').width * 1,
   },
-  box: {
-    marginTop: 20,
-    height: Dimensions.get('window').height * 0.48,
-    width: Dimensions.get('window').width * 0.9,
-    borderRadius: 10,
-    borderWidth: 0.5,
-    padding: 10,
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 10,
+  scrollContainer: {
+    flexGrow: 1, // Allows scrolling past the screen height
+    alignItems: "center",
+    paddingBottom: 50, // Prevents last item from getting cut off
+  },
+  padding: {
+    padding: 5,
   },
   inner: {
     justifyContent: 'center',
@@ -396,5 +451,81 @@ const styles = StyleSheet.create({
   },
   invisiblePadding: {
     padding: 20,
-  }
+  },
+
+  // movie of the day styling 
+  box: {
+    marginTop: 20,
+    width: Dimensions.get('window').width * 0.9,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    padding: 10,
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
+    overflow: 'hidden',
+  },
+  motdHeader: {
+    fontWeight: 'bold',
+    fontSize: 24,
+    textAlign: 'center',
+  },
+  poster: {
+    width: '100%',
+    height: Dimensions.get('window').height * 0.55,
+    resizeMode: 'contain',
+    marginTop: 5,
+  },
+  cardText: {
+    fontSize: 16,
+    marginVertical: 1,
+    textAlign: 'center',
+  },
+  bold: {
+    fontWeight: 'bold',
+  },
+  imdbLogo: {
+    width: 40,
+    height: 20,
+    marginLeft: 5,
+    resizeMode: 'contain',
+  },
+  row: {
+    flexDirection: 'row', 
+  },
+  width: {
+    width: Dimensions.get('window').width * 0.9,
+  },
+  spaceAround: {
+    flexDirection: 'row', 
+    justifyContent: 'space-around'
+  },
+  centered: {
+    justifyContent: 'center',
+  },
+  height: {
+    height: Dimensions.get('window').height * 0.358,
+  },
+  descriptionBox: {
+    flexGrow: 1, 
+    justifyContent: "center", 
+    alignSelf: "center",
+  },
+  margin: {
+    marginBottom: 5,
+  },
+  descriptionText: {
+    fontSize: 14, 
+    marginVertical: 10,
+    textAlign: 'left',
+    padding: 5,
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  ratingContainer: {
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
 });

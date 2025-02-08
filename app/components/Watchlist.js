@@ -4,11 +4,12 @@ import { supabase } from '../services/supabase';
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { fetchMovieCredits } from '../services/tmdbApi';
+import _ from 'lodash';
 import theme from '../services/theme';
 
 const Watchlist = () => {
-    const { userId, setStaticMovie, updatePage, colorMode } = useContext(PageContext);
-    const [watchlist, setWatchlist] = useState([]);
+    const { userId, setStaticMovie, updatePage, colorMode, watchlist, setWatchlist} = useContext(PageContext);
+    // const [watchlist, setWatchlist] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
@@ -30,7 +31,15 @@ const Watchlist = () => {
                 console.error('Error fetching Watchlist:', error.message);
             } else {
                 // console.log('Fetched from Watchlist:', data);
-                setWatchlist(data || []);
+                // console.log("data", data);
+                // console.log("watchlist", watchlist)
+                if (!_.isEqual(data, watchlist)) {
+                    console.log("There were changes in watchlist, updating watchlist...");
+                    setWatchlist(data || []);
+                }
+                else {
+                    console.log('no changes in watchlist, nothing to do!');
+                }
             }
         } catch (error) {
             console.error('Unexpected error:', error); 
@@ -195,7 +204,8 @@ const Watchlist = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 27,
+        marginTop: 15,
+        marginBottom: -2,
         flex: 1,
         padding: 10,
         alignItems: 'center',

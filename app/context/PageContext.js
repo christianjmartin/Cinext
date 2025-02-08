@@ -11,6 +11,8 @@ export const PageProvider = ({ children }) => {
   const [staticMovie, setStaticMovie] = useState(null);
   const [colorMode, setColorMode] = useState("light");
   const [movieOTD, setMovieOTD] = useState({});
+  const [seenFilms, setSeenFilms] = useState([]);
+  const [watchlist, setWatchlist] = useState([]);
 
   // initialize userId when the context is created
   useEffect(() => {
@@ -47,7 +49,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD }}>
+    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist}}>
       {children}
     </PageContext.Provider>
   );

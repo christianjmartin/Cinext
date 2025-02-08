@@ -11,6 +11,8 @@ export const fetchMovieDetails = async (query) => {
   const [movieTitle, year] = query.split('^').map(part => part.trim()); 
   // console.log("Year:", year);
 
+  // MANUALLY DISCARD SEVEN 1995
+
   try {
     // Search for the movie by title and year
     const searchResponse = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
@@ -27,8 +29,12 @@ export const fetchMovieDetails = async (query) => {
       return null; // No results found
     }
 
-    // Return first movie to come up in the search 
-    const movie = movies[0]; 
+    const exactMatch = movies.find(movie => 
+      movie.title.toLowerCase() === movieTitle.toLowerCase()
+    );
+
+    // Return exact matching title, or first movie to come up in the search
+    const movie = exactMatch || movies[0];
 
     // Fetch movie credits to get directors
     const creditsResponse = await axios.get(`${TMDB_BASE_URL}/movie/${movie.id}/credits`, {

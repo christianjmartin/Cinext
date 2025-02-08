@@ -4,11 +4,12 @@ import { supabase } from '../services/supabase';
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { fetchMovieCredits } from '../services/tmdbApi';
+import _ from 'lodash';
 import theme from '../services/theme';
 
 const SeenFilms = () => {
-    const { userId, setStaticMovie, updatePage, colorMode } = useContext(PageContext);
-    const [seenFilms, setSeenFilms] = useState([]);
+    const { userId, setStaticMovie, updatePage, colorMode, seenFilms, setSeenFilms } = useContext(PageContext);
+    // const [seenFilms, setSeenFilms] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
@@ -30,7 +31,15 @@ const SeenFilms = () => {
                 console.error('Error fetching SeenFilms:', error.message);
             } else {
                 // console.log('Fetched from SeenFilms:', data);
-                setSeenFilms(data || []);
+                // console.log("data", data);
+                // console.log("seenFilms", seenFilms)
+                if (!_.isEqual(data, seenFilms)) {
+                    console.log("There were changes in seenfilms, updating seenfilms...");
+                    setSeenFilms(data || []);
+                }
+                else {
+                    console.log('no changes in seenfilms, nothing to do!');
+                }
             }
         } catch (error) {
             console.error('Unexpected error:', error); 
@@ -43,6 +52,7 @@ const SeenFilms = () => {
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
     }, []);
+    
 
     // if searching, update the UI to display search 
     const handleSearch = async (query) => {
@@ -195,7 +205,8 @@ const SeenFilms = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 27,
+        marginTop: 15,
+        marginBottom: -2,
         flex: 1,
         padding: 10,
         alignItems: 'center',

@@ -29,8 +29,8 @@ const styles = StyleSheet.create ({
     headerContainer: {
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 10,
-        marginBottom: 10,
+        marginTop: 4,
+        marginBottom: 4,
     },
     title: {
         fontFamily: 'Jakarta-sans',

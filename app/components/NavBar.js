@@ -51,11 +51,9 @@ const styles = StyleSheet.create({
       width: Dimensions.get('window').width * 1,
     },
     button: {
-      backgroundColor: "#6C100F",
+    //   backgroundColor: "#6C100F",
       paddingLeft: 7,
       paddingRight: 7,
-      paddingTop: 2,
-      paddingBottom: 2,
       borderRadius: 50,
     },
     btnIcon: {
