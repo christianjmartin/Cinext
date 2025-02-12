@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native';
 import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
@@ -7,6 +7,7 @@ import theme from '../services/theme';
 
 const MovieList = () => {
   const { movieList, updatePage, userId, colorMode} = useContext(PageContext);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const currentTheme = theme[colorMode];
   const itemWidth = Dimensions.get('window').width * 0.8;
@@ -38,6 +39,14 @@ const MovieList = () => {
         userId
     );
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDisabled(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
   
 
 
@@ -48,6 +57,7 @@ const MovieList = () => {
       <TouchableOpacity
           style={styles.exitButton}
           onPress={() => updatePage("Recs")}
+          disabled={isDisabled}
         >
           <Text style={styles.buttonText}>Go back and say sum else crody</Text>
       </TouchableOpacity>
@@ -62,6 +72,7 @@ const MovieList = () => {
         <TouchableOpacity
           style={styles.exitButton}
           onPress={() => updatePage("Recs")}
+          disabled={isDisabled}
         >
           <Text style={styles.buttonText}>Exit</Text>
         </TouchableOpacity>
@@ -104,10 +115,10 @@ const MovieList = () => {
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.seenButton} onPress={() => handleAddToSeen(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
+                <TouchableOpacity style={[styles.seenButton, {backgroundColor: currentTheme.seenBtn}]} onPress={() => handleAddToSeen(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
                   <Text style={styles.buttonText}>I've Seen This</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.watchlistButton} onPress={() => handleAddToWatchlist(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
+                <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={() => handleAddToWatchlist(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
                   <Text style={styles.buttonText}>Add to Watchlist</Text>
                 </TouchableOpacity>
               </View>
@@ -189,17 +200,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#8EE357",
     padding: 12,
     marginHorizontal: 5,
-    borderRadius: 5,
-    borderWidth: 2,
-    borderColor: "#62B42D",
+    borderRadius: 40,
+    borderWidth: 3,
+    borderColor: "#57CB32",
   },
   watchlistButton: {
     backgroundColor: "#B2B2B2",
     padding: 12,
     marginHorizontal: 5,
-    borderRadius: 5,
-    borderWidth: 2,
-    borderColor: "#979797",
+    borderRadius: 40,
+    borderWidth: 3,
+    borderColor: "#969696",
   },
   buttonText: {
     fontSize: 16,

@@ -79,10 +79,10 @@ const StaticMovie = () => {
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.seenButton} onPress={handleAddToSeen}>
+                <TouchableOpacity style={[styles.seenButton, {backgroundColor: currentTheme.seenBtn}]} onPress={handleAddToSeen}>
                   <Text style={styles.buttonText}>I've Seen This</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.watchlistButton} onPress={handleAddToWatchlist}>
+                <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={handleAddToWatchlist}>
                   <Text style={styles.buttonText}>Add to Watchlist</Text>
                 </TouchableOpacity>
               </View>
@@ -161,17 +161,17 @@ const styles = StyleSheet.create({
       backgroundColor: "#8EE357",
       padding: 12,
       marginHorizontal: 5,
-      borderRadius: 5,
-      borderWidth: 2,
-      borderColor: "#62B42D",
+      borderRadius: 40,
+      borderWidth: 3,
+      borderColor: "#57CB32",
     },
     watchlistButton: {
       backgroundColor: "#B2B2B2",
       padding: 12,
       marginHorizontal: 5,
-      borderRadius: 5,
-      borderWidth: 2,
-      borderColor: "#979797",
+      borderRadius: 40,
+      borderWidth: 3,
+      borderColor: "#969696",
     },
     buttonText: {
       fontSize: 16,

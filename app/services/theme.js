@@ -1,10 +1,11 @@
 const theme = {
     light: {
         background: "#f4edec",
+        backgroundSecondary: "#FBF8F8",
         textColor: '#000000',
         textColorSecondary: "#000000",
         border: "#c5c5c5",
-        border2: "#505050",
+        border2: "#9B9B9B",
         description: "#eeeeee",
         description2: "#f5f5f5",
         movieTitle: "#580000",
@@ -15,13 +16,18 @@ const theme = {
         gridItemColor: "#FFFFFF", // general cards 
         swiperBackground: '#f5f5f5',
         editBtn: "#d8d8d8",
+        seenBtn: "#8EE357",
+        watchlistBtn: "#B2B2B2",
+        submitBtn: "#A44443",
+        submitBtnBorder: "#570606",
     },
     dark: {
         background: "#151515",
+        backgroundSecondary: "#202020",
         textColor: '#FFFFFF',
         textColorSecondary: "#e5e5e5",
         border: "#898989",
-        border2: "#898989",
+        border2: "#6b6b6b",
         description: "#5f5f5f",
         description2: "#373737",
         movieTitle: "#f4edec",
@@ -32,6 +38,10 @@ const theme = {
         gridItemColor: "#444444", // general cards
         swiperBackground: '#171717',
         editBtn: "#888888",
+        seenBtn: "#444444",
+        watchlistBtn: "#444444",
+        submitBtn: "#202020",
+        submitBtnBorder: "#A44443",
     }
 };
 

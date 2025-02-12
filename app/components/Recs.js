@@ -65,10 +65,10 @@ export default function Recs() {
       const today = new Date();
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const day = String(today.getDate()).padStart(2, '0');
-      const formattedDate = `${month}-${day}`;
+      // const formattedDate = `${month}-${day}`;
 
       // FOR TESTING
-      // const formattedDate = "12-09";
+      const formattedDate = "09-30";
   
       // first, check if today's movie is already in context
       if (Object.keys(movieOTD).length > 0) {
@@ -170,6 +170,10 @@ export default function Recs() {
         // extract the information from the TMDB API for the UI (detailedMovies) object
         let detailedMovies = [];
         for (const movie of movies1) {
+            if (movie.includes("Seven ^ 1995")) {
+              console.log("imposter film spotted lol")
+              continue;
+            }
             try {
                 const detailedMovie = await fetchMovieDetails(movie.trim());
                 detailedMovies.push(detailedMovie || { Title: movie.trim(), error: true });
@@ -327,8 +331,8 @@ export default function Recs() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={[styles.inner, {backgroundColor: currentTheme.background, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <View style={[styles.inner, {backgroundColor: currentTheme.backgroundSecondary, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
           {/* {isTyping ? <View style={styles.invisiblePadding}></View> : <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>} */}
           <Text style={[styles.subtitle, {color: currentTheme.textColorSecondary}]}>Enter what kind of movie you want to see next, then let us do the rest</Text>
           {/* <Text>Hi - {userId}</Text> */}
@@ -345,15 +349,15 @@ export default function Recs() {
           />
 
           {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
-          <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.border2}]} onPress={handleSubmit} disabled={loading}>
+          <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.submitBtnBorder, backgroundColor: currentTheme.submitBtn}]} onPress={handleSubmit} disabled={loading}>
             <Text style={styles.submitButtonText}> Submit</Text>
           </TouchableOpacity>}
 
         </View>
       
-      <View style={[styles.box, {backgroundColor: currentTheme.background, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
-          <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>Today in film</Text>
-          <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>{movieOTD.Date ? extractStringDate(movieOTD.Date) : null}, {movieOTD.Year ? movieOTD.Year : null}</Text>
+        <View style={[styles.box, {backgroundColor: currentTheme.backgroundSecondary, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
+            <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>Today in film</Text>
+            <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>{movieOTD.Date ? extractStringDate(movieOTD.Date) : null}, {movieOTD.Year ? movieOTD.Year : null}</Text>
 
 
     
@@ -428,7 +432,7 @@ const styles = StyleSheet.create({
   },
   textInputBox: {
     height: 50,
-    borderColor: 'gray',
+    borderColor: '#bcbcbc',
     borderWidth: 1,
     width: 300,
     borderRadius: 15,
@@ -436,13 +440,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   submitButton: {
-    backgroundColor: '#A44443',
+    // borderColor: '#942020',
     padding: 10,
     width: '42%',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 7,
-    borderWidth: 1,
+    borderRadius: 50,
+    borderWidth: 3,
+    margin: 3,
+    marginBottom: 8,
   },
   submitButtonText: {
     fontSize: 18,
@@ -475,7 +481,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: Dimensions.get('window').height * 0.55,
     resizeMode: 'contain',
-    marginTop: 5,
+    marginTop: 12,
   },
   cardText: {
     fontSize: 16,
