@@ -1,22 +1,114 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PageContext from '../context/PageContext';  
 import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';  
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { fetchLLMResponse } from '../services/geminiapi';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
+import { updateSuggestionSeenPreference } from '../services/preferences.js';
+import { updateSuggestionWatchlistPreference } from '../services/preferences.js';
 import imdb from '../assets/IMDB.svg.png';
-import MOTD from '../services/MOTD.json'
+import MOTD from '../services/MOTD.json';
 import Swiper from 'react-native-swiper';
 import theme from '../services/theme.js';
+import _ from 'lodash';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist} = useContext(PageContext);  
   const [text, setText] = useState('');  
   const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
   // const [movieOTD, setMovieOTD] = useState({});
   const currentTheme = theme[colorMode];
   let noRating = 'N/A';
+  const togglePositionSeen = useSharedValue(suggestSeen === false ? 50 : 5);
+  const togglePositionWatchlist = useSharedValue(suggestWatchlist === false ? 50 : 5);
+
+  // toggles between pulling from seen or not 
+  const toggleSuggestSeen = () => {
+      togglePositionSeen.value = withTiming(suggestSeen === false ? 5 : 50, { duration: 250 });
+      if (suggestSeen) {
+        setSuggestSeen(false);
+        updateSuggestionSeenPreference(false, userId);
+      } else {
+        setSuggestSeen(true);
+        updateSuggestionSeenPreference(true, userId);
+      }
+  };
+
+  // toggles between pulling from watchlist or not 
+  const toggleSuggestWatchlist = () => {
+    togglePositionWatchlist.value = withTiming(suggestWatchlist === false ? 5 : 50, { duration: 250 });
+    if (suggestWatchlist) {
+      setSuggestWatchlist(false);
+      updateSuggestionWatchlistPreference(false, userId);
+    } else {
+      setSuggestWatchlist(true);
+      updateSuggestionWatchlistPreference(true, userId);
+    }
+  };
+
+  const animatedStyleSeen = useAnimatedStyle(() => ({
+      transform: [{ translateX: togglePositionSeen.value }],
+  }));
+
+  const animatedStyleWatchlist = useAnimatedStyle(() => ({
+      transform: [{ translateX: togglePositionWatchlist.value }],
+  }));
+
+
+
+  // gets all of the films the user has put in their watchlist
+  const getFilms = async () => {
+    try {
+        const { data, error } = await supabase
+            .from('Watchlist')
+            .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+            .order('id', { ascending: false })
+            .eq('UserID', userId);
+
+        if (error) {
+            console.error('Error fetching Watchlist:', error.message);
+        } else {
+            // console.log('Fetched from Watchlist:', data);
+            // console.log("data", data);
+            // console.log("watchlist", watchlist)
+            if (!_.isEqual(data, watchlist)) {
+                console.log("There were changes in watchlist, updating watchlist...");
+                setWatchlist(data || []);
+            }
+            else {
+                console.log('no changes in watchlist, nothing to do!');
+            }
+        }
+    } catch (error) {
+        console.error('Unexpected error:', error); 
+    }
+    try {
+      const { data, error } = await supabase
+          .from('SeenFilms')
+          .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+          .order('id', { ascending: false })
+          .eq('UserID', userId);
+
+      if (error) {
+          console.error('Error fetching SeenFilms:', error.message);
+      } else {
+          // console.log('Fetched from SeenFilms:', data);
+          // console.log("data", data);
+          // console.log("seenFilms", seenFilms)
+          if (!_.isEqual(data, seenFilms)) {
+              console.log("There were changes in seenfilms, updating seenfilms...");
+              setSeenFilms(data || []);
+          }
+          else {
+              console.log('no changes in seenfilms, nothing to do!');
+          }
+      }
+    } catch (error) {
+        console.error('Unexpected error:', error); 
+    }
+  };
 
  
   // gets the film of the day and updates it in context api "movieOTD" object
@@ -65,10 +157,10 @@ export default function Recs() {
       const today = new Date();
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const day = String(today.getDate()).padStart(2, '0');
-      // const formattedDate = `${month}-${day}`;
+      const formattedDate = `${month}-${day}`;
 
       // FOR TESTING
-      const formattedDate = "09-30";
+      // const formattedDate = "01-01";
   
       // first, check if today's movie is already in context
       if (Object.keys(movieOTD).length > 0) {
@@ -89,7 +181,8 @@ export default function Recs() {
     };
   
     fetchMOTD();
-  }, []);
+    getFilms();
+  }, [userId]);
   
 
   // this function does the following
@@ -348,10 +441,29 @@ export default function Recs() {
             onBlur={() => setIsTyping(false)}
           />
 
+        <View style={styles.toggleSection}>
+          <TouchableOpacity onPress={toggleSuggestSeen} style={styles.toggleContainer}>
+              <Animated.View style={[styles.toggleCircle, animatedStyleSeen]}>
+                  {suggestSeen ? <Text>YES SEEN</Text> : <Text>NO SEEN</Text> }
+              </Animated.View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleSuggestWatchlist} style={styles.toggleContainer}>
+              <Animated.View style={[styles.toggleCircle, animatedStyleWatchlist]}>
+                  {suggestWatchlist? <Text>YES WLIST</Text> : <Text>NO WLIST</Text> }
+              </Animated.View>
+          </TouchableOpacity>
+        </View>
+
           {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
           <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.submitBtnBorder, backgroundColor: currentTheme.submitBtn}]} onPress={handleSubmit} disabled={loading}>
             <Text style={styles.submitButtonText}> Submit</Text>
           </TouchableOpacity>}
+          <TouchableOpacity>
+            <Text style={{color: 'white'}}>Exclude movies i've seen from recs?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={{color: 'white'}}>Exclude movies in my watchlist from recs?</Text>
+          </TouchableOpacity>
 
         </View>
       
@@ -534,4 +646,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
   },
+
+  // toggles
+  toggleSection: { 
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  toggleContainer: {
+    width: 100,
+    height: 50,
+    backgroundColor: '#ccc',
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 2,
+    position: 'relative',
+},
+toggleCircle: {
+    width: 45,
+    height: 45,
+    borderRadius: 45,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+},
+emoji: {
+    fontSize: 40,
+},
 });

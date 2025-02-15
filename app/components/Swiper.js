@@ -4,49 +4,60 @@ import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
 import { addToSeen, addToWatchlist } from '../services/dbFuncs';
 import theme from '../services/theme';
+import check from '../assets/check.png';
 
 const MovieList = () => {
-  const { movieList, updatePage, userId, colorMode} = useContext(PageContext);
+  const { movieList, updatePage, userId, colorMode, seenFilms, watchlist} = useContext(PageContext);
   const [isDisabled, setIsDisabled] = useState(true);
+
+  const [seenMovies, setSeenMovies] = useState({});
+  const [watchlistMovies, setWatchlistMovies] = useState({});
 
   const currentTheme = theme[colorMode];
   const itemWidth = Dimensions.get('window').width * 0.8;
   const spacing = Dimensions.get('window').width * 0.1;
   const noRatingCase = 'N/A';
 
-  const handleAddToSeen = async (Title, Director, Year, PosterPath, Description, Rating, tmdbID) => {
+
+  const handleAddToSeen = async (movie) => {
+    setSeenMovies(prev => ({ ...prev, [movie.tmdbID]: true }));
+
+    // Remove from watchlist if present
+    setWatchlistMovies(prev => ({ ...prev, [movie.tmdbID]: false }));
+
     await addToSeen(
-        Title,
-        Director,
-        Year,
-        PosterPath,
-        Description,
-        Rating,
-        tmdbID,
-        userId
+      movie.Title, movie.Director, movie.Year, movie.PosterPath,
+      movie.Description, movie.Rating, movie.tmdbID, userId
     );
   };
 
-  const handleAddToWatchlist = async (Title, Director, Year, PosterPath, Description, Rating, tmdbID) => {
+  const handleAddToWatchlist = async (movie) => {
+    setWatchlistMovies(prev => ({ ...prev, [movie.tmdbID]: true }));
+
     await addToWatchlist(
-        Title,
-        Director,
-        Year,
-        PosterPath,
-        Description,
-        Rating,
-        tmdbID,
-        userId
+      movie.Title, movie.Director, movie.Year, movie.PosterPath,
+      movie.Description, movie.Rating, movie.tmdbID, userId
     );
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsDisabled(false);
-    }, 2500);
+    }, 2500); 
 
+    const seenState = {};
+    const watchlistState = {};
+
+    movieList.forEach(movie => {
+      seenState[movie.tmdbID] = seenFilms.some(seenMovie => seenMovie.tmdbID === movie.tmdbID);
+      watchlistState[movie.tmdbID] = watchlist.some(watchMovie => watchMovie.tmdbID === movie.tmdbID);
+    });
+
+    setSeenMovies(seenState);
+    setWatchlistMovies(watchlistState);
     return () => clearTimeout(timer);
-  }, []);
+}, [movieList, seenFilms, watchlist]);
+
   
 
 
@@ -104,6 +115,7 @@ const MovieList = () => {
                 <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
                   Released: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Year}</Text>
                 </Text>
+                
                 <View style={styles.ratingContainer}>
                   <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
                     Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Rating ? item.Rating : noRatingCase}</Text>
@@ -115,12 +127,21 @@ const MovieList = () => {
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
-                <TouchableOpacity style={[styles.seenButton, {backgroundColor: currentTheme.seenBtn}]} onPress={() => handleAddToSeen(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
-                  <Text style={styles.buttonText}>I've Seen This</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={() => handleAddToWatchlist(item.Title, item.Director, item.Year, item.PosterPath, item.Description, item.Rating, item.tmdbID)}>
-                  <Text style={styles.buttonText}>Add to Watchlist</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.seenButton, { backgroundColor: currentTheme.seenBtn }]}
+                onPress={() => handleAddToSeen(item)}
+              >
+                <Text style={styles.buttonText}>I've Seen This</Text>
+                {seenMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.watchlistButton, { backgroundColor: currentTheme.watchlistBtn }]}
+                onPress={() => handleAddToWatchlist(item)}
+              >
+                <Text style={styles.buttonText}>Add to Watchlist</Text>
+                {watchlistMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
+              </TouchableOpacity>
               </View>
             </View>
           )}
@@ -143,7 +164,7 @@ const styles = StyleSheet.create({
     left: 0,
     backgroundColor: "#ea2121",
     padding: 7,
-    borderRadius: 5,
+    borderRadius: 40,
     borderWidth: 0.7,
     borderColor: "#681212",
     zIndex: 10, 
@@ -228,6 +249,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     justifyContent: 'center', 
     alignItems: 'center', 
+  },
+  checkmark: {
+    width: 50,
+    height: 50,
+    resizeMode: 'cover',
+    position: 'absolute',
+    right: 0,
+    opacity: 0.4,
   }
 });
 

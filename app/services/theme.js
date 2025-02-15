@@ -19,7 +19,7 @@ const theme = {
         seenBtn: "#8EE357",
         watchlistBtn: "#B2B2B2",
         submitBtn: "#A44443",
-        submitBtnBorder: "#570606",
+        submitBtnBorder: "#801616",
     },
     dark: {
         background: "#151515",
@@ -38,9 +38,9 @@ const theme = {
         gridItemColor: "#444444", // general cards
         swiperBackground: '#171717',
         editBtn: "#888888",
-        seenBtn: "#444444",
-        watchlistBtn: "#444444",
-        submitBtn: "#202020",
+        seenBtn: "#57CB32",
+        watchlistBtn: "#969696",
+        submitBtn: "#A44443",
         submitBtnBorder: "#A44443",
     }
 };

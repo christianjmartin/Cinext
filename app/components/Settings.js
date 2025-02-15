@@ -1,17 +1,25 @@
 import React, { useContext } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { updateColorPreference } from '../services/preferences.js';
 import PageContext from '../context/PageContext';
 import vader from '../assets/vader.png';
 import yoda from '../assets/yoda.png';
 
 const Settings = () => {
-    const { colorMode, updateColorMode } = useContext(PageContext);
+    const { colorMode, updateColorMode, userId} = useContext(PageContext);
     const togglePosition = useSharedValue(colorMode === 'dark' ? 105 : 5);
 
     // toggles between light and dark mode, calling updateColorMode from context 
     const toggleTheme = () => {
         togglePosition.value = withTiming(colorMode === 'dark' ? 5 : 105, { duration: 250 });
+        console.log(colorMode);
+        let updatedColor;
+        if (colorMode === 'dark') {
+            updatedColor = 'light';
+        } else { updatedColor = 'dark'; }
+        // console.log("updated color is" , updatedColor)
+        updateColorPreference(updatedColor, userId);
         updateColorMode(); 
     };
 

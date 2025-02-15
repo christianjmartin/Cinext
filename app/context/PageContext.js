@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getOrCreateUserId } from '../services/userID';
+import { createClient } from '../services/createClient';
 
 const PageContext = createContext();
 
@@ -13,16 +14,51 @@ export const PageProvider = ({ children }) => {
   const [movieOTD, setMovieOTD] = useState({});
   const [seenFilms, setSeenFilms] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
+  const [suggestSeen, setSuggestSeen] = useState(false);
+  const [suggestWatchlist, setSuggestWatchlist] = useState(false)
+  const [initialLoad, setInitialLoad] = useState(true);
+
 
   // initialize userId when the context is created
   useEffect(() => {
-    const initializeUserId = async () => {
+    const initializeUser = async () => {
       const id = await getOrCreateUserId();
       setUserId(id);
     };
 
-    initializeUserId();
+    initializeUser();
   }, []);
+
+  useEffect(() => {
+    const initializeClient = async () => {
+        try {
+            const preferences = await createClient({userId});
+
+            if (!preferences) {
+                console.error("Error: createClient() returned null or undefined.");
+                return;
+            }
+
+            console.log("Loaded Preferences:", preferences);
+            
+            // Update context states safely
+            if (preferences.color) setColorMode(preferences.color);
+            if (preferences.suggestSeen !== undefined) setSuggestSeen(preferences.suggestSeen);
+            if (preferences.suggestWatchlist !== undefined) setSuggestWatchlist(preferences.suggestWatchlist);
+
+        } catch (error) {
+            console.error("Error initializing client:", error);
+        }
+        finally {
+          setInitialLoad(false);
+        }
+    };
+
+    if (userId) {
+        initializeClient();
+    }
+  }, [userId, setColorMode, setSuggestSeen, setSuggestWatchlist]);
+
 
 
 
@@ -49,7 +85,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist}}>
+    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad}}>
       {children}
     </PageContext.Provider>
   );

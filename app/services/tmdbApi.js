@@ -34,7 +34,17 @@ export const fetchMovieDetails = async (query) => {
     );
 
     // Return exact matching title, or first movie to come up in the search
-    const movie = exactMatch || movies[0];
+    // edge case for "mother" by bong joon ho
+    // have to hard code due to limitations by TMDB API in narrowing searches
+    let movie;
+    if (query === "Mother ^ 2009") {
+      movie = movies.find(m => m.release_date === "2009-05-28") || null;
+    } else {
+      movie = exactMatch || movies[0];
+    }
+    if (movie === null) {
+      return null;
+    }
 
     // Fetch movie credits to get directors
     const creditsResponse = await axios.get(`${TMDB_BASE_URL}/movie/${movie.id}/credits`, {
@@ -102,7 +112,6 @@ export const searchMovies = async (query) => {
 
 // gets the directors, given a tmdbID
 export const fetchMovieCredits = async (tmdbID) => {
-  console.log("FANUM TAXXXX")
   try {
     const creditsResponse = await axios.get(`${TMDB_BASE_URL}/movie/${tmdbID}/credits`, {
       params: { api_key: TMDB_API_KEY },

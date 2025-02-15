@@ -10,39 +10,46 @@ import MovieSwiper from './Swiper';
 import SeenFilms from './SeenFilms';
 import StaticMovie from './StaticMovie';
 import Settings from './Settings';
+import Loading from './Loading';
 import theme from '../services/theme';
 
 // handles page navigation within the app via conditional rendering
 export default function Page() {
-  const { page, colorMode } = useContext(PageContext);
+  const { page, colorMode, initialLoad } = useContext(PageContext);
   const currentTheme = theme[colorMode];
 
-  return (
-    <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
+  if (initialLoad) {
+    return (<Loading></Loading>)
+  }
+  else {
+    return (
+      <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
 
-      {/* header placement */}
-      <View style={styles.header}>
-        <Header />
-      </View>
+        {/* header placement */}
+        <View style={styles.header}>
+          <Header />
+        </View>
 
-      {/* the main screen of the app (within both header and navigation bar) */}
-      <View style={styles.main}>
-        {page === "Recs" ? <Recs /> : null}
-        {page === "Watchlist" ? <Watchlist/> : null}
-        {page === "Seen Films" ? <SeenFilms/> : null}
-        {page === "Show Swiper" ? <MovieSwiper/> : null}
-        {page === "Static Movie" ? <StaticMovie/> : null}
-        {page === "Settings" ? <Settings/> : null}
-      </View>
+        {/* the main screen of the app (within both header and navigation bar) */}
+        <View style={styles.main}>
+          {page === "Recs" ? <Recs /> : null}
+          {page === "Watchlist" ? <Watchlist/> : null}
+          {page === "Seen Films" ? <SeenFilms/> : null}
+          {page === "Show Swiper" ? <MovieSwiper/> : null}
+          {page === "Static Movie" ? <StaticMovie/> : null}
+          {page === "Settings" ? <Settings/> : null}
+        </View>
 
-      {/* bottom navigation bar placement */}
-      <View style={styles.navBar}>
-        {page != "Show Swiper" ? <NavBar/> : null}
+        {/* bottom navigation bar placement */}
+        <View style={styles.navBar}>
+          {page != "Show Swiper" ? <NavBar/> : null}
+        </View>
+        
       </View>
-      
-    </View>
-  );
+    );
+  }
 }
+
 
 const styles = StyleSheet.create({
   container: {

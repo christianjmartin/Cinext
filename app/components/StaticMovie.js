@@ -6,15 +6,23 @@ import PageContext from '../context/PageContext';
 import arrow from '../assets/arrow.webp';
 import arrow2 from '../assets/arrow2.png';
 import theme from '../services/theme';
-
+import check from '../assets/check.png';
 
 const StaticMovie = () => {
-    const { staticMovie, previousPage, updatePage, userId, colorMode} = useContext(PageContext);
+    const { staticMovie, previousPage, updatePage, userId, colorMode, seenFilms, watchlist} = useContext(PageContext);
     const currentTheme = theme[colorMode];
+    const [toWatch, setToWatch] = useState(false);
+    const [seen, setSeen] = useState(false);
+
 
     let noRating = 'N/A';
 
     const handleAddToSeen = async () => {
+      setSeen(true);
+      // remove checkmark from watchlist button, as the user has now seen it
+      if (watchlist.some(movie => movie.tmdbID === staticMovie.tmdbID) || toWatch) {
+        setToWatch(false);
+      }
       await addToSeen(
           staticMovie.Title,
           staticMovie.Director,
@@ -28,6 +36,7 @@ const StaticMovie = () => {
     };
     
     const handleAddToWatchlist = async () => {
+      setToWatch(true);
       await addToWatchlist(
           staticMovie.Title,
           staticMovie.Director,
@@ -39,6 +48,13 @@ const StaticMovie = () => {
           userId
       );
     };
+
+
+    useEffect(() => {
+      if (watchlist?.some(movie => movie.tmdbID === staticMovie.tmdbID)) {
+        setToWatch(true);
+      }
+    }, []);
 
 
 
@@ -81,9 +97,11 @@ const StaticMovie = () => {
               <View style={styles.btnContainer}>
                 <TouchableOpacity style={[styles.seenButton, {backgroundColor: currentTheme.seenBtn}]} onPress={handleAddToSeen}>
                   <Text style={styles.buttonText}>I've Seen This</Text>
+                  {seenFilms?.some(movie => movie.tmdbID === staticMovie.tmdbID) || seen ? <Image style={styles.checkmark} source={check}></Image> : null}
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={handleAddToWatchlist}>
                   <Text style={styles.buttonText}>Add to Watchlist</Text>
+                  {toWatch ? <Image style={styles.checkmark} source={check}></Image> : null}
                 </TouchableOpacity>
               </View>
             </View>
@@ -189,6 +207,14 @@ const styles = StyleSheet.create({
       flexDirection: 'row', 
       justifyContent: 'center', 
       alignItems: 'center', 
+    },
+    checkmark: {
+      width: 50,
+      height: 50,
+      resizeMode: 'cover',
+      position: 'absolute',
+      right: 0,
+      opacity: 0.4,
     }
   });
 
