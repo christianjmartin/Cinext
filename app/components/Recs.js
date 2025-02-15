@@ -21,33 +21,24 @@ export default function Recs() {
   // const [movieOTD, setMovieOTD] = useState({});
   const currentTheme = theme[colorMode];
   let noRating = 'N/A';
-  const togglePositionSeen = useSharedValue(suggestSeen === false ? 50 : 5);
-  const togglePositionWatchlist = useSharedValue(suggestWatchlist === false ? 50 : 5);
+  const togglePositionSeen = useSharedValue(suggestSeen ? 35 : 5);
+  const togglePositionWatchlist = useSharedValue(suggestWatchlist ? 35 : 5);
 
-  // toggles between pulling from seen or not 
+  // Toggles between pulling from "Seen" or not 
   const toggleSuggestSeen = () => {
-      togglePositionSeen.value = withTiming(suggestSeen === false ? 5 : 50, { duration: 250 });
-      if (suggestSeen) {
-        setSuggestSeen(false);
-        updateSuggestionSeenPreference(false, userId);
-      } else {
-        setSuggestSeen(true);
-        updateSuggestionSeenPreference(true, userId);
-      }
+      togglePositionSeen.value = withTiming(suggestSeen ? 5 : 35, { duration: 250 });
+      setSuggestSeen(!suggestSeen);
+      updateSuggestionSeenPreference(!suggestSeen, userId);
   };
 
-  // toggles between pulling from watchlist or not 
+  // Toggles between pulling from "Watchlist" or not 
   const toggleSuggestWatchlist = () => {
-    togglePositionWatchlist.value = withTiming(suggestWatchlist === false ? 5 : 50, { duration: 250 });
-    if (suggestWatchlist) {
-      setSuggestWatchlist(false);
-      updateSuggestionWatchlistPreference(false, userId);
-    } else {
-      setSuggestWatchlist(true);
-      updateSuggestionWatchlistPreference(true, userId);
-    }
+      togglePositionWatchlist.value = withTiming(suggestWatchlist ? 5 : 35, { duration: 250 });
+      setSuggestWatchlist(!suggestWatchlist);
+      updateSuggestionWatchlistPreference(!suggestWatchlist, userId);
   };
 
+  // Animated styles for smooth transitions
   const animatedStyleSeen = useAnimatedStyle(() => ({
       transform: [{ translateX: togglePositionSeen.value }],
   }));
@@ -227,7 +218,18 @@ export default function Recs() {
         }
 
         // get the tmdbIDs of the movies the user has already seen or in watchlist (GENERAL / ALL)
-        const alreadyInListsMovieIDs = new Set([...data.map(m => m.tmdbID), ...watchlistData.map(m => m.tmdbID)]);
+        //const alreadyInListsMovieIDs = new Set([...data.map(m => m.tmdbID), ...watchlistData.map(m => m.tmdbID)]);
+        let alreadyInListsMovieIDs = new Set();
+
+        // Exclude Seen Films if the toggle is OFF
+        if (!suggestSeen) {
+            data.forEach(m => alreadyInListsMovieIDs.add(m.tmdbID));
+        }
+
+        // Exclude Watchlist Films if the toggle is OFF
+        if (!suggestWatchlist) {
+            watchlistData.forEach(m => alreadyInListsMovieIDs.add(m.tmdbID));
+        }
 
         // get 40 movies based on the sentiment
         let firstPrompt = `Provide a list of 40 movies in this exact format:
@@ -276,7 +278,7 @@ export default function Recs() {
             }
         }
 
-        // The movies the user has NOT seen yet (KEEP)
+        // The movies the user has NOT seen yet (KEEP)... or based on whatever they have toggled
         let uniqueMovies = detailedMovies.filter(movie => !alreadyInListsMovieIDs.has(movie.tmdbID));
 
         // the list of movies returned by the first response
@@ -288,6 +290,7 @@ export default function Recs() {
         // if there arent enough unqiue movies after filtering, try again
         if (uniqueMovies.length < 5) { 
             console.log("Too many seen movies. Fetching another batch...");
+            console.log("exclude list: ", excludeList);
 
             // prompt AI API again, explicity telling to not include movies from first response
             let finalPrompt = `Provide a list of 20 movies in this exact format:
@@ -296,8 +299,8 @@ export default function Recs() {
             ...
             (Strictly follow this format—no extra information, no deviations.)
             Choose from the following sentiment: ${text}.
-            DO NOT include these movies: ${Array.from(excludeList).join(', ')}.
-            If that list included everything possible, don't give me anything, that is okay. Just fill in the blanks if there are any. the 20 movies is just the max, it could be 0, 1, 5 or 20...
+            DO NOT include these movies: [${Array.from(excludeList).join(', ')}].
+            If that list included everything possible, do NOT give me anything, that is okay. Just fill in the blanks if there are any. the 20 movies is just the max, it could be 0, 1, 5 or 20...
             Ensure there are no repeats.
             If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
             Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot.
@@ -441,29 +444,37 @@ export default function Recs() {
             onBlur={() => setIsTyping(false)}
           />
 
+        {!loading && 
+        <>
         <View style={styles.toggleSection}>
-          <TouchableOpacity onPress={toggleSuggestSeen} style={styles.toggleContainer}>
+          <TouchableOpacity onPress={toggleSuggestSeen} style={[suggestSeen ? [styles.yes, {backgroundColor: currentTheme.seenBtn}] : styles.no, styles.toggleContainer]}>
               <Animated.View style={[styles.toggleCircle, animatedStyleSeen]}>
-                  {suggestSeen ? <Text>YES SEEN</Text> : <Text>NO SEEN</Text> }
+                  {/* {suggestSeen ? <Text></Text> : <Text></Text> } */}
               </Animated.View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={toggleSuggestWatchlist} style={styles.toggleContainer}>
+          <TouchableOpacity onPress={toggleSuggestWatchlist} style={[suggestWatchlist ? [styles.yes, {backgroundColor: currentTheme.seenBtn}] : styles.no, styles.toggleContainer]}>
               <Animated.View style={[styles.toggleCircle, animatedStyleWatchlist]}>
-                  {suggestWatchlist? <Text>YES WLIST</Text> : <Text>NO WLIST</Text> }
+                  {/* {suggestWatchlist? <Text></Text> : <Text></Text> } */}
               </Animated.View>
           </TouchableOpacity>
         </View>
+        <View style={styles.toggleSectionText}>
+          {suggestSeen ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Exclude my seen films</Text>}
+          {suggestWatchlist ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Exclude watchlist films</Text>}
+        </View>
+        </>
+        }
 
           {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
           <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.submitBtnBorder, backgroundColor: currentTheme.submitBtn}]} onPress={handleSubmit} disabled={loading}>
             <Text style={styles.submitButtonText}> Submit</Text>
           </TouchableOpacity>}
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Text style={{color: 'white'}}>Exclude movies i've seen from recs?</Text>
           </TouchableOpacity>
           <TouchableOpacity>
             <Text style={{color: 'white'}}>Exclude movies in my watchlist from recs?</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
         </View>
       
@@ -532,9 +543,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     padding: 10,
     shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 10,
+    elevation: 5,
   },
   subtitle: {
     fontSize: 20,
@@ -559,7 +570,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 50,
     borderWidth: 3,
-    margin: 3,
+    margin: 15,
     marginBottom: 8,
   },
   submitButtonText: {
@@ -579,9 +590,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     padding: 10,
     shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 10,
+    elevation: 5,
     overflow: 'hidden',
   },
   motdHeader: {
@@ -654,26 +665,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
   },
+  toggleSectionText: { 
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
   toggleContainer: {
-    width: 100,
-    height: 50,
-    backgroundColor: '#ccc',
+    width: 70,
+    height: 35,
+    // backgroundColor: '#ccc',
     borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 2,
+    margin: 3,
     position: 'relative',
-},
-toggleCircle: {
-    width: 45,
-    height: 45,
-    borderRadius: 45,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-},
-emoji: {
-    fontSize: 40,
-},
+  },
+  yes: {
+    backgroundColor: '#57CB32',
+  },
+  no: {
+    backgroundColor: '#A44443',
+  },
+  toggleCircle: {
+      width: 30,
+      height: 30,
+      borderRadius: 45,
+      backgroundColor: 'white',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'absolute',
+  },
+  emoji: {
+      fontSize: 40,
+  },
 });

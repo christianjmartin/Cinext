@@ -4,6 +4,8 @@ import { supabase } from '../services/supabase';
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { fetchMovieCredits } from '../services/tmdbApi';
+import whiteArrows from '../assets/whiteArrows.png';
+import blackArrows from '../assets/blackArrows.png';
 import _ from 'lodash';
 import theme from '../services/theme';
 
@@ -173,13 +175,17 @@ const Watchlist = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <View style={styles.headerContainer}>
+                    <TouchableOpacity style={styles.alignSortingSection}>
+                        <Text style={{color: currentTheme.textColorSecondary}}>Recent</Text>
+                        {colorMode === 'dark' ? <Image style={styles.sortingIcon} source={whiteArrows}/> : <Image style={styles.sortingIcon} source={blackArrows}/>}
+                    </TouchableOpacity>
                     <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]}>Watchlist</Text>
                     {/* make the edit button appear only when the user is NOT searching for something */}
                     {editModeAvailable && 
                     (<TouchableOpacity style={[styles.editButton, {backgroundColor: currentTheme.editBtn}]} onPress={handleEditMode}>
                         <Text>{getEditButtonText()}</Text>
                     </TouchableOpacity>)}
-                    </View>
+                </View>
                 <TextInput
                     style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
                     placeholder="Search for movies to add..."
@@ -274,9 +280,10 @@ const styles = StyleSheet.create({
     },
     editButton: {
         position: 'absolute',
-        top: 3,
+        top: 6,
         right: 4,
-        padding: 7,
+        padding: 4,
+        paddingHorizontal: 9,
         textAlign: 'center',
         borderWidth: 0.7,
         borderColor: '#888888',
@@ -300,7 +307,24 @@ const styles = StyleSheet.create({
     },
     bottomSpacer: {
         marginTop: 15,
-    }
+    },
+    sortingIcon: {
+        height: 20,
+        width: 20, 
+        marginTop: 1,
+        marginLeft: 4,
+    },
+    alignSortingSection: {
+        position: 'absolute',
+        flexDirection: 'row',
+        top: 3,
+        left: 0,
+        padding: 7,
+        marginTop: 0.8,
+        textAlign: 'center',
+        zIndex: 2,
+        opacity: 0.75,
+    },
 });
 
 export default Watchlist;
