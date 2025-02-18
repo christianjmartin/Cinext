@@ -7,12 +7,14 @@ import arrow from '../assets/arrow.webp';
 import arrow2 from '../assets/arrow2.png';
 import theme from '../services/theme';
 import check from '../assets/check.png';
+import { useNavigation } from '@react-navigation/native';
 
 const StaticMovie = () => {
-    const { staticMovie, previousPage, updatePage, userId, colorMode, seenFilms, watchlist} = useContext(PageContext);
+    const { staticMovie, updatePage, userId, colorMode, seenFilms, watchlist} = useContext(PageContext);
     const currentTheme = theme[colorMode];
     const [toWatch, setToWatch] = useState(false);
     const [seen, setSeen] = useState(false);
+    const navigation = useNavigation();
 
 
     let noRating = 'N/A';
@@ -60,10 +62,11 @@ const StaticMovie = () => {
 
     return (
     <>
+    <View style={[styles.main, {backgroundColor: currentTheme.background}]}>
         <View style={styles.container}>
             <TouchableOpacity
                 style={styles.exitButton}
-                onPress={() => updatePage(previousPage)}
+                onPress={() => navigation.goBack()}
                 >
                 {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
                 : <Image source={arrow} style={styles.backBtn}></Image>}
@@ -106,13 +109,19 @@ const StaticMovie = () => {
               </View>
             </View>
         </View> 
+        </View>
     </>
     )  
 }
 
 const styles = StyleSheet.create({
+    main: {
+      height: '100%',
+    },
     container: {
-      marginBottom: 35,
+      marginBottom: 80,
+      marginTop: -30,
+      marginHorizontal: 30,
     },
     exitButton: {
       position: 'absolute',
@@ -166,6 +175,7 @@ const styles = StyleSheet.create({
     poster: {
       width: '100%',
       height: Dimensions.get('window').width * 1.1,
+      // height: Dimensions.get('height').width * 0.5,
       resizeMode: 'contain',
       marginTop: 5,
     },

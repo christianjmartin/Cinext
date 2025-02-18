@@ -1,22 +1,35 @@
-import React, {useContext, useState} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, {useContext} from 'react';
+import { View, Image, TouchableOpacity, Dimensions, StyleSheet} from 'react-native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
+import PageContext from '../context/PageContext';
 import bookmark from '../assets/bookmark.png';
 import bulb from '../assets/lightbulb.png';
 import eyeball from '../assets/eyeball.png';
-import PageContext from '../context/PageContext';
 
-// navigation bar at the bottom, main pages of the app 
 export default function NavBar() {
     const {updatePage} = useContext(PageContext);
+    const navigation = useNavigation();
+
+    const navigateWithReset = (screen) => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: screen }], // ✅ Clears stack & starts fresh
+            })
+        );
+    };
     
     return (
-        <View>
+        <View style={styles.navBar}>
             <View style={styles.btnContainer}>
 
                 {/* RECS */}
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => updatePage("Recs")}
+                    onPress={() => {
+                        updatePage("NULL");
+                        navigateWithReset("Recs");
+                    }}
                     >
                     <Image source={bulb} style={styles.btnIcon}></Image>
                 </TouchableOpacity>
@@ -24,7 +37,10 @@ export default function NavBar() {
                 {/* WATCHLIST */}
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => updatePage("Watchlist")}
+                    onPress={() => {
+                        navigateWithReset("Watchlist")
+                        updatePage("NULL");
+                    }}
                     >
                     <Image source={bookmark} style={styles.btnIcon}></Image>
                 </TouchableOpacity>
@@ -32,7 +48,10 @@ export default function NavBar() {
                 {/* SEEN FILMS  */}
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => updatePage("Seen Films")}
+                    onPress={() => {
+                        navigateWithReset("Seen Films");
+                        updatePage("NULL");
+                    }}
                     >
                     <Image source={eyeball} style={styles.btnIcon}></Image>
                     {/* <Text style={styles.buttonText}>Queue</Text> */}
@@ -44,6 +63,15 @@ export default function NavBar() {
 };
 
 const styles = StyleSheet.create({
+    navBar: {
+        // position: 'absolute',
+        // bottom: 0,
+        // left: 0,
+        // right: 0,
+        backgroundColor: '#A44443',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
     btnContainer: {
       display: "flex",
       flexDirection: "row",

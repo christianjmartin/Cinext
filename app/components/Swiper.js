@@ -5,6 +5,7 @@ import imdb from '../assets/IMDB.svg.png';
 import { addToSeen, addToWatchlist } from '../services/dbFuncs';
 import theme from '../services/theme';
 import check from '../assets/check.png';
+import { useNavigation } from '@react-navigation/native';
 
 const MovieList = () => {
   const { movieList, updatePage, userId, colorMode, seenFilms, watchlist} = useContext(PageContext);
@@ -17,6 +18,7 @@ const MovieList = () => {
   const itemWidth = Dimensions.get('window').width * 0.8;
   const spacing = Dimensions.get('window').width * 0.1;
   const noRatingCase = 'N/A';
+  const navigation = useNavigation();
 
 
   const handleAddToSeen = async (movie) => {
@@ -67,7 +69,10 @@ const MovieList = () => {
       <View style={[styles.container, {backgroundColor: currentTheme.swiperBackground}]}>
       <TouchableOpacity
           style={styles.exitButton}
-          onPress={() => updatePage("Recs")}
+          onPress={() => {
+            navigation.replace("Recs");
+            updatePage("NULL");
+          }}
           disabled={isDisabled}
         >
           <Text style={styles.buttonText}>Go back and say sum else crody</Text>
@@ -78,11 +83,15 @@ const MovieList = () => {
   }
   else {
     return (
+    
       <View style={[styles.container, {backgroundColor: currentTheme.swiperBackground}]}>
         {/* Exit Button */}
         <TouchableOpacity
           style={styles.exitButton}
-          onPress={() => updatePage("Recs")}
+          onPress={() => {
+            updatePage("NULL");
+            navigation.replace("Recs");
+          }}
           disabled={isDisabled}
         >
           <Text style={styles.buttonText}>Exit</Text>
@@ -94,7 +103,7 @@ const MovieList = () => {
           keyExtractor={(item, index) => index.toString()}
           horizontal
           showsHorizontalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: spacing / 2 }}
+          contentContainerStyle={{ paddingHorizontal: spacing }}
           decelerationRate="fast"
           snapToInterval={itemWidth + spacing}
           snapToAlignment="start"
@@ -148,6 +157,7 @@ const MovieList = () => {
         />
 
       </View>
+    
     );
   }
 };
@@ -155,13 +165,14 @@ const MovieList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 40,
-    width: Dimensions.get('window').width * 0.9,
+    width: Dimensions.get('window').width * 1,
+    height: '100%',
+    paddingBottom: 20,
   },
   exitButton: {
     position: 'absolute',
     top: 5,
-    left: 0,
+    left: 4,
     backgroundColor: "#ea2121",
     padding: 7,
     borderRadius: 40,
@@ -209,6 +220,7 @@ const styles = StyleSheet.create({
   poster: {
     width: '100%',
     height: Dimensions.get('window').width * 1,
+    // height: Dimensions.get('height').width * 0.5,
     resizeMode: 'contain',
     marginTop: 10,
   },

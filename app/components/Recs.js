@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import PageContext from '../context/PageContext';  
 import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';  
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -7,17 +8,19 @@ import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
 import { updateSuggestionSeenPreference } from '../services/preferences.js';
 import { updateSuggestionWatchlistPreference } from '../services/preferences.js';
+import { useNavigation } from '@react-navigation/native';
 import imdb from '../assets/IMDB.svg.png';
 import MOTD from '../services/MOTD.json';
 import Swiper from 'react-native-swiper';
 import theme from '../services/theme.js';
-import _ from 'lodash';
+import _, { curryRight } from 'lodash';
 
 export default function Recs() {
   const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist} = useContext(PageContext);  
   const [text, setText] = useState('');  
   const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
+  const navigation = useNavigation();
   // const [movieOTD, setMovieOTD] = useState({});
   const currentTheme = theme[colorMode];
   let noRating = 'N/A';
@@ -143,37 +146,40 @@ export default function Recs() {
     }
   }
 
-  useEffect(() => {
-    const fetchMOTD = async () => {
-      const today = new Date();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      const formattedDate = `${month}-${day}`;
-
-      // FOR TESTING
-      // const formattedDate = "01-01";
+  useFocusEffect(
+    useCallback(() => {
+      const fetchMOTD = async () => {
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${month}-${day}`;
   
-      // first, check if today's movie is already in context
-      if (Object.keys(movieOTD).length > 0) {
-        if (movieOTD?.Date === formattedDate) {
-          console.log("movie exists in context and is up to date.");
-          return;
-        } else {
-          console.log("new day -> fetching today's motd...");
-          await getMOTD(formattedDate);
-          return;
+        // FOR TESTING
+        // const formattedDate = "01-01";
+    
+        // Check if today's movie is already in context
+        if (Object.keys(movieOTD).length > 0) {
+          if (movieOTD?.Date === formattedDate) {
+            console.log("movie exists in context and is up to date.");
+            return;
+          } else {
+            console.log("new day -> fetching today's motd...");
+            await getMOTD(formattedDate);
+            return;
+          }
         }
-      }
-      else {
-        console.log("ts was not in context, it better be in the DB");
-        await getMOTD(formattedDate);
-        return; 
-      }
-    };
+        else {
+          console.log("ts was not in context, it better be in the DB");
+          await getMOTD(formattedDate);
+          return; 
+        }
+      };
+
+      fetchMOTD();
+      getFilms();
   
-    fetchMOTD();
-    getFilms();
-  }, [userId]);
+    }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
+  );
   
 
   // this function does the following
@@ -375,6 +381,7 @@ export default function Recs() {
         console.error('Error:', error);
     } finally {
         updatePage("Show Swiper");
+        navigation.replace("Show Swiper");
         setLoading(false);
         setText('');
         Keyboard.dismiss();
@@ -423,7 +430,7 @@ export default function Recs() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, {backgroundColor: currentTheme.background}]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -486,7 +493,8 @@ export default function Recs() {
     
                 <TouchableOpacity style={styles.margin} onPress={() => {
                       setStaticMovie(movieOTD);
-                      updatePage("Static Movie");
+                      updatePage("NULL");
+                      navigation.navigate("Static Movie");
                     }}>
                     <Image
                       source={{ uri: `https://image.tmdb.org/t/p/w500${movieOTD.PosterPath}` }}
@@ -522,7 +530,7 @@ export default function Recs() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 43,
+    paddingTop: 10,
     justifyContent: 'top',
     alignItems: 'center',
     width: Dimensions.get('window').width * 1,
@@ -584,7 +592,7 @@ const styles = StyleSheet.create({
 
   // movie of the day styling 
   box: {
-    marginTop: 20,
+    marginTop: 40,
     width: Dimensions.get('window').width * 0.9,
     borderRadius: 10,
     borderWidth: 0.5,

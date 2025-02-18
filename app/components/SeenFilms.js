@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { Text, View, FlatList, Image, StyleSheet, Keyboard, Dimensions, TouchableWithoutFeedback, TouchableOpacity, TextInput, TouchableHighlight } from 'react-native';
 import { supabase } from '../services/supabase'; 
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
+import { useFocusEffect } from '@react-navigation/native';
 import { fetchMovieCredits } from '../services/tmdbApi';
 import whiteArrows from '../assets/whiteArrows.png';
 import blackArrows from '../assets/blackArrows.png';
 import _ from 'lodash';
 import theme from '../services/theme';
+import { useNavigation } from '@react-navigation/native';
 
 const SeenFilms = () => {
     const { userId, setStaticMovie, updatePage, colorMode, seenFilms, setSeenFilms } = useContext(PageContext);
@@ -19,6 +21,7 @@ const SeenFilms = () => {
     const [editMode, setEditMode] = useState(false);
     const [editModeAvailable, setEditModeAvailable] = useState(true);
     const currentTheme = theme[colorMode];
+    const navigation = useNavigation();
 
     // gets all of the films the user has seen
     const getFilms = async () => {
@@ -49,11 +52,12 @@ const SeenFilms = () => {
     };
 
     // call "getFilms" on mount
-    useEffect(() => {
-        getFilms();
+    useFocusEffect(
+        useCallback(() => {
+            getFilms();
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
-    }, []);
+    }, []));
     
 
     // if searching, update the UI to display search 
@@ -145,7 +149,8 @@ const SeenFilms = () => {
                 }
             }
             setStaticMovie(item);
-            updatePage("Static Movie");
+            updatePage("NULL");
+            navigation.navigate("Static Movie");
         }}>  
             {/* handle a case where a movie doesnt have a poster gracefully  */}
             {item.PosterPath ? (
@@ -174,7 +179,7 @@ const SeenFilms = () => {
     return (
         // Seen films screen
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.container}>
+            <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity style={styles.alignSortingSection}>
                         <Text style={{color: currentTheme.textColorSecondary}}>Recent</Text>
@@ -211,10 +216,10 @@ const SeenFilms = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 15,
-        marginBottom: -2,
+        // marginTop: 15,
+        marginBottom: -15,
         flex: 1,
-        padding: 10,
+        // padding: 10,
         alignItems: 'center',
         width: Dimensions.get('window').width * 1,
     },

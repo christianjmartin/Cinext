@@ -6,7 +6,7 @@ const PageContext = createContext();
 
 export const PageProvider = ({ children }) => {
   const [page, setPage] = useState("Recs");
-  const [previousPage, setPreviousPage] = useState(null);
+  // const [previousPage, setPreviousPage] = useState(null);
   const [movieList, setList] = useState([]);
   const [userId, setUserId] = useState(null);
   const [staticMovie, setStaticMovie] = useState(null);
@@ -65,8 +65,8 @@ export const PageProvider = ({ children }) => {
   // this function handles updating components for page views
   // sets previous page for easy back button logic 
   const updatePage = (newPage) => {
-    console.log("page updating to", newPage);
-    setPreviousPage(page);
+    // console.log("page updating to", newPage);
+    // setPreviousPage(page);
     setPage(newPage);
   };
 
@@ -85,7 +85,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, previousPage, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad}}>
+    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad}}>
       {children}
     </PageContext.Provider>
   );
