@@ -121,7 +121,7 @@ export const fetchMovieCredits = async (tmdbID) => {
       .filter(person => person.job === 'Director')
       .map(director => director.name);
 
-    console.log(directors.join(', '));
+    // console.log(directors.join(', '));
     return directors.join(', '); // Combine director names into a single string
   } catch (error) {
     console.error('Error fetching credits:', error.message);
