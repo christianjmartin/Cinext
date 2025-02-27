@@ -28,7 +28,6 @@ const SeenFilms = () => {
     const [arrowDesc, setArrowDesc] = useState();
     const currentTheme = theme[colorMode];
     const navigation = useNavigation();
-    const [currSort, setCurrSort] = useState('Date Added');
 
     // gets all of the films the user has seen
     const getFilms = async ( sortingOption ) => {

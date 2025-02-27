@@ -13,10 +13,10 @@ import imdb from '../assets/IMDB.svg.png';
 import MOTD from '../services/MOTD.json';
 import Swiper from 'react-native-swiper';
 import theme from '../services/theme.js';
-import _, { curryRight } from 'lodash';
+import _ from 'lodash';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist} = useContext(PageContext);  
   const [text, setText] = useState('');  
   const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
@@ -53,55 +53,105 @@ export default function Recs() {
 
 
   // gets all of the films the user has put in their watchlist
-  const getFilms = async () => {
+  const getFilms = async (sortingOptionSeen, sortingOptionWatchlist) => {
     try {
-        const { data, error } = await supabase
-            .from('Watchlist')
-            .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-            .order('id', { ascending: false })
-            .eq('UserID', userId);
+      let query = supabase
+      .from('Watchlist')
+      .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+      .eq('UserID', userId);
+
+      // add the order based on the sorting option if exists
+      switch (sortingOptionWatchlist) {
+          case 'Alphabetical 1':
+              query = query.order('Title', { ascending: true });
+              break;
+          case 'Alphabetical 2':
+              query = query.order('Title', { ascending: false });
+              break;
+          case 'Date Added 1':
+              query = query.order('created_at', { ascending: false });
+              break;
+          case 'Date Added 2':
+              query = query.order('created_at', { ascending: true });
+              break;
+          case 'Release Date 1':
+              query = query.order('Year', { ascending: false});
+              break;
+          case 'Release Date 2':
+              query = query.order('Year', { ascending: true });
+              break;
+          default:
+              query = query.order('created_at', { ascending: false });
+      }
+
+    const { data, error } = await query;
 
         if (error) {
             console.error('Error fetching Watchlist:', error.message);
         } else {
             // console.log('Fetched from Watchlist:', data);
             // console.log("data", data);
-            // console.log("watchlist", watchlist)
+            // console.log("Watchlist", watchlist)
             if (!_.isEqual(data, watchlist)) {
-                console.log("There were changes in watchlist, updating watchlist...");
+                console.log("There were changes in Watchlist, updating Watchlist...");
                 setWatchlist(data || []);
             }
             else {
-                console.log('no changes in watchlist, nothing to do!');
+                console.log('no changes in Watchlist, nothing to do!');
             }
         }
     } catch (error) {
         console.error('Unexpected error:', error); 
     }
     try {
-      const { data, error } = await supabase
-          .from('SeenFilms')
-          .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-          .order('id', { ascending: false })
-          .eq('UserID', userId);
+      let query = supabase
+      .from('SeenFilms')
+      .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+      .eq('UserID', userId);
 
-      if (error) {
-          console.error('Error fetching SeenFilms:', error.message);
-      } else {
-          // console.log('Fetched from SeenFilms:', data);
-          // console.log("data", data);
-          // console.log("seenFilms", seenFilms)
-          if (!_.isEqual(data, seenFilms)) {
-              console.log("There were changes in seenfilms, updating seenfilms...");
-              setSeenFilms(data || []);
-          }
-          else {
-              console.log('no changes in seenfilms, nothing to do!');
-          }
+      // add the order based on the sorting option if exists
+      switch (sortingOptionSeen) {
+          case 'Alphabetical 1':
+              query = query.order('Title', { ascending: true });
+              break;
+          case 'Alphabetical 2':
+              query = query.order('Title', { ascending: false });
+              break;
+          case 'Date Added 1':
+              query = query.order('created_at', { ascending: false });
+              break;
+          case 'Date Added 2':
+              query = query.order('created_at', { ascending: true });
+              break;
+          case 'Release Date 1':
+              query = query.order('Year', { ascending: false});
+              break;
+          case 'Release Date 2':
+              query = query.order('Year', { ascending: true });
+              break;
+          default:
+              query = query.order('created_at', { ascending: false });
       }
-    } catch (error) {
-        console.error('Unexpected error:', error); 
-    }
+
+      const { data, error } = await query;
+
+          if (error) {
+              console.error('Error fetching SeenFilms:', error.message);
+          } else {
+              // console.log('Fetched from SeenFilms:', data);
+              // console.log("data", data);
+              // console.log("seenFilms", seenFilms)
+              if (!_.isEqual(data, seenFilms)) {
+                  console.log("There were changes in seenfilms, updating seenfilms...");
+                  setSeenFilms(data || []);
+              }
+              else {
+                  console.log('no changes in seenfilms, nothing to do!');
+              }
+          }
+      } catch (error) {
+          console.error('Unexpected error:', error); 
+      }
   };
 
  
@@ -176,11 +226,102 @@ export default function Recs() {
       };
 
       fetchMOTD();
-      getFilms();
+      getFilms(currSortSeen, currSortWatchlist);
   
     }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
   );
+
+
+
+
+
+
+  const updateRequestsTable = async () => {
+    const today = new Date().toISOString().split('T')[0]; // Ensure date is in correct format (YYYY-MM-DD)
+
+    try {
+      // Check if user has an existing request count entry
+      const { data: existingRequest, error: fetchError } = await supabase
+        .from('Requests')
+        .select('Date, Count')
+        .eq('UserID', userId)
+        // .eq('Date', today) // Ensure you're checking today's entry
+        .single();
   
+      if (fetchError && fetchError.code !== 'PGRST116') { // Handle actual fetch errors
+        console.error('Error fetching request count:', fetchError);
+        return -1;
+      }
+
+  
+      if (existingRequest) {
+        let newCount;
+        if (today === existingRequest.Date) {
+          console.log('the same');
+          newCount = existingRequest.Count + 1;
+          if (newCount > 20) {
+            console.log("too many requests today!, table not updated");
+            return newCount;
+          }
+          const { data: updatedRequest, error: updateError } = await supabase
+            .from('Requests')
+            .update({ Count: newCount })
+            .eq('UserID', userId)
+            .eq('Date', today)
+            .select();
+          if (updateError) {
+            console.error('Error updating request count:', updateError);
+            return -1;
+          } else {
+            console.log('Updated request count:', updatedRequest);
+          }
+          return newCount; 
+        }
+        else {
+          console.log('new day');
+          const { data: updatedRequest2, error: updateError2 } = await supabase
+            .from('Requests')
+            .update({ Count: 1, Date: today})
+            .eq('UserID', userId)
+            .select();
+    
+          if (updateError2) {
+            console.error('Error updating request count:', updateError2);
+            return -1;
+          } else if (!updatedRequest2 || updatedRequest2.length === 0) {
+            console.log('Request limit reached! No update made.');
+          } else {
+            console.log('Updated request count:', updatedRequest2);
+            return 1;
+          }
+        }
+      } else {
+        // If no record exists, insert a new one
+        console.log("This is their first request ever.");
+        const { data: newRequest, error: insertError } = await supabase
+          .from('Requests')
+          .insert([{ UserID: userId, Date: today, Count: 1 }]); // Set initial count to 1
+  
+        if (insertError) {
+          console.error('Error inserting new request record:', insertError);
+          return -1;
+        } else {
+          console.log('New request record created:', newRequest);
+          return 1;
+        }
+      }
+    } catch (error) {
+      console.error('Error updating requests table:', error);
+      return -1;
+    }
+  };
+
+  
+
+
+
+
+
 
   // this function does the following
   // fetches the films that are in the user's lists (Seen and Watchlist) and creates a Set of their respective ID's from TMDB
@@ -207,6 +348,15 @@ export default function Recs() {
     setLoading(true);
 
     try {
+        const requests = await updateRequestsTable();
+        if (requests > 20) {
+          console.log("too many requests")
+          Alert.alert("To many requests for today, try again tomorrow");
+          setLoading(false);
+          setText('');
+          Keyboard.dismiss();
+          return;
+        }
         // fetch everything this user has already seen
         const { data, error } = await supabase
             .from('SeenFilms')
@@ -220,6 +370,10 @@ export default function Recs() {
         
         if (error || watchlistError) {
             console.error('Error fetching movies:', error || watchlistError);
+            Alert.alert("Fatal error");
+            setLoading(false);
+            setText('');
+            Keyboard.dismiss();
             return;
         }
 
@@ -265,6 +419,12 @@ export default function Recs() {
         let movies1 = extractMovieList(responseText1);
         if (movies1.length === 0) {
             updateMovieList(['This is a special error case !@#$']);
+            // ready to go, update page
+            updatePage("Show Swiper");
+            navigation.replace("Show Swiper");
+            setLoading(false);
+            setText('');
+            Keyboard.dismiss();
             return;
         }
 
@@ -376,15 +536,17 @@ export default function Recs() {
           updateMovieList(['This is a special error case !@#$']);
         }
         else {updateMovieList(uniqueMovies);}
+        
 
-    } catch (error) {
-        console.error('Error:', error);
-    } finally {
+        // ready to go, update page
         updatePage("Show Swiper");
         navigation.replace("Show Swiper");
         setLoading(false);
         setText('');
         Keyboard.dismiss();
+
+    } catch (error) {
+        console.error('Error:', error);
     }
   };
 
