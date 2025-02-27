@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getOrCreateUserId } from '../services/userID';
-import { createClient } from '../services/createClient';
+import { createClient } from '../database/createClient';
 
 const PageContext = createContext();
 
@@ -17,6 +17,8 @@ export const PageProvider = ({ children }) => {
   const [suggestSeen, setSuggestSeen] = useState(false);
   const [suggestWatchlist, setSuggestWatchlist] = useState(false)
   const [initialLoad, setInitialLoad] = useState(true);
+  const [currSortSeen, setCurrSortSeen] = useState('Date Added 1');
+  const [currSortWatchlist, setCurrSortWatchlist] = useState('Date Added 1');
 
 
   // initialize userId when the context is created
@@ -85,7 +87,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad}}>
+    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist}}>
       {children}
     </PageContext.Provider>
   );

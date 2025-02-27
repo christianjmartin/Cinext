@@ -6,8 +6,8 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import { fetchLLMResponse } from '../services/geminiapi';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
-import { updateSuggestionSeenPreference } from '../services/preferences.js';
-import { updateSuggestionWatchlistPreference } from '../services/preferences.js';
+import { updateSuggestionSeenPreference } from '../database/preferences.js';
+import { updateSuggestionWatchlistPreference } from '../database/preferences.js';
 import { useNavigation } from '@react-navigation/native';
 import imdb from '../assets/IMDB.svg.png';
 import MOTD from '../services/MOTD.json';

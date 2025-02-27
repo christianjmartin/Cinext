@@ -3,16 +3,20 @@ import { Text, View, FlatList, Image, StyleSheet, Keyboard, Dimensions, Touchabl
 import { supabase } from '../services/supabase'; 
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
-import { fetchMovieCredits } from '../services/tmdbApi';
 import { useFocusEffect } from '@react-navigation/native';
-import whiteArrows from '../assets/whiteArrows.png';
-import blackArrows from '../assets/blackArrows.png';
+import { fetchMovieCredits } from '../services/tmdbApi';
+import SortDropdown from './SortDropdown';
+import waUp from '../assets/waUp.png';
+import waDown from '../assets/waDown.png';
+import baUp from '../assets/baUp.png';
+import baDown from '../assets/baDown.png';
+import X from '../assets/X.png';
 import _ from 'lodash';
 import theme from '../services/theme';
 import { useNavigation } from '@react-navigation/native';
 
 const Watchlist = () => {
-    const { userId, setStaticMovie, updatePage, colorMode, watchlist, setWatchlist} = useContext(PageContext);
+    const { userId, setStaticMovie, updatePage, colorMode, watchlist, setWatchlist, currSortWatchlist, setCurrSortWatchlist} = useContext(PageContext);
     // const [watchlist, setWatchlist] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
@@ -20,30 +24,58 @@ const Watchlist = () => {
     const [selectedMovies, setSelectedMovies] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const [editModeAvailable, setEditModeAvailable] = useState(true);
+    const [sortingDropdownAvailable, setSortingDropdownAvailable] = useState(false);
+    const [arrowDesc, setArrowDesc] = useState();
     const currentTheme = theme[colorMode];
     const navigation = useNavigation();
+    const [currSort, setCurrSort] = useState('Date Added');
 
-    // gets all of the films the user has put in their watchlist
-    const getFilms = async () => {
+    // gets all of the films the user has in Watchlist
+    const getFilms = async ( sortingOption ) => {
         try {
-            const { data, error } = await supabase
-                .from('Watchlist')
-                .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-                .order('id', { ascending: false })
-                .eq('UserID', userId);
+            let query = supabase
+            .from('Watchlist')
+            .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+            .eq('UserID', userId);
+
+            // add the order based on the sorting option if exists
+            switch (sortingOption) {
+                case 'Alphabetical 1':
+                    query = query.order('Title', { ascending: true });
+                    break;
+                case 'Alphabetical 2':
+                    query = query.order('Title', { ascending: false });
+                    break;
+                case 'Date Added 1':
+                    query = query.order('created_at', { ascending: false });
+                    break;
+                case 'Date Added 2':
+                    query = query.order('created_at', { ascending: true });
+                    break;
+                case 'Release Date 1':
+                    query = query.order('Year', { ascending: false});
+                    break;
+                case 'Release Date 2':
+                    query = query.order('Year', { ascending: true });
+                    break;
+                default:
+                    query = query.order('created_at', { ascending: false });
+            }
+
+        const { data, error } = await query;
 
             if (error) {
                 console.error('Error fetching Watchlist:', error.message);
             } else {
                 // console.log('Fetched from Watchlist:', data);
                 // console.log("data", data);
-                // console.log("watchlist", watchlist)
+                // console.log("Watchlist", watchlist)
                 if (!_.isEqual(data, watchlist)) {
-                    console.log("There were changes in watchlist, updating watchlist...");
+                    console.log("There were changes in Watchlist, updating Watchlist...");
                     setWatchlist(data || []);
                 }
                 else {
-                    console.log('no changes in watchlist, nothing to do!');
+                    console.log('no changes in Watchlist, nothing to do!');
                 }
             }
         } catch (error) {
@@ -54,13 +86,17 @@ const Watchlist = () => {
     // call "getFilms" on mount
     useFocusEffect(
         useCallback(() => {
-            getFilms();
+            setSortingDropdownAvailable(false);
+            arrowDirection();
+            getFilms(currSortWatchlist);
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
     }, []));
+    
 
     // if searching, update the UI to display search 
     const handleSearch = async (query) => {
+        setSortingDropdownAvailable(false);
         setEditMode(false);
         setEditModeAvailable(false);
         setSearchQuery(query);
@@ -110,7 +146,7 @@ const Watchlist = () => {
                     }
                 }
                 // call getFilms again to update the UI as they delete films
-                getFilms();
+                getFilms(currSortWatchlist);
             }
             setSelectedMovies([]);
         }
@@ -132,6 +168,33 @@ const Watchlist = () => {
         );
     }
 
+    // opens the options for sorting
+    const openSortingOptions = () => {
+        setSortingDropdownAvailable(!sortingDropdownAvailable);
+    }
+
+    // processes the sorting selection
+    const handleSort = (sortingOption) => {
+        setSortingDropdownAvailable(!sortingDropdownAvailable);
+        setCurrSortWatchlist(sortingOption.option);
+        setArrowDesc(sortingOption.desc);
+        // console.log(sortingOption.option);
+        getFilms(sortingOption.option);
+    }
+
+    // handles dismissal of keyboard and sorting dropdown when clicking
+    const handleDismiss = () => {
+        Keyboard.dismiss();
+        setSortingDropdownAvailable(false);
+    };
+
+    const arrowDirection = () => {
+        if (currSortWatchlist === "Alphabetical 1" || currSortWatchlist === "Date Added 2" || currSortWatchlist === "Release Date 2") {
+            setArrowDesc(false);
+        }
+        else { setArrowDesc(true); }
+    }
+
     // render a film card
     const renderFilm = ({ item }) => (
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border}]} onPress={async () => {
@@ -148,8 +211,8 @@ const Watchlist = () => {
                 }
             }
             setStaticMovie(item);
-            navigation.navigate("Static Movie");
             updatePage("NULL");
+            navigation.navigate("Static Movie");
         }}>  
             {/* handle a case where a movie doesnt have a poster gracefully  */}
             {item.PosterPath ? (
@@ -176,14 +239,23 @@ const Watchlist = () => {
     );
 
     return (
-        // Watchlist screen
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        // Watchlist films screen
+        <TouchableWithoutFeedback onPress={handleDismiss}>
             <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
                 <View style={styles.headerContainer}>
-                    <TouchableOpacity style={styles.alignSortingSection}>
-                        <Text style={{color: currentTheme.textColorSecondary}}>Recent</Text>
-                        {colorMode === 'dark' ? <Image style={styles.sortingIcon} source={whiteArrows}/> : <Image style={styles.sortingIcon} source={blackArrows}/>}
+                    {editModeAvailable && (
+                    <TouchableOpacity style={styles.alignSortingSection} onPress={openSortingOptions}>
+                        <Text style={{fontWeight: '500', color: currentTheme.textColorSecondary}}>{currSortWatchlist.slice(0,-2)}</Text>
+                        {colorMode === 'dark' ? 
+                            <Image style={styles.sortingIcon} source={arrowDesc ? waDown : waUp}/> 
+                        : <Image style={styles.sortingIcon} source={arrowDesc ? baDown : baUp}/>}
                     </TouchableOpacity>
+                    )}
+                    {sortingDropdownAvailable && (
+                        <SortDropdown 
+                            option={handleSort}>
+                        </SortDropdown>
+                    )}
                     <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]}>Watchlist</Text>
                     {/* make the edit button appear only when the user is NOT searching for something */}
                     {editModeAvailable && 
@@ -191,13 +263,20 @@ const Watchlist = () => {
                         <Text>{getEditButtonText()}</Text>
                     </TouchableOpacity>)}
                 </View>
-                <TextInput
-                    style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
-                    placeholder="Search for movies to add..."
-                    placeholderTextColor="#888"
-                    value={searchQuery}
-                    onChangeText={handleSearch}
-                />
+                <View>
+                    <TextInput
+                        style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
+                        placeholder="Search for movies to add..."
+                        placeholderTextColor="#888"
+                        value={searchQuery}
+                        onChangeText={handleSearch}
+                    />
+                    {!editModeAvailable && 
+                        <TouchableOpacity style={styles.xBtn} onPress={()=>handleSearch('')}>
+                            <Image source={X} style={styles.xImage}></Image>
+                        </TouchableOpacity>
+                    }
+                </View>
                 <FlatList
                     data={searching ? searchResults : watchlist}
                     keyExtractor={(item, index) => index.toString()}
@@ -244,6 +323,16 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         paddingHorizontal: 10,
         backgroundColor: '#fff',
+    },
+    xBtn: {
+        position: 'absolute',
+        zIndex: 20,
+        top: 8.5,
+        right: 7,
+    },
+    xImage: {
+        height: 24,
+        width: 24,
     },
     row: {
         justifyContent: 'flex-start',
@@ -314,9 +403,9 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     sortingIcon: {
-        height: 20,
-        width: 20, 
-        marginTop: 1,
+        height: 16,
+        width: 12, 
+        marginTop: 1.2,
         marginLeft: 4,
     },
     alignSortingSection: {

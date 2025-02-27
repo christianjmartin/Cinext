@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { updateColorPreference } from '../services/preferences.js';
+import { updateColorPreference } from '../database/preferences.js';
 import { useNavigation } from '@react-navigation/native';
 import PageContext from '../context/PageContext';
 import vader from '../assets/vader.png';
@@ -84,7 +84,21 @@ const styles = StyleSheet.create({
         height: 70,
         width: 70,
         resizeMode: 'contain',
-    }
+    },
+    exitButton: {
+        position: 'absolute',
+        top: 10,
+        left: -10,
+        zIndex: 10, 
+    },
+    backBtn: {
+        width: 70,
+        height: 70,
+        resizeMode: 'contain',
+        opacity: 0.42,
+        borderRadius: 20,
+    },
+
 });
 
 export default Settings;

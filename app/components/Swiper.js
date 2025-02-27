@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native';
 import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
-import { addToSeen, addToWatchlist } from '../services/dbFuncs';
+import { addToSeen, addToWatchlist } from '../database/dbFuncs';
 import theme from '../services/theme';
 import check from '../assets/check.png';
 import { useNavigation } from '@react-navigation/native';

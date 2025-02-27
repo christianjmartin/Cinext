@@ -5,14 +5,18 @@ import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { useFocusEffect } from '@react-navigation/native';
 import { fetchMovieCredits } from '../services/tmdbApi';
-import whiteArrows from '../assets/whiteArrows.png';
-import blackArrows from '../assets/blackArrows.png';
+import SortDropdown from './SortDropdown';
+import waUp from '../assets/waUp.png';
+import waDown from '../assets/waDown.png';
+import baUp from '../assets/baUp.png';
+import baDown from '../assets/baDown.png';
+import X from '../assets/X.png';
 import _ from 'lodash';
 import theme from '../services/theme';
 import { useNavigation } from '@react-navigation/native';
 
 const SeenFilms = () => {
-    const { userId, setStaticMovie, updatePage, colorMode, seenFilms, setSeenFilms } = useContext(PageContext);
+    const { userId, setStaticMovie, updatePage, colorMode, seenFilms, setSeenFilms, currSortSeen, setCurrSortSeen} = useContext(PageContext);
     // const [seenFilms, setSeenFilms] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
@@ -20,17 +24,45 @@ const SeenFilms = () => {
     const [selectedMovies, setSelectedMovies] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const [editModeAvailable, setEditModeAvailable] = useState(true);
+    const [sortingDropdownAvailable, setSortingDropdownAvailable] = useState(false);
+    const [arrowDesc, setArrowDesc] = useState();
     const currentTheme = theme[colorMode];
     const navigation = useNavigation();
+    const [currSort, setCurrSort] = useState('Date Added');
 
     // gets all of the films the user has seen
-    const getFilms = async () => {
+    const getFilms = async ( sortingOption ) => {
         try {
-            const { data, error } = await supabase
-                .from('SeenFilms')
-                .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-                .order('id', { ascending: false })
-                .eq('UserID', userId);
+            let query = supabase
+            .from('SeenFilms')
+            .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+            .eq('UserID', userId);
+
+            // add the order based on the sorting option if exists
+            switch (sortingOption) {
+                case 'Alphabetical 1':
+                    query = query.order('Title', { ascending: true });
+                    break;
+                case 'Alphabetical 2':
+                    query = query.order('Title', { ascending: false });
+                    break;
+                case 'Date Added 1':
+                    query = query.order('created_at', { ascending: false });
+                    break;
+                case 'Date Added 2':
+                    query = query.order('created_at', { ascending: true });
+                    break;
+                case 'Release Date 1':
+                    query = query.order('Year', { ascending: false});
+                    break;
+                case 'Release Date 2':
+                    query = query.order('Year', { ascending: true });
+                    break;
+                default:
+                    query = query.order('created_at', { ascending: false });
+            }
+
+        const { data, error } = await query;
 
             if (error) {
                 console.error('Error fetching SeenFilms:', error.message);
@@ -54,7 +86,9 @@ const SeenFilms = () => {
     // call "getFilms" on mount
     useFocusEffect(
         useCallback(() => {
-            getFilms();
+            setSortingDropdownAvailable(false);
+            arrowDirection();
+            getFilms(currSortSeen);
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
     }, []));
@@ -62,6 +96,7 @@ const SeenFilms = () => {
 
     // if searching, update the UI to display search 
     const handleSearch = async (query) => {
+        setSortingDropdownAvailable(false);
         setEditMode(false);
         setEditModeAvailable(false);
         setSearchQuery(query);
@@ -111,7 +146,7 @@ const SeenFilms = () => {
                     }
                 }
                 // call getFilms again to update the UI as they delete films
-                getFilms();
+                getFilms(currSortSeen);
             }
             setSelectedMovies([]);
         }
@@ -131,6 +166,33 @@ const SeenFilms = () => {
                 ? selectedMovies.filter(id => id !== tmdbID) // remove from list of to be deleted (BTN WAS UNDO)
                 : [...selectedMovies, tmdbID] // add film to the list of to be deleted (BTN WAS X)
         );
+    }
+
+    // opens the options for sorting
+    const openSortingOptions = () => {
+        setSortingDropdownAvailable(!sortingDropdownAvailable);
+    }
+
+    // processes the sorting selection
+    const handleSort = (sortingOption) => {
+        setSortingDropdownAvailable(!sortingDropdownAvailable);
+        setCurrSortSeen(sortingOption.option);
+        setArrowDesc(sortingOption.desc);
+        // console.log(sortingOption.option);
+        getFilms(sortingOption.option);
+    }
+
+    // handles dismissal of keyboard and sorting dropdown when clicking
+    const handleDismiss = () => {
+        Keyboard.dismiss();
+        setSortingDropdownAvailable(false);
+    };
+
+    const arrowDirection = () => {
+        if (currSortSeen === "Alphabetical 1" || currSortSeen === "Date Added 2" || currSortSeen === "Release Date 2") {
+            setArrowDesc(false);
+        }
+        else { setArrowDesc(true); }
     }
 
     // render a film card
@@ -178,27 +240,43 @@ const SeenFilms = () => {
 
     return (
         // Seen films screen
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={handleDismiss}>
             <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
                 <View style={styles.headerContainer}>
-                    <TouchableOpacity style={styles.alignSortingSection}>
-                        <Text style={{color: currentTheme.textColorSecondary}}>Recent</Text>
-                        {colorMode === 'dark' ? <Image style={styles.sortingIcon} source={whiteArrows}/> : <Image style={styles.sortingIcon} source={blackArrows}/>}
+                    {editModeAvailable && (
+                    <TouchableOpacity style={styles.alignSortingSection} onPress={openSortingOptions}>
+                        <Text style={{fontWeight: '500', color: currentTheme.textColorSecondary}}>{currSortSeen.slice(0,-2)}</Text>
+                        {colorMode === 'dark' ? 
+                            <Image style={styles.sortingIcon} source={arrowDesc ? waDown : waUp}/> 
+                        : <Image style={styles.sortingIcon} source={arrowDesc ? baDown : baUp}/>}
                     </TouchableOpacity>
-                    <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]}>Movies I've Seen</Text>
+                    )}
+                    {sortingDropdownAvailable && (
+                        <SortDropdown 
+                            option={handleSort}>
+                        </SortDropdown>
+                    )}
+                    <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]}>Seen Movies</Text>
                     {/* make the edit button appear only when the user is NOT searching for something */}
                     {editModeAvailable && 
                     (<TouchableOpacity style={[styles.editButton, {backgroundColor: currentTheme.editBtn}]} onPress={handleEditMode}>
                         <Text>{getEditButtonText()}</Text>
                     </TouchableOpacity>)}
                 </View>
-                <TextInput
-                    style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
-                    placeholder="Search for movies to add..."
-                    placeholderTextColor="#888"
-                    value={searchQuery}
-                    onChangeText={handleSearch}
-                />
+                <View>
+                    <TextInput
+                        style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
+                        placeholder="Search for movies to add..."
+                        placeholderTextColor="#888"
+                        value={searchQuery}
+                        onChangeText={handleSearch}
+                    />
+                    {!editModeAvailable && 
+                        <TouchableOpacity style={styles.xBtn} onPress={()=>handleSearch('')}>
+                            <Image source={X} style={styles.xImage}></Image>
+                        </TouchableOpacity>
+                    }
+                </View>
                 <FlatList
                     data={searching ? searchResults : seenFilms}
                     keyExtractor={(item, index) => index.toString()}
@@ -245,6 +323,16 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         paddingHorizontal: 10,
         backgroundColor: '#fff',
+    },
+    xBtn: {
+        position: 'absolute',
+        zIndex: 20,
+        top: 8.5,
+        right: 7,
+    },
+    xImage: {
+        height: 24,
+        width: 24,
     },
     row: {
         justifyContent: 'flex-start',
@@ -315,9 +403,9 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     sortingIcon: {
-        height: 20,
-        width: 20, 
-        marginTop: 1,
+        height: 16,
+        width: 12, 
+        marginTop: 1.2,
         marginLeft: 4,
     },
     alignSortingSection: {
@@ -331,7 +419,6 @@ const styles = StyleSheet.create({
         zIndex: 2,
         opacity: 0.75,
     },
-
 });
 
 export default SeenFilms;

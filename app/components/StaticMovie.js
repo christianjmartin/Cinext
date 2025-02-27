@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Text, View, FlatList, Image, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { addToSeen, addToWatchlist } from '../services/dbFuncs'
+import { addToSeen, addToWatchlist } from '../database/dbFuncs'
 import imdb from '../assets/IMDB.svg.png';
 import PageContext from '../context/PageContext';
 import arrow from '../assets/arrow.webp';

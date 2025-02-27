@@ -1,4 +1,4 @@
-import { supabase } from './supabase'; 
+import { supabase } from '../services/supabase';
 
 /*
 The functions below encapsulate the logic to add to Watchlist and Seen Films lists.
