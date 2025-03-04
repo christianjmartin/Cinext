@@ -10,7 +10,7 @@ export const PageProvider = ({ children }) => {
   const [movieList, setList] = useState([]);
   const [userId, setUserId] = useState(null);
   const [staticMovie, setStaticMovie] = useState(null);
-  const [colorMode, setColorMode] = useState("light");
+  const [colorMode, setColorMode] = useState("dark");
   const [movieOTD, setMovieOTD] = useState({});
   const [seenFilms, setSeenFilms] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
@@ -19,6 +19,7 @@ export const PageProvider = ({ children }) => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [currSortSeen, setCurrSortSeen] = useState('Date Added 1');
   const [currSortWatchlist, setCurrSortWatchlist] = useState('Date Added 1');
+  const [requestCount, setRequestCount] = useState();
 
 
   // initialize userId when the context is created
@@ -87,7 +88,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist}}>
+    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount}}>
       {children}
     </PageContext.Provider>
   );

@@ -44,7 +44,7 @@ const Settings = () => {
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
                 <Animated.View style={[styles.toggleCircle, animatedStyle]}>
-                    <Text style={styles.emoji}>{colorMode === 'dark' ? <Image source={vader} style={styles.colorIcon}></Image>: <Image source={yoda} style={styles.colorIcon}></Image>}</Text>
+                    <Text style={styles.emoji}>{colorMode === 'dark' ? <Text>🌙</Text>: <Text>🌞</Text>}</Text>
                 </Animated.View>
             </TouchableOpacity>
         </View>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     emoji: {
-        fontSize: 40,
+        fontSize: 50,
     },
     colorIcon: {
         height: 70,

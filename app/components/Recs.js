@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import PageContext from '../context/PageContext';  
 import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';  
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { fetchLLMResponse } from '../services/geminiapi';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
@@ -16,10 +17,11 @@ import theme from '../services/theme.js';
 import _ from 'lodash';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist, requestCount, setRequestCount} = useContext(PageContext);  
   const [text, setText] = useState('');  
   const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
+  // const [requestCount, setRequestCount] = useState();
   const navigation = useNavigation();
   // const [movieOTD, setMovieOTD] = useState({});
   const currentTheme = theme[colorMode];
@@ -196,6 +198,39 @@ export default function Recs() {
     }
   }
 
+  const getRequestsLeft = async () => {
+    const today = new Date().toISOString().split('T')[0];
+  
+    try {
+      const storedData = await AsyncStorage.getItem('requestCountData');
+      if (storedData) {
+        const { count, date } = JSON.parse(storedData);
+        if (date === today) {
+          setRequestCount(count);
+          setLoading(false);
+          return;
+        }
+      }
+  
+      const { data: existingRequest, error } = await supabase
+        .from('Requests')
+        .select('Count, Date')
+        .eq('UserID', userId)
+        .single();
+  
+      let requestsLeft = 25;
+      if (!error && existingRequest && existingRequest.Date === today) {
+        requestsLeft = 25 - existingRequest.Count;
+      }
+  
+      setRequestCount(requestsLeft);
+      
+      await AsyncStorage.setItem('requestCountData', JSON.stringify({ count: requestsLeft, date: today }));
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       const fetchMOTD = async () => {
@@ -227,6 +262,7 @@ export default function Recs() {
 
       fetchMOTD();
       getFilms(currSortSeen, currSortWatchlist);
+      getRequestsLeft();
   
     }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
   );
@@ -259,7 +295,7 @@ export default function Recs() {
         if (today === existingRequest.Date) {
           console.log('the same');
           newCount = existingRequest.Count + 1;
-          if (newCount > 20) {
+          if (newCount > 25) {
             console.log("too many requests today!, table not updated");
             return newCount;
           }
@@ -345,6 +381,7 @@ export default function Recs() {
       return;
     }
     console.log(`Fetching movie recommendations...`);
+    await AsyncStorage.setItem('requestCountData', JSON.stringify({ count: requestCount - 1, date: new Date().toISOString().split('T')[0]}));
     setLoading(true);
 
     try {
@@ -357,6 +394,7 @@ export default function Recs() {
           Keyboard.dismiss();
           return;
         }
+       
         // fetch everything this user has already seen
         const { data, error } = await supabase
             .from('SeenFilms')
@@ -405,7 +443,9 @@ export default function Recs() {
         If there are not 40 movies available given the sentiment, give as many as you can but no repeats.
         Choose from the following sentiment: ${text}`;
 
+       
         const result1 = await fetchLLMResponse(firstPrompt);
+    
         const responseText1 = result1?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
         
@@ -547,6 +587,9 @@ export default function Recs() {
 
     } catch (error) {
         console.error('Error:', error);
+        Alert.alert("Error, avoid leaving the app while suggestions generate!");
+        setLoading(false);
+        setText('');
     }
   };
 
@@ -634,16 +677,15 @@ export default function Recs() {
         </>
         }
 
-          {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
-          <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.submitBtnBorder, backgroundColor: currentTheme.submitBtn}]} onPress={handleSubmit} disabled={loading}>
-            <Text style={styles.submitButtonText}> Submit</Text>
-          </TouchableOpacity>}
-          {/* <TouchableOpacity>
-            <Text style={{color: 'white'}}>Exclude movies i've seen from recs?</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={{color: 'white'}}>Exclude movies in my watchlist from recs?</Text>
-          </TouchableOpacity> */}
+        {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
+        <>
+        <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.submitBtnBorder, backgroundColor: currentTheme.submitBtn}]} onPress={handleSubmit} disabled={loading}>
+          <Text style={styles.submitButtonText}> Submit</Text>
+        </TouchableOpacity>
+
+        <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Daily requests left: {requestCount}</Text>
+        </>
+        }
 
         </View>
       
@@ -740,6 +782,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 50,
     borderWidth: 3,
+    marginTop: 25,
     margin: 15,
     marginBottom: 8,
   },
