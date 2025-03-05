@@ -35,7 +35,7 @@ const SeenFilms = () => {
             let query = supabase
             .from('SeenFilms')
             .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-            .eq('UserID', userId);
+            .eq('AuthID', userId);
 
             // add the order based on the sorting option if exists
             switch (sortingOption) {

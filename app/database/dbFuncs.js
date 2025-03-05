@@ -20,7 +20,7 @@ const addToWatchlist = async (title, director, year, posterPath, description, ra
           .eq('Director', director)
           .eq('Year', year)
           .eq('tmdbID', tmdbID)
-          .eq('UserID', userId)
+          .eq('AuthID', userId)
           .select();
     
         if (error) {
@@ -37,7 +37,7 @@ const addToWatchlist = async (title, director, year, posterPath, description, ra
     try {
       const { data, error } = await supabase
         .from('Watchlist')
-        .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating, tmdbID: tmdbID }])
+        .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, Description: description, Rating: rating, tmdbID: tmdbID }])
         .select();
   
       if (error) {
@@ -66,7 +66,7 @@ const addToSeen = async (title, director, year, posterPath, description, rating,
         .eq('Director', director)
         .eq('Year', year)
         .eq('tmdbID', tmdbID)
-        .eq('UserID', userId)
+        .eq('AuthID', userId)
         .select();
   
       if (error) {
@@ -89,7 +89,7 @@ const addToSeen = async (title, director, year, posterPath, description, rating,
         .eq('Director', director)
         .eq('Year', year)
         .eq('tmdbID', tmdbID)
-        .eq('UserID', userId)
+        .eq('AuthID', userId)
         .select();
   
       if (error) {
@@ -106,7 +106,7 @@ const addToSeen = async (title, director, year, posterPath, description, rating,
   try {
     const { data, error } = await supabase
       .from('SeenFilms')
-      .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, UserID: userId, Description: description, Rating: rating, tmdbID: tmdbID }])
+      .insert([{ Title: title, Director: director, Year: parseInt(year), PosterPath: posterPath, Description: description, Rating: rating, tmdbID: tmdbID }])
       .select();
 
     if (error) {
@@ -132,7 +132,7 @@ const alreadySeen = async (title, director, year, userId, tmdbID) => {
       .eq('Director', director)
       .eq('Year', year)
       .eq('tmdbID', tmdbID)
-      .eq('UserID', userId) // Ensure user-specific query
+      .eq('AuthID', userId) // Ensure user-specific query
 
     if (error) {
       console.error('Error fetching data:', error);
@@ -164,7 +164,7 @@ const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
       .eq('Director', director)
       .eq('Year', year)
       .eq('tmdbID', tmdbID)
-      .eq('UserID', userId)
+      .eq('AuthID', userId)
 
 
     if (error) {
@@ -186,4 +186,32 @@ const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
   }
 };
 
-export { addToWatchlist, addToSeen };
+const getRequestsLeft = async () => {
+  const today = new Date().toISOString().split('T')[0];
+
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  let userId = userData?.user?.id;
+  // const tomorrow = new Date();
+  // tomorrow.setDate(tomorrow.getDate() + 1);
+  // const today = tomorrow.toISOString().split('T')[0];
+  try {
+    const { data: existingRequest, error } = await supabase
+      .from('Requests')
+      .select('Count, Date')
+      .eq('Date', today)
+      .eq('AuthID', userId)
+      .single();
+
+    let requestsLeft = 25;
+    // console.log(existingRequest);
+    if (!error && existingRequest && existingRequest.Date === today) {
+      requestsLeft = 25 - existingRequest.Count;
+    }
+    return requestsLeft;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+export { addToWatchlist, addToSeen, getRequestsLeft };

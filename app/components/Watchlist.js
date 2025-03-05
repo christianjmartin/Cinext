@@ -35,7 +35,7 @@ const Watchlist = () => {
             let query = supabase
             .from('Watchlist')
             .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-            .eq('UserID', userId);
+            .eq('AuthID', userId);
 
             // add the order based on the sorting option if exists
             switch (sortingOption) {

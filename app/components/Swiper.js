@@ -110,7 +110,9 @@ const MovieList = () => {
           renderItem={({ item }) => (
             <View style={[styles.card, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border, width: itemWidth, marginRight: spacing }]}>
               {/* Scrollable Content */}
-              <ScrollView style={styles.cardContent}>
+              <ScrollView 
+                showsVerticalScrollIndicator={false} 
+                style={styles.cardContent}>
                 <Text style={[styles.cardTextTitle, {color: currentTheme.movieTitle}]}>{item.Title}</Text>
                 {item.PosterPath && (
                   <Image
@@ -136,13 +138,6 @@ const MovieList = () => {
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
-              <TouchableOpacity
-                style={[styles.seenButton, { backgroundColor: currentTheme.seenBtn }]}
-                onPress={() => handleAddToSeen(item)}
-              >
-                <Text style={styles.buttonText}>I've Seen This</Text>
-                {seenMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
-              </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.watchlistButton, { backgroundColor: currentTheme.watchlistBtn }]}
@@ -151,6 +146,16 @@ const MovieList = () => {
                 <Text style={styles.buttonText}>Add to Watchlist</Text>
                 {watchlistMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
               </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.seenButton, { backgroundColor: currentTheme.seenBtn }]}
+                onPress={() => handleAddToSeen(item)}
+              >
+                <Text style={styles.buttonText}>I've Seen This</Text>
+                {seenMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
+              </TouchableOpacity>
+
+              
               </View>
             </View>
           )}
@@ -204,7 +209,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     padding: 7,
     paddingHorizontal: 10,
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 5,
   },
   bold: {

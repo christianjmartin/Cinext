@@ -73,7 +73,9 @@ const StaticMovie = () => {
             </TouchableOpacity>
             <View style={[styles.card, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border}]}>
               {/* Scrollable Content */}
-              <ScrollView style={styles.cardContent}>
+              <ScrollView 
+                showsVerticalScrollIndicator={false} 
+                style={styles.cardContent}>
                 <Text style={[styles.cardTextTitle, {color: currentTheme.movieTitle}]}>{staticMovie.Title}</Text>
                 {staticMovie.PosterPath && (
                   <Image
@@ -98,13 +100,13 @@ const StaticMovie = () => {
           
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
+              <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={handleAddToWatchlist}>
+                  <Text style={styles.buttonText}>Add to Watchlist</Text>
+                  {toWatch ? <Image style={styles.checkmark} source={check}></Image> : null}
+                </TouchableOpacity>
                 <TouchableOpacity style={[styles.seenButton, {backgroundColor: currentTheme.seenBtn}]} onPress={handleAddToSeen}>
                   <Text style={styles.buttonText}>I've Seen This</Text>
                   {seenFilms?.some(movie => movie.tmdbID === staticMovie.tmdbID) || seen ? <Image style={styles.checkmark} source={check}></Image> : null}
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={handleAddToWatchlist}>
-                  <Text style={styles.buttonText}>Add to Watchlist</Text>
-                  {toWatch ? <Image style={styles.checkmark} source={check}></Image> : null}
                 </TouchableOpacity>
               </View>
             </View>
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
       textAlign: 'left',
       padding: 7,
       paddingHorizontal: 10,
-      borderWidth: 1,
+      // borderWidth: 1,
       borderRadius: 5,
     },
     bold: {

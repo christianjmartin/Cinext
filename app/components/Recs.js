@@ -17,9 +17,9 @@ import theme from '../services/theme.js';
 import _ from 'lodash';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist, requestCount, setRequestCount} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist, requestCount, setRequestCount, loading, setLoading} = useContext(PageContext);  
   const [text, setText] = useState('');  
-  const [loading, setLoading] = useState(false);  
+  // const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
   // const [requestCount, setRequestCount] = useState();
   const navigation = useNavigation();
@@ -60,7 +60,7 @@ export default function Recs() {
       let query = supabase
       .from('Watchlist')
       .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-      .eq('UserID', userId);
+      .eq('AuthID', userId);
 
       // add the order based on the sorting option if exists
       switch (sortingOptionWatchlist) {
@@ -109,7 +109,7 @@ export default function Recs() {
       let query = supabase
       .from('SeenFilms')
       .select('Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-      .eq('UserID', userId);
+      .eq('AuthID', userId);
 
       // add the order based on the sorting option if exists
       switch (sortingOptionSeen) {
@@ -172,20 +172,21 @@ export default function Recs() {
       } else {
           // nothing exists in the database for this day 
           if (data.length === 0) {
-            const movieOfTheDay = await fetchMovieDetails(motd);
-            console.log("movie of the day is:", movieOfTheDay);
-            const { data2, error2 } = await supabase
-              .from('MovieOfTheDay')
-              .insert([{ Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }])
-              .select();
+            // const movieOfTheDay = await fetchMovieDetails(motd);
+            // console.log("movie of the day is:", movieOfTheDay);
+            // const { data2, error2 } = await supabase
+            //   .from('MovieOfTheDay')
+            //   .insert([{ Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }])
+            //   .select();
         
-            if (error2) {
-              console.error('Error adding to Movie of the Day:', error2.message);
-            } else {
-              const updateContext = { Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }
-              setMovieOTD(updateContext);
-              console.log('Added a new film to the Movie of the Day table');
-            }
+            // if (error2) {
+            //   console.error('Error adding to Movie of the Day:', error2.message);
+            // } else {
+            //   const updateContext = { Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }
+            //   setMovieOTD(updateContext);
+            //   console.log('Added a new film to the Movie of the Day table');
+            // }
+            console.log('idk what to tell u ....')
           }
           // something was there, update context for movieoftheday
           else {
@@ -198,38 +199,37 @@ export default function Recs() {
     }
   }
 
-  const getRequestsLeft = async () => {
-    const today = new Date().toISOString().split('T')[0];
+  // const getRequestsLeft = async () => {
+  //   const today = new Date().toISOString().split('T')[0];
   
-    try {
-      const storedData = await AsyncStorage.getItem('requestCountData');
-      if (storedData) {
-        const { count, date } = JSON.parse(storedData);
-        if (date === today) {
-          setRequestCount(count);
-          setLoading(false);
-          return;
-        }
-      }
+  //   try {
+  //     const storedData = await AsyncStorage.getItem('requestCountData');
+  //     if (storedData) {
+  //       const { count, date } = JSON.parse(storedData);
+  //       if (date === today) {
+  //         setRequestCount(count);
+  //         return;
+  //       }
+  //     }
   
-      const { data: existingRequest, error } = await supabase
-        .from('Requests')
-        .select('Count, Date')
-        .eq('UserID', userId)
-        .single();
+  //     const { data: existingRequest, error } = await supabase
+  //       .from('Requests')
+  //       .select('Count, Date')
+  //       .eq('UserID', userId)
+  //       .single();
   
-      let requestsLeft = 25;
-      if (!error && existingRequest && existingRequest.Date === today) {
-        requestsLeft = 25 - existingRequest.Count;
-      }
+  //     let requestsLeft = 25;
+  //     if (!error && existingRequest && existingRequest.Date === today) {
+  //       requestsLeft = 25 - existingRequest.Count;
+  //     }
   
-      setRequestCount(requestsLeft);
+  //     setRequestCount(requestsLeft);
       
-      await AsyncStorage.setItem('requestCountData', JSON.stringify({ count: requestsLeft, date: today }));
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+  //     await AsyncStorage.setItem('requestCountData', JSON.stringify({ count: requestsLeft, date: today }));
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // };
 
   useFocusEffect(
     useCallback(() => {
@@ -262,7 +262,7 @@ export default function Recs() {
 
       fetchMOTD();
       getFilms(currSortSeen, currSortWatchlist);
-      getRequestsLeft();
+      // getRequestsLeft();
   
     }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
   );
@@ -280,7 +280,7 @@ export default function Recs() {
       const { data: existingRequest, error: fetchError } = await supabase
         .from('Requests')
         .select('Date, Count')
-        .eq('UserID', userId)
+        .eq('AuthID', userId)
         // .eq('Date', today) // Ensure you're checking today's entry
         .single();
   
@@ -302,7 +302,7 @@ export default function Recs() {
           const { data: updatedRequest, error: updateError } = await supabase
             .from('Requests')
             .update({ Count: newCount })
-            .eq('UserID', userId)
+            .eq('AuthID', userId)
             .eq('Date', today)
             .select();
           if (updateError) {
@@ -318,7 +318,7 @@ export default function Recs() {
           const { data: updatedRequest2, error: updateError2 } = await supabase
             .from('Requests')
             .update({ Count: 1, Date: today})
-            .eq('UserID', userId)
+            .eq('AuthID', userId)
             .select();
     
           if (updateError2) {
@@ -336,7 +336,7 @@ export default function Recs() {
         console.log("This is their first request ever.");
         const { data: newRequest, error: insertError } = await supabase
           .from('Requests')
-          .insert([{ UserID: userId, Date: today, Count: 1 }]); // Set initial count to 1
+          .insert([{ Date: today, Count: 1 }]); // Set initial count to 1
   
         if (insertError) {
           console.error('Error inserting new request record:', insertError);
@@ -381,7 +381,7 @@ export default function Recs() {
       return;
     }
     console.log(`Fetching movie recommendations...`);
-    await AsyncStorage.setItem('requestCountData', JSON.stringify({ count: requestCount - 1, date: new Date().toISOString().split('T')[0]}));
+    setRequestCount(prevCount => prevCount - 1);
     setLoading(true);
 
     try {
@@ -399,12 +399,12 @@ export default function Recs() {
         const { data, error } = await supabase
             .from('SeenFilms')
             .select('tmdbID')
-            .eq('UserID', userId);
+            .eq('AuthID', userId);
 
         const { data: watchlistData, error: watchlistError } = await supabase
             .from('Watchlist')
             .select('tmdbID')
-            .eq('UserID', userId);
+            .eq('AuthID', userId);
         
         if (error || watchlistError) {
             console.error('Error fetching movies:', error || watchlistError);
@@ -430,7 +430,7 @@ export default function Recs() {
         }
 
         // get 40 movies based on the sentiment
-        let firstPrompt = `Provide a list of 40 movies in this exact format:
+        let firstPrompt = `Provide a list of 40 movie recommendations in this exact format:
         1. title ^ year
         2. title ^ year
         ...
@@ -499,7 +499,7 @@ export default function Recs() {
             console.log("exclude list: ", excludeList);
 
             // prompt AI API again, explicity telling to not include movies from first response
-            let finalPrompt = `Provide a list of 20 movies in this exact format:
+            let finalPrompt = `Provide a list of 20 movie recommendations in this exact format:
             1. title ^ year
             2. title ^ year
             ...
@@ -564,11 +564,11 @@ export default function Recs() {
             }
         }
     
-        // cut off the amount of movies shown to the user to 30 at most
-        if (uniqueMovies.length > 30) {
-          let cutoffAmount = uniqueMovies.length % 30;
+        // cut off the amount of movies shown to the user to 21 at most
+        if (uniqueMovies.length > 24) {
+          let cutoffAmount = uniqueMovies.length % 24;
           uniqueMovies = uniqueMovies.slice(0, -cutoffAmount);
-          console.log("The number of films actually displayed (it was over 30):", uniqueMovies.length);
+          console.log("The number of films actually displayed (it was over 24):", uniqueMovies.length);
         }
 
         // update the movieList for context
@@ -610,9 +610,12 @@ export default function Recs() {
 
   const extractStringDate = (date) => {
     const month = date.slice(0,2);
-    const day = date.slice(3);
-    // console.log(date);
-    
+    let day = date.slice(3);
+    if (day) {
+      const tempDay = parseInt(day);
+      day = tempDay < 10 ? day[1] : day;
+    }
+
     switch (month) {
         case "01": return `January ${day}`;
         case "02": return `February ${day}`;
@@ -683,7 +686,7 @@ export default function Recs() {
           <Text style={styles.submitButtonText}> Submit</Text>
         </TouchableOpacity>
 
-        <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Daily requests left: {requestCount}</Text>
+        <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Requests left today: {requestCount}</Text>
         </>
         }
 

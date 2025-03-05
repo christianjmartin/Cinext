@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getOrCreateUserId } from '../services/userID';
+import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
 
 const PageContext = createContext();
@@ -20,22 +21,29 @@ export const PageProvider = ({ children }) => {
   const [currSortSeen, setCurrSortSeen] = useState('Date Added 1');
   const [currSortWatchlist, setCurrSortWatchlist] = useState('Date Added 1');
   const [requestCount, setRequestCount] = useState();
+  const [loading, setLoading] = useState(false);  
 
 
   // initialize userId when the context is created
-  useEffect(() => {
-    const initializeUser = async () => {
-      const id = await getOrCreateUserId();
-      setUserId(id);
-    };
+  // useEffect(() => {
+  //   const initializeUser = async () => {
+  //     const id = await getOrCreateUserId();
+  //     console.log(id);
+  //     setUserId(id);
+  //   };
 
-    initializeUser();
-  }, []);
+  //   initializeUser();
+  // }, []);
 
   useEffect(() => {
     const initializeClient = async () => {
         try {
-            const preferences = await createClient({userId});
+            const preferences = await createClient();
+            if (preferences.id) setUserId(preferences.id);
+            console.log("they id" , preferences.id);
+            const reqs = await getRequestsLeft();
+            console.log(reqs);
+            setRequestCount(reqs);
 
             if (!preferences) {
                 console.error("Error: createClient() returned null or undefined.");
@@ -57,10 +65,10 @@ export const PageProvider = ({ children }) => {
         }
     };
 
-    if (userId) {
+    // if (userId) {
         initializeClient();
-    }
-  }, [userId, setColorMode, setSuggestSeen, setSuggestWatchlist]);
+    // }
+  }, [setColorMode, setSuggestSeen, setSuggestWatchlist, setRequestCount]);
 
 
 
@@ -88,7 +96,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount}}>
+    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount, loading, setLoading}}>
       {children}
     </PageContext.Provider>
   );
