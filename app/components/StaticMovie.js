@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Text, View, FlatList, Image, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { addToSeen, addToWatchlist } from '../database/dbFuncs'
 import imdb from '../assets/IMDB.svg.png';
+import tmdb2 from '../assets/tmdb2.png';
 import PageContext from '../context/PageContext';
 import arrow from '../assets/arrow.webp';
 import arrow2 from '../assets/arrow2.png';
@@ -93,7 +94,7 @@ const StaticMovie = () => {
                   <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
                     Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{staticMovie.Rating ? staticMovie.Rating : noRating}</Text>
                   </Text>
-                  <Image style={styles.imdbLogo} source={imdb}></Image>
+                  <Image style={styles.imdbLogo} source={tmdb2}></Image>
                 </View>
                 <Text style={[styles.descriptionText, {color: currentTheme.textColorSecondary, borderColor: currentTheme.border, backgroundColor: currentTheme.description}]}>{staticMovie.Description}</Text>
               </ScrollView>
@@ -210,8 +211,8 @@ const styles = StyleSheet.create({
       textAlign: "center",
     },
     imdbLogo: {
-      width: 40,
-      height: 20,
+      width: 30,
+      height: 17,
       marginLeft: 5,
       resizeMode: 'contain',
     },

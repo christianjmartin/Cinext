@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native';
 import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
+import tmdb2 from '../assets/tmdb2.png';
 import { addToSeen, addToWatchlist } from '../database/dbFuncs';
 import theme from '../services/theme';
 import check from '../assets/check.png';
@@ -131,7 +132,7 @@ const MovieList = () => {
                   <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
                     Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Rating ? item.Rating : noRatingCase}</Text>
                   </Text>
-                  <Image style={styles.imdbLogo} source={imdb}></Image>
+                  <Image style={styles.imdbLogo} source={tmdb2}></Image>
                 </View>
                 <Text style={[styles.descriptionText, {color: currentTheme.textColorSecondary, borderColor: currentTheme.border, backgroundColor: currentTheme.description}]}>{item.Description}</Text>
               </ScrollView>
@@ -257,8 +258,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   imdbLogo: {
-    width: 40,
-    height: 20,
+    width: 30,
+    height: 17,
     marginLeft: 5,
     resizeMode: 'contain',
   },

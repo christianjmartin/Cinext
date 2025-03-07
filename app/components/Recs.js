@@ -11,6 +11,7 @@ import { updateSuggestionSeenPreference } from '../database/preferences.js';
 import { updateSuggestionWatchlistPreference } from '../database/preferences.js';
 import { useNavigation } from '@react-navigation/native';
 import imdb from '../assets/IMDB.svg.png';
+import tmdb2 from '../assets/tmdb2.png';
 import MOTD from '../services/MOTD.json';
 import Swiper from 'react-native-swiper';
 import theme from '../services/theme.js';
@@ -386,7 +387,7 @@ export default function Recs() {
 
     try {
         const requests = await updateRequestsTable();
-        if (requests > 20) {
+        if (requests > 25) {
           console.log("too many requests")
           Alert.alert("To many requests for today, try again tomorrow");
           setLoading(false);
@@ -720,7 +721,7 @@ export default function Recs() {
                     <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
                       Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Rating ? movieOTD.Rating : noRating}</Text>
                     </Text>
-                    <Image style={styles.imdbLogo} source={imdb}></Image>
+                    <Image style={styles.imdbLogo} source={tmdb2}></Image>
                 </View>
                 <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
                   Released: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Year}</Text>
@@ -831,8 +832,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   imdbLogo: {
-    width: 40,
-    height: 20,
+    width: 30,
+    height: 17,
     marginLeft: 5,
     resizeMode: 'contain',
   },

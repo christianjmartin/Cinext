@@ -35,13 +35,19 @@ const Settings = () => {
 
     return (
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
-            <TouchableOpacity
-                style={styles.exitButton}
-                onPress={() => navigation.goBack()}
-                >
-                {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
-                : <Image source={arrow} style={styles.backBtn}></Image>}
-            </TouchableOpacity>
+            {/* <View class={styles.head}> */}
+                <TouchableOpacity
+                    style={styles.exitButton}
+                    onPress={() => navigation.goBack()}
+                    >
+                    {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
+                    : <Image source={arrow} style={styles.backBtn}></Image>}
+                </TouchableOpacity>
+            {/* <View> */}
+            {/* PUT THE TMDB ATTRIBUTION INFORMATION HERE  */}
+                <Text>FAQ</Text>
+            {/* </View> */}
+            {/* </View> */}
             <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
                 <Animated.View style={[styles.toggleCircle, animatedStyle]}>
                     <Text style={styles.emoji}>{colorMode === 'dark' ? <Text>🌙</Text>: <Text>🌞</Text>}</Text>
@@ -52,6 +58,9 @@ const Settings = () => {
 };
 
 const styles = StyleSheet.create({
+    head: {
+        justifyContent: 'space-between',
+    },
     container: {
         display: 'flex',
         alignItems: 'center',
