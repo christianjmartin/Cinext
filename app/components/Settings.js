@@ -11,7 +11,7 @@ import arrow from '../assets/arrow.webp';
 import arrow2 from '../assets/arrow2.png';
 
 const Settings = () => {
-    const { colorMode, updateColorMode, userId} = useContext(PageContext);
+    const { colorMode, updateColorMode, userId, updatePage} = useContext(PageContext);
     const currentTheme = theme[colorMode];
     const navigation = useNavigation();
     const togglePosition = useSharedValue(colorMode === 'dark' ? 105 : 5);
@@ -34,32 +34,39 @@ const Settings = () => {
     }));
 
     return (
+        <>
+        <View style={[styles.head, {backgroundColor: currentTheme.background}]}>
+            <TouchableOpacity
+                style={styles.exitButton}
+                onPress={() => {navigation.goBack()
+                                updatePage("NULL")}}
+                >
+                {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
+                : <Image source={arrow} style={styles.backBtn}></Image>}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.faqBtn} onPress={() => {
+                navigation.navigate("FAQ");
+            }}>
+                <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>FAQ</Text>
+            </TouchableOpacity>
+        </View>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
-            {/* <View class={styles.head}> */}
-                <TouchableOpacity
-                    style={styles.exitButton}
-                    onPress={() => navigation.goBack()}
-                    >
-                    {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
-                    : <Image source={arrow} style={styles.backBtn}></Image>}
-                </TouchableOpacity>
-            {/* <View> */}
-            {/* PUT THE TMDB ATTRIBUTION INFORMATION HERE  */}
-                <Text>FAQ</Text>
-            {/* </View> */}
-            {/* </View> */}
             <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
                 <Animated.View style={[styles.toggleCircle, animatedStyle]}>
                     <Text style={styles.emoji}>{colorMode === 'dark' ? <Text>🌙</Text>: <Text>🌞</Text>}</Text>
                 </Animated.View>
             </TouchableOpacity>
         </View>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     head: {
+        display: 'flex',
         justifyContent: 'space-between',
+        flexDirection: 'row',
+        height: 70,
     },
     container: {
         display: 'flex',
@@ -75,7 +82,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 2,
-        position: 'relative',
+        marginBottom: 100,
     },
     toggleCircle: {
         width: 90,
@@ -89,16 +96,22 @@ const styles = StyleSheet.create({
     emoji: {
         fontSize: 50,
     },
+    exitButton: {
+        left: -10,
+    },
     colorIcon: {
         height: 70,
         width: 70,
         resizeMode: 'contain',
     },
-    exitButton: {
-        position: 'absolute',
-        top: 10,
-        left: -10,
-        zIndex: 10, 
+    faqText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    faqBtn: {
+        padding: 12,
+        paddingRight: 15,
+        paddingTop: 15,
     },
     backBtn: {
         width: 70,

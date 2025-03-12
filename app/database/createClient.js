@@ -7,7 +7,7 @@ import { supabase } from '../services/supabase.js';
  */
 export const createClient = async () => {
     try {
-        // 🔹 Step 1: Try to restore an existing session
+        // restore an existing session
         const storedSession = await SecureStore.getItemAsync("session");
 
         if (storedSession) {
@@ -28,7 +28,7 @@ export const createClient = async () => {
             }
         }
 
-        // 🔹 Step 2: No valid session, sign in anonymously
+        // no valid session, sign in anonymously
         console.log("No session found, signing in anonymously...");
         const { data: signInData, error: signInError } = await supabase.auth.signInAnonymously();
 
@@ -39,7 +39,7 @@ export const createClient = async () => {
 
         console.log("Signed in anonymously:", signInData.user);
 
-        // 🔹 Step 3: Retrieve the new session
+        // retrieve the new session
         const { data: newSessionData } = await supabase.auth.getSession();
 
         if (!newSessionData?.session) {
@@ -47,10 +47,8 @@ export const createClient = async () => {
             return null;
         }
 
-        // Securely store session for future logins
         await SecureStore.setItemAsync("session", JSON.stringify(newSessionData.session));
 
-        // 🔹 Step 4: Fetch or create the user's `Client` data
         return await fetchClientData(signInData.user.id);
 
     } catch (error) {

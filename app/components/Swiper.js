@@ -46,7 +46,7 @@ const MovieList = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsDisabled(false);
-    }, 2500); 
+    }, 1500); 
 
     const seenState = {};
     const watchlistState = {};

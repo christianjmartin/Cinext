@@ -21,9 +21,10 @@ export default function Header() {
             {/* {page != "Show Swiper" ?  */}
             <TouchableOpacity onPress={() => {
                 navigation.navigate("Settings");
-                // updatePage("NULL");
+                updatePage("Settings");
             }}>
-                <Image source={settings} style={[styles.image, styles.settings]}></Image>
+            {page != "Settings" ? <Image source={settings} style={[styles.image, styles.settings]}></Image> : null}
+            
             </TouchableOpacity>
             {/* : null } */}
         </View>
