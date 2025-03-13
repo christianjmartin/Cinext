@@ -12,7 +12,10 @@ import SeenFilms from './SeenFilms';
 import MovieSwiper from './Swiper';
 import StaticMovie from './StaticMovie';
 import Settings from './Settings';
-import FAQ from './FAQ'
+import DATA from './DATA';
+import CONTACT from './CONTACT';
+import ABOUT from './ABOUT';
+import FAQ from './FAQ';
 
 import Header from './Header';
 import NavBar from './NavBar';
@@ -44,6 +47,9 @@ export default function Page() {
           <Stack.Screen name="Show Swiper" component={MovieSwiper} />
           <Stack.Screen name="Static Movie" component={StaticMovie} />
           <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="DATA" component={DATA}/>
+          <Stack.Screen name="CONTACT" component={CONTACT}/>
+          <Stack.Screen name="ABOUT" component={ABOUT}/>
           <Stack.Screen name="FAQ" component={FAQ}/>
         </Stack.Navigator>
       </View>

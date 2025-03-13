@@ -44,11 +44,28 @@ const Settings = () => {
                 {colorMode === "dark" ? <Image source={arrow2} style={styles.backBtn}></Image> 
                 : <Image source={arrow} style={styles.backBtn}></Image>}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.faqBtn} onPress={() => {
-                navigation.navigate("FAQ");
-            }}>
-                <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>FAQ</Text>
-            </TouchableOpacity>
+            <View style={styles.col}>
+                <TouchableOpacity style={styles.faqBtn} onPress={() => {
+                    navigation.navigate("DATA");
+                }}>
+                    <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>Film Data</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.faqBtn} onPress={() => {
+                    navigation.navigate("CONTACT");
+                }}>
+                    <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>Contact</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.faqBtn} onPress={() => {
+                    navigation.navigate("ABOUT");
+                }}>
+                    <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>About</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.faqBtn} onPress={() => {
+                    navigation.navigate("FAQ");
+                }}>
+                    <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>FAQ</Text>
+                </TouchableOpacity>
+            </View>
         </View>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
             <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
@@ -66,13 +83,17 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        height: 70,
+    },
+    col: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignSelf: 'flex-end', 
     },
     container: {
+        flex: 1,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
     },
     toggleContainer: {
         width: 200,
@@ -82,7 +103,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 2,
-        marginBottom: 100,
+        marginBottom: 200,
     },
     toggleCircle: {
         width: 90,
@@ -107,11 +128,10 @@ const styles = StyleSheet.create({
     faqText: {
         fontSize: 20,
         fontWeight: 'bold',
+        textAlign: 'right',
     },
     faqBtn: {
         padding: 12,
-        paddingRight: 15,
-        paddingTop: 15,
     },
     backBtn: {
         width: 70,

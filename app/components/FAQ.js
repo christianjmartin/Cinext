@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions, ScrollView} from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { updateColorPreference } from '../database/preferences.js';
 import { useNavigation } from '@react-navigation/native';
-import PageContext from '../context/PageContext';
+import PageContext from '../context/PageContext.js';
 import tmdbOfficial from '../assets/tmdbOfficial.png';
 import theme from '../services/theme.js';
 import arrow from '../assets/arrow.webp';
@@ -27,10 +27,27 @@ const FAQ = () => {
                 : <Image source={arrow} style={styles.backBtn}></Image>}
             </TouchableOpacity>
         </View>
-        <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
-            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>All data used by MovieNext, including Posters, Titles, Directors, Ratings and Dates is provided by TMDB (The Movie Database)</Text>
-            <Image source={tmdbOfficial} style={styles.tmdbLogo}></Image>
-        </View>
+        <ScrollView style={[styles.container, {backgroundColor: currentTheme.background}]}>
+            <View style={{alignItems: 'center'}}>
+                <View style={styles.QA}>
+                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>If I delete my account, will my lists hold if I re-download?</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Unfortunately not! In the future, we plan on introducing an account system to tackle this issue.</Text>
+                </View>
+                <View style={styles.QA}>
+                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>A movie was suggested that was in one of my lists, and I had the toggle off, whats going on?</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>After extensive filtering, the film recommendation algorithm keeps 5 movies no matter what, to prevent empty suggestions. Try refining and further detailing your ask to pinpoint new movies. Be creative!</Text>
+                </View>
+                <View style={styles.QA}>
+                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Where are the ratings coming from?</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Ratings come directly from TMDB, being an average of user ratings on that service.</Text>
+                </View>
+                <View style={styles.QA}>
+                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Am I able to ask for recent movies?</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Currently, the reccomendation system cannot process films after 2023. You can still add them to your lists by using the search feature.</Text>
+                </View>
+            </View>
+        </ScrollView>
+        
         </>
     );
 };
@@ -40,10 +57,11 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        height: 70,
+    },
+    bold: {
+        fontWeight: 'bold',
     },
     container: {
-        alignItems: 'center',
         height: '100%',
     },
     backBtn: {
@@ -54,15 +72,14 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     infoContainer: {
-        width: Dimensions.get('window').width * 0.8,
-    },
-    tmdbLogo: {
-        width: Dimensions.get('window').width * 0.8,
-        resizeMode: 'contain',
-        marginTop: -80,
+        width: Dimensions.get('window').width * 0.95,
+        padding: 5,
     },
     exitButton: {
         left: -10,
+    },
+    QA: {
+        padding: 24,
     },
 
 
