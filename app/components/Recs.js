@@ -4,7 +4,7 @@ import PageContext from '../context/PageContext';
 import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { fetchLLMResponse } from '../services/geminiapi';
+import { fetchLLMResponse } from '../services/apiComms.js';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
 import { updateSuggestionSeenPreference } from '../database/preferences.js';

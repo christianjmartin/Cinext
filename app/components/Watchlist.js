@@ -5,6 +5,7 @@ import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { useFocusEffect } from '@react-navigation/native';
 import { fetchMovieCredits } from '../services/tmdbApi';
+import { fetchMovieDirectors } from '../services/apiComms';
 import SortDropdown from './SortDropdown';
 import waUp from '../assets/waUp.png';
 import waDown from '../assets/waDown.png';
@@ -201,7 +202,9 @@ const Watchlist = () => {
             if (!item.Director) {
                 try {
                     if (item.tmdbID) {
-                        const directors = await fetchMovieCredits(item.tmdbID);
+                        // const directors = await fetchMovieCredits(item.tmdbID);
+                        console.log("searched for a movie, clicked, and need directors");
+                        const directors = await fetchMovieDirectors(item.tmdbID);
                         item.Director = directors; // add the director(s) to the film object 
                     }
                 } catch (error) {
