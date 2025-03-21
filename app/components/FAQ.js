@@ -38,6 +38,10 @@ const FAQ = () => {
                     <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>After extensive filtering, the film recommendation algorithm keeps 5 movies no matter what, to prevent empty suggestions. Try refining and further detailing your ask to pinpoint new movies. Be creative!</Text>
                 </View>
                 <View style={styles.QA}>
+                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Why did my request count for the day go down by 2 after one request?</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>If too many movies were filtered from the reccomendations, we need to get more to satisy the request to provide the best suggestions possible.</Text>
+                </View>
+                <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Where are the ratings coming from?</Text>
                     <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Ratings come directly from TMDB, being an average of user ratings on that service.</Text>
                 </View>

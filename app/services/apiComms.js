@@ -3,10 +3,11 @@ import { CONFIG } from '../../config';
 
 const BASE_URL = CONFIG.URL;
 
-export const fetchLLMResponse = async (text) => {
+// gemini
+export const fetchLLMResponse = async (text, sentiment, userId) => {
   try {
-    const response = await axios.post(`${BASE_URL}/gemini`, { text });
-    console.log(response);
+    const response = await axios.post(`${BASE_URL}/gemini`, {text, sentiment, userId});
+    // console.log(response);
     return response.data;
   } catch (error) {
     console.error('Error connecting to backend:', error);
@@ -14,6 +15,10 @@ export const fetchLLMResponse = async (text) => {
   }
 };
 
+
+
+
+// tmdb movie data
 export const fetchMovieData = async (movieTitle, year) => {
   try {
     const response = await axios.get(`${BASE_URL}/movieDetails`, {
@@ -57,3 +62,4 @@ export const fetchMovieSearch = async (searchQuery) => {
     throw error;
   }
 };
+

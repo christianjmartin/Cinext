@@ -382,19 +382,19 @@ export default function Recs() {
       return;
     }
     console.log(`Fetching movie recommendations...`);
-    setRequestCount(prevCount => prevCount - 1);
+    // setRequestCount(prevCount => prevCount - 1);
     setLoading(true);
 
     try {
-        const requests = await updateRequestsTable();
-        if (requests > 25) {
-          console.log("too many requests")
-          Alert.alert("To many requests for today, try again tomorrow");
-          setLoading(false);
-          setText('');
-          Keyboard.dismiss();
-          return;
-        }
+        // const requests = await updateRequestsTable();
+        // if (requests > 25) {
+        //   console.log("too many requests")
+        //   Alert.alert("To many requests for today, try again tomorrow");
+        //   setLoading(false);
+        //   setText('');
+        //   Keyboard.dismiss();
+        //   return;
+        // }
        
         // fetch everything this user has already seen
         const { data, error } = await supabase
@@ -445,7 +445,35 @@ export default function Recs() {
         Choose from the following sentiment: ${text}`;
 
        
-        const result1 = await fetchLLMResponse(firstPrompt);
+        const result1 = await fetchLLMResponse(firstPrompt, text, userId);
+
+        // error getting requests
+        if (result1 == "err_getting_requests_wtf") {
+          Alert.alert("There was an error getting your request count, try again later.");
+          setLoading(false);
+          setText('');
+          Keyboard.dismiss();
+          return;
+        }
+        // daily limit reached
+        if (result1 == "bruh_yo_daily_limit_reached") {
+          Alert.alert("Too many requests for today, try again tomorrow.");
+          setLoading(false);
+          setText('');
+          Keyboard.dismiss();
+          return;
+        }
+        // too many chars sent to llm
+        if (result1 == "too_many_characters_in_prompt_brody") {
+          Alert.alert("cmon crode", "you done typed way too much lmao");
+          setLoading(false);
+          setText('');
+          Keyboard.dismiss();
+          return;
+        }
+
+        setRequestCount(prevCount => prevCount - 1);
+        
     
         const responseText1 = result1?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
@@ -500,7 +528,7 @@ export default function Recs() {
             console.log("exclude list: ", excludeList);
 
             // prompt AI API again, explicity telling to not include movies from first response
-            let finalPrompt = `Provide a list of 20 movie recommendations in this exact format:
+            let finalPrompt = `Provide a list of 40 movie recommendations in this exact format:
             1. title ^ year
             2. title ^ year
             ...
@@ -514,7 +542,37 @@ export default function Recs() {
             Remember absolutely no repeating movies.
             Make sure there are no contraversial picks unless specifically asked for.`;
 
-            const result2 = await fetchLLMResponse(finalPrompt);
+            const result2 = await fetchLLMResponse(finalPrompt, text, userId);
+
+
+            // error getting requests
+            if (result2 == "err_getting_requests_wtf") {
+              Alert.alert("There was an error getting your request count, try again later.");
+              setLoading(false);
+              setText('');
+              Keyboard.dismiss();
+              return;
+            }
+            // daily limit reached
+            if (result2 == "bruh_yo_daily_limit_reached") {
+              Alert.alert("That request needed 2 tokens... Too many requests for today, try again tomorrow. ");
+              setLoading(false);
+              setText('');
+              Keyboard.dismiss();
+              return;
+            }
+            // too many chars sent to llm
+            if (result2 == "too_many_characters_in_prompt_brody") {
+              Alert.alert("cmon crode", "you done typed way too much lmao");
+              setLoading(false);
+              setText('');
+              Keyboard.dismiss();
+              return;
+            }
+
+            setRequestCount(prevCount => prevCount - 1);
+            // Alert.alert("Due to your filtering needs, 2 requests are needed for this request.");
+        
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
             // raw second response
