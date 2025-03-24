@@ -1,20 +1,36 @@
 import axios from 'axios';
 import { CONFIG } from '../../config';
+import { supabase } from '../services/supabase.js';
 
 const BASE_URL = CONFIG.URL;
 
 // gemini
-export const fetchLLMResponse = async (text, sentiment, userId) => {
+export const fetchLLMResponse = async (text, sentiment) => {
   try {
-    const response = await axios.post(`${BASE_URL}/gemini`, {text, sentiment, userId});
-    // console.log(response);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session || !session.access_token) {
+      throw new Error("No valid session/token found");
+    }
+
+    const response = await axios.post(
+      `${BASE_URL}/gemini`,
+      { text, sentiment }, 
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`, // 👈 pass token here
+        },
+      }
+    );
+
     return response.data;
   } catch (error) {
     console.error('Error connecting to backend:', error);
     throw error;
   }
 };
-
 
 
 

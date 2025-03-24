@@ -46,10 +46,6 @@ const FAQ = () => {
                     <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Ratings come directly from TMDB, being an average of user ratings on that service.</Text>
                 </View>
                 <View style={styles.QA}>
-                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Am I able to ask for recent movies?</Text>
-                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Currently, the reccomendation system cannot process films after 2023. You can still add them to your lists by using the search feature.</Text>
-                </View>
-                <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>My requests just reset at an odd time?</Text>
                     <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Requests per day reset at 12:00 AM UTC, so this will be different for users based on location</Text>
                 </View>

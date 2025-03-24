@@ -445,7 +445,7 @@ export default function Recs() {
         Choose from the following sentiment: ${text}`;
 
        
-        const result1 = await fetchLLMResponse(firstPrompt, text, userId);
+        const result1 = await fetchLLMResponse(firstPrompt, text);
 
         // error getting requests
         if (result1 == "err_getting_requests_wtf") {
@@ -542,7 +542,7 @@ export default function Recs() {
             Remember absolutely no repeating movies.
             Make sure there are no contraversial picks unless specifically asked for.`;
 
-            const result2 = await fetchLLMResponse(finalPrompt, text, userId);
+            const result2 = await fetchLLMResponse(finalPrompt, text);
 
 
             // error getting requests
