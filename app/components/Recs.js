@@ -500,10 +500,6 @@ export default function Recs() {
         // extract the information from the TMDB API for the UI (detailedMovies) object
         let detailedMovies = [];
         for (const movie of movies1) {
-            if (movie.includes("Seven ^ 1995")) {
-              console.log("imposter film spotted lol")
-              continue;
-            }
             try {
                 const detailedMovie = await fetchMovieDetails(movie.trim());
                 detailedMovies.push(detailedMovie || { Title: movie.trim(), error: true });

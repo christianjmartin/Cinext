@@ -23,9 +23,17 @@ export const fetchMovieDetails = async (query) => {
     let movie;
     if (query === "Mother ^ 2009") {
       movie = movies.find(m => m.release_date === "2009-05-28") || null;
-    } else {
+    } 
+    else if (query === "Silence of the Lambs ^ 1991") {
+      movie = movies.find(m=>m.title === "The Silence of the Lambs" || null);
+    }
+    else if (query === "Seven ^ 1995") {
+      movie = movies.find(m=>m.title === "Se7en" || null);
+    }
+    else {
       movie = exactMatch || movies[0];
     }
+
     if (movie === null) {
       return null;
     }
