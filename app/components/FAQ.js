@@ -30,7 +30,7 @@ const FAQ = () => {
         <ScrollView style={[styles.container, {backgroundColor: currentTheme.background}]}>
             <View style={{alignItems: 'center'}}>
                 <View style={styles.QA}>
-                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>If I delete my account, will my lists hold if I re-download?</Text>
+                    <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>If I delete the app, will my lists hold if I re-download?</Text>
                     <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Unfortunately not! In the future, we plan on introducing an account system to tackle this issue.</Text>
                 </View>
                 <View style={styles.QA}>

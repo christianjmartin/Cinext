@@ -18,7 +18,7 @@ export const fetchMovieDetails = async (query) => {
     );
 
     // Return exact matching title, or first movie to come up in the search
-    // edge case for "mother" by bong joon ho
+    // edge cases for films where the search is unexpected (TMDB) handled here
     // have to hard code due to limitations by TMDB API in narrowing searches
     let movie;
     if (query === "Mother ^ 2009") {
@@ -29,6 +29,9 @@ export const fetchMovieDetails = async (query) => {
     }
     else if (query === "Seven ^ 1995") {
       movie = movies.find(m=>m.title === "Se7en" || null);
+    }
+    else if (query === "Insomnia ^ 2002") {
+      movie = movies.find(m=>m.release_date === "2002-05-24" || null);
     }
     else {
       movie = exactMatch || movies[0];

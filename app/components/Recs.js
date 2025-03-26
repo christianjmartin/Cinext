@@ -386,16 +386,6 @@ export default function Recs() {
     setLoading(true);
 
     try {
-        // const requests = await updateRequestsTable();
-        // if (requests > 25) {
-        //   console.log("too many requests")
-        //   Alert.alert("To many requests for today, try again tomorrow");
-        //   setLoading(false);
-        //   setText('');
-        //   Keyboard.dismiss();
-        //   return;
-        // }
-       
         // fetch everything this user has already seen
         const { data, error } = await supabase
             .from('SeenFilms')
@@ -729,8 +719,8 @@ export default function Recs() {
           </TouchableOpacity>
         </View>
         <View style={styles.toggleSectionText}>
-          {suggestSeen ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Exclude my seen films</Text>}
-          {suggestWatchlist ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Exclude watchlist films</Text>}
+          {suggestSeen ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text>}
+          {suggestWatchlist ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text>}
         </View>
         </>
         }

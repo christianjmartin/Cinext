@@ -4,7 +4,7 @@ import { supabase } from '../services/supabase';
 import PageContext from '../context/PageContext';
 import { searchMovies } from '../services/tmdbApi';
 import { useFocusEffect } from '@react-navigation/native';
-import { fetchMovieCredits } from '../services/tmdbApi';
+// import { fetchMovieCredits } from '../services/tmdbApi';
 import { fetchMovieDirectors } from '../services/apiComms';
 import SortDropdown from './SortDropdown';
 import waUp from '../assets/waUp.png';
