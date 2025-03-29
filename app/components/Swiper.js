@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     borderColor: "#969696",
   },
   buttonText: {
-    fontSize: 16,
+    // fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
