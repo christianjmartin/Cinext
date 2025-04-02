@@ -28,7 +28,7 @@ const CONTACT = () => {
             </TouchableOpacity>
         </View>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
-            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Email movienextofficial@gmail.com for any inquires, we will respond as soon as possible</Text>
+            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Email cinextofficial@gmail.com for any inquires, we will respond as soon as possible</Text>
         </View>
         </>
     );

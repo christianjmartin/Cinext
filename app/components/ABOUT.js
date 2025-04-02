@@ -29,9 +29,9 @@ const ABOUT = () => {
         </View>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
             <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>
-                    MovieNext was created with the inspiration of scrolling through streaming service after streaming service, 
+                    Cinext was created with the inspiration of scrolling through streaming service after streaming service, 
                     day after day, taking hours to find a new movie to see. Reminiscing on the hours spent shuffling through
-                    these movies I had already seen, the idea of MovieNext was conspired.
+                    these movies I had already seen, the idea of Cinext was conspired.
             </Text>
         </View>
         </>
