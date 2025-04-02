@@ -1,6 +1,9 @@
 import React, { useContext } from 'react';
 import camera4 from '../assets/camera4.png';
 import camera5 from '../assets/camera5.png';
+import camera7 from '../assets/camera7.png';
+import camera8 from '../assets/camera8.png';
+import camera9 from '../assets/camera9.png';
 import settings from '../assets/settings-2.png';
 import PageContext from '../context/PageContext';  
 import { useNavigation } from '@react-navigation/native';
@@ -12,9 +15,8 @@ export default function Header() {
     const navigation = useNavigation();
     return (
         <View style={styles.headerContainer}>
-            <Image source={camera4} style={styles.logo} /> 
+            <Image source={camera9} style={styles.logo} /> 
             <View style={styles.invisiblePadding}></View>
-            {/* <Text style={styles.title}>MovieNext</Text> */}
             <View style={styles.spacer}></View>
 
             {/* only allow user to leave reccomendation screen by exit button, since theres no going back wihtout re-entry */}
@@ -55,6 +57,7 @@ const styles = StyleSheet.create ({
         width: 40,
         height: '100%',
         marginLeft: 8,
+        marginTop: 1,
     },
     settings: {
         marginRight: 5,
