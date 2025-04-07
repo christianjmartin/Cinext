@@ -39,6 +39,7 @@
     "expo-system-ui": "~4.0.7",
     "expo-web-browser": "~14.0.2",
     "express": "^4.21.2",
+    "image-size": "^2.0.2",
     "lodash": "^4.17.21",
     "react": "18.3.1",
     "react-dom": "18.3.1",
