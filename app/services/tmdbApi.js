@@ -54,7 +54,7 @@ export const fetchMovieDetails = async (query) => {
       Description: movie.overview || 'No description avaliable',
     };
   } catch (error) {
-    console.error('Error fetching movie details:', error.message);
+    console.error('Error fetching movie details:');
     throw error;
   }
 };
@@ -82,7 +82,7 @@ export const searchMovies = async (query) => {
       Description: movie.overview || 'No description available',
     }));
   } catch (error) {
-    console.error('Error searching movies:', error.message);
+    console.error('Error searching movies:');
     throw error;
   }
 };

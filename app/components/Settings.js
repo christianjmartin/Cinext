@@ -19,7 +19,7 @@ const Settings = () => {
     // toggles between light and dark mode, calling updateColorMode from context 
     const toggleTheme = () => {
         togglePosition.value = withTiming(colorMode === 'dark' ? 5 : 105, { duration: 250 });
-        console.log(colorMode);
+        // console.log(colorMode);
         let updatedColor;
         if (colorMode === 'dark') {
             updatedColor = 'light';

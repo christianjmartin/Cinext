@@ -24,12 +24,12 @@ const addToWatchlist = async (title, director, year, posterPath, description, ra
           .select();
     
         if (error) {
-          console.error('Error deleting first to Watchlist,:', error.message);
+          console.error('Error deleting first to Watchlist');
         } else {
           // console.log('deleted from Watchlist:', data);
         }
       } catch (error) {
-        console.error('Unexpected error:', error);
+        console.error('error adding watchlist');
       }
     }
 
@@ -41,12 +41,12 @@ const addToWatchlist = async (title, director, year, posterPath, description, ra
         .select();
   
       if (error) {
-        console.error('Error adding to Watchlist:', error.message);
+        console.error('Error adding to Watchlist:');
       } else {
         // console.log('Added to Watchlist:', data);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error('Unexpected error adding watchlist');
     }
 };
   
@@ -70,12 +70,12 @@ const addToSeen = async (title, director, year, posterPath, description, rating,
         .select();
   
       if (error) {
-        console.error('Error deleting first to SeenFilms:', error.message);
+        console.error('Error deleting first to SeenFilms:');
       } else {
         // console.log('deleted from SeenFilms:', data);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error('Unexpected error: adding to seen');
     }
   }
 
@@ -93,12 +93,12 @@ const addToSeen = async (title, director, year, posterPath, description, rating,
         .select();
   
       if (error) {
-        console.error('Error deleting first to Watchlist,:', error.message);
+        console.error('Error deleting first to Watchlist,:');
       } else {
         // console.log('deleted from Watchlist:', data);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error('Unexpected error: add seen films');
     }
   }
 
@@ -110,12 +110,12 @@ const addToSeen = async (title, director, year, posterPath, description, rating,
       .select();
 
     if (error) {
-      console.error('Error adding to SeenFilms:', error.message);
+      console.error('Error adding to SeenFilms:');
     } else {
       // console.log('Added to SeenFilms:', data);
     }
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error: adding film to seen films ');
   }
 };
 
@@ -135,7 +135,7 @@ const alreadySeen = async (title, director, year, userId, tmdbID) => {
       .eq('AuthID', userId) // Ensure user-specific query
 
     if (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data: already seen');
       return false; // Return false if there's an error
     }
 
@@ -148,7 +148,7 @@ const alreadySeen = async (title, director, year, userId, tmdbID) => {
       return false;
     }
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error: checking already seen');
     return false; // Return false in case of unexpected errors
   }
 };
@@ -168,7 +168,7 @@ const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
 
 
     if (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data checking if film in watchlist');
       return false; 
     }
 
@@ -181,7 +181,7 @@ const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
       return false;
     }
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error checking film in watchlist');
     return false;
   }
 };
@@ -210,7 +210,7 @@ const getRequestsLeft = async () => {
     }
     return requestsLeft;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error request left check');
   }
 };
 

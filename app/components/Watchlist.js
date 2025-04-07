@@ -65,7 +65,7 @@ const Watchlist = () => {
         const { data, error } = await query;
 
             if (error) {
-                console.error('Error fetching Watchlist:', error.message);
+                console.error('Error fetching Watchlist:');
             } else {
                 // console.log('Fetched from Watchlist:', data);
                 // console.log("data", data);
@@ -79,7 +79,7 @@ const Watchlist = () => {
                 }
             }
         } catch (error) {
-            console.error('Unexpected error:', error); 
+            console.error('Unexpected error: get films'); 
         }
     };
 
@@ -113,7 +113,7 @@ const Watchlist = () => {
             const results = await searchMovies(query);
             setSearchResults(results);
         } catch (error) {
-            console.error('Error fetching search results:', error);
+            console.error('Error fetching search results:');
             setSearchResults([]); // Fallback in case of API failure
         }
     };
@@ -137,12 +137,12 @@ const Watchlist = () => {
                             .select()
             
                         if (error) {
-                            console.error('Error deleting from Watchlist:', error.message);
+                            console.error('Error deleting from Watchlist:');
                         } else {
                             // console.log('Deleted from Watchlist:', data);
                         }
                     } catch (error) {
-                        console.error('Unexpected error:', error); 
+                        console.error('Unexpected error: deleting from watchlist'); 
                     }
                 }
                 // call getFilms again to update the UI as they delete films
@@ -208,7 +208,7 @@ const Watchlist = () => {
                         item.Director = directors; // add the director(s) to the film object 
                     }
                 } catch (error) {
-                    console.error('Error fetching directors:', error);
+                    console.error('Error fetching directors:');
                     item.Director = 'Unknown';
                 }
             }

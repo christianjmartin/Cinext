@@ -3,17 +3,17 @@ import { supabase } from '../services/supabase.js';
 import { v4 as uuidv4, validate as isUUID } from 'uuid';
 
 export const updateColorPreference = async ( color, userId ) => {
-    console.log(color);
+    // console.log(color);
     try {
         const {data, error} = await supabase
             .from('Client')
             .update({Color: color})
             .eq('AuthID', userId)
 
-        console.log("updating color pref to ", color);
+        console.log("updating color pref");
     }
     catch (error) {
-        console.error('bruh', error);
+        console.error("error updating color pref");
     }
 }
 
@@ -24,10 +24,10 @@ export const updateSuggestionSeenPreference = async ( bool, userId ) => {
             .update({SuggestSeen: bool})
             .eq('AuthID', userId)
 
-        console.log("updating seen films inclusion pref to ", bool);
+        console.log("updating seen films inclusion pref");
     }
     catch (error) {
-        console.error('bruh', error);
+        console.error("error updating seen pref");
     }
 }
 
@@ -41,10 +41,9 @@ export const updateSuggestionWatchlistPreference = async (bool, userId) => {
 
         if (error) throw error;
 
-        console.log("Updated data:", data);
-        console.log("Updating watchlist inclusion pref to:", bool);
+        console.log("Updating watchlist inclusion pref");
     } catch (error) {
-        console.error("bruh", error);
+        console.error("error updating watchlist pref");
     }
 };
 

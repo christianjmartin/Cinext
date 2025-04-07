@@ -27,7 +27,7 @@ export const fetchLLMResponse = async (text, sentiment) => {
 
     return response.data;
   } catch (error) {
-    console.error('Error connecting to backend:', error);
+    console.error('Error connecting to backend:');
     throw error;
   }
 };
@@ -42,7 +42,7 @@ export const fetchMovieData = async (movieTitle, year) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching movie data:', error);
+    console.error('Error fetching movie data:');
     throw error;
   }
 };
@@ -60,7 +60,7 @@ export const fetchMovieDirectors = async (movieID) => {
     }
     else { return ('tf bruh')};
   } catch (error) {
-    console.error('Error fetching movie data:', error);
+    console.error('Error fetching movie data:');
     throw error;
   }
 };
@@ -74,7 +74,7 @@ export const fetchMovieSearch = async (searchQuery) => {
     // console.log("the response is: ", response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching movie data:', error);
+    console.error('Error fetching movie data:');
     throw error;
   }
 };

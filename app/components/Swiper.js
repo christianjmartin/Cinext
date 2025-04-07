@@ -7,6 +7,7 @@ import { addToSeen, addToWatchlist } from '../database/dbFuncs';
 import theme from '../services/theme';
 import check from '../assets/check.png';
 import { useNavigation } from '@react-navigation/native';
+import SwiperErrScreen from './SwiperErrScreen';
 
 const MovieList = () => {
   const { movieList, updatePage, userId, colorMode, seenFilms, watchlist} = useContext(PageContext);
@@ -66,20 +67,9 @@ const MovieList = () => {
 
   if (movieList[0] === 'This is a special error case !@#$') {
     return (
-      <>
-      <View style={[styles.container, {backgroundColor: currentTheme.swiperBackground}]}>
-      <TouchableOpacity
-          style={styles.exitButton}
-          onPress={() => {
-            navigation.replace("Recs");
-            updatePage("NULL");
-          }}
-          disabled={isDisabled}
-        >
-          <Text style={styles.buttonText}>Go back and say sum else crody</Text>
-      </TouchableOpacity>
+      <View style={{backgroundColor: currentTheme.swiperBackground, height: '100%', width: '100%'}}>
+        <SwiperErrScreen/>
       </View>
-      </>
     )
   }
   else {

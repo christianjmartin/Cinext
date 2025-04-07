@@ -65,7 +65,7 @@ const SeenFilms = () => {
         const { data, error } = await query;
 
             if (error) {
-                console.error('Error fetching SeenFilms:', error.message);
+                console.error('Error fetching SeenFilms:');
             } else {
                 // console.log('Fetched from SeenFilms:', data);
                 // console.log("data", data);
@@ -79,7 +79,7 @@ const SeenFilms = () => {
                 }
             }
         } catch (error) {
-            console.error('Unexpected error:', error); 
+            console.error('Unexpected error: in get films'); 
         }
     };
 
@@ -113,7 +113,7 @@ const SeenFilms = () => {
             const results = await searchMovies(query);
             setSearchResults(results);
         } catch (error) {
-            console.error('Error fetching search results:', error);
+            console.error('Error fetching search results:');
             setSearchResults([]); // Fallback in case of API failure
         }
     };
@@ -137,12 +137,12 @@ const SeenFilms = () => {
                             .select()
             
                         if (error) {
-                            console.error('Error deleting from SeenFilms:', error.message);
+                            console.error('Error deleting from SeenFilms:');
                         } else {
                             // console.log('Deleted from SeenFilms:', data);
                         }
                     } catch (error) {
-                        console.error('Unexpected error:', error); 
+                        console.error('Unexpected error: edit mode, deleting films'); 
                     }
                 }
                 // call getFilms again to update the UI as they delete films
@@ -208,7 +208,7 @@ const SeenFilms = () => {
                         item.Director = directors; // add the director(s) to the film object 
                     }
                 } catch (error) {
-                    console.error('Error fetching directors:', error);
+                    console.error('Error fetching directors:');
                     item.Director = 'Unknown';
                 }
             }

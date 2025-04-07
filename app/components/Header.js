@@ -25,7 +25,7 @@ export default function Header() {
                 navigation.navigate("Settings");
                 updatePage("Settings");
             }}>
-            {page != "Settings" ? <Image source={settings} style={[styles.image, styles.settings]}></Image> : null}
+            {page != "Settings" && page != "Show Swiper" ? <Image source={settings} style={[styles.image, styles.settings]}></Image> : null}
             
             </TouchableOpacity>
             {/* : null } */}

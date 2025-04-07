@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { getOrCreateUserId } from '../services/userID';
 import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
 
@@ -23,26 +22,12 @@ export const PageProvider = ({ children }) => {
   const [requestCount, setRequestCount] = useState();
   const [loading, setLoading] = useState(false);  
 
-
-  // initialize userId when the context is created
-  // useEffect(() => {
-  //   const initializeUser = async () => {
-  //     const id = await getOrCreateUserId();
-  //     console.log(id);
-  //     setUserId(id);
-  //   };
-
-  //   initializeUser();
-  // }, []);
-
   useEffect(() => {
     const initializeClient = async () => {
         try {
             const preferences = await createClient();
             if (preferences.id) setUserId(preferences.id);
-            console.log("they id" , preferences.id);
             const reqs = await getRequestsLeft();
-            console.log(reqs);
             setRequestCount(reqs);
 
             if (!preferences) {
@@ -50,7 +35,7 @@ export const PageProvider = ({ children }) => {
                 return;
             }
 
-            console.log("Loaded Preferences:", preferences);
+            console.log("Loaded Preferences:");
             
             // Update context states safely
             if (preferences.color) setColorMode(preferences.color);
@@ -58,7 +43,7 @@ export const PageProvider = ({ children }) => {
             if (preferences.suggestWatchlist !== undefined) setSuggestWatchlist(preferences.suggestWatchlist);
 
         } catch (error) {
-            console.error("Error initializing client:", error);
+            console.error("Error initializing client:");
         }
         finally {
           setInitialLoad(false);
@@ -76,7 +61,6 @@ export const PageProvider = ({ children }) => {
   // this function handles updating components for page views
   // sets previous page for easy back button logic 
   const updatePage = (newPage) => {
-    // console.log("page updating to", newPage);
     // setPreviousPage(page);
     setPage(newPage);
   };

@@ -90,7 +90,7 @@ export default function Recs() {
     const { data, error } = await query;
 
         if (error) {
-            console.error('Error fetching Watchlist:', error.message);
+            console.error('Error fetching Watchlist:');
         } else {
             // console.log('Fetched from Watchlist:', data);
             // console.log("data", data);
@@ -104,7 +104,7 @@ export default function Recs() {
             }
         }
     } catch (error) {
-        console.error('Unexpected error:', error); 
+        console.error('Unexpected error: get films func'); 
     }
     try {
       let query = supabase
@@ -139,7 +139,7 @@ export default function Recs() {
       const { data, error } = await query;
 
           if (error) {
-              console.error('Error fetching SeenFilms:', error.message);
+              console.error('Error fetching SeenFilms:');
           } else {
               // console.log('Fetched from SeenFilms:', data);
               // console.log("data", data);
@@ -153,7 +153,7 @@ export default function Recs() {
               }
           }
       } catch (error) {
-          console.error('Unexpected error:', error); 
+          console.error('Unexpected error: in getfilms'); 
       }
   };
 
@@ -169,25 +169,11 @@ export default function Recs() {
         .eq('Date', formattedDate);
 
       if (error) {
-          console.error('Error fetching SeenFilms:', error.message);
+          console.error('Error fetching SeenFilms:');
       } else {
           // nothing exists in the database for this day 
           if (data.length === 0) {
-            // const movieOfTheDay = await fetchMovieDetails(motd);
-            // console.log("movie of the day is:", movieOfTheDay);
-            // const { data2, error2 } = await supabase
-            //   .from('MovieOfTheDay')
-            //   .insert([{ Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }])
-            //   .select();
-        
-            // if (error2) {
-            //   console.error('Error adding to Movie of the Day:', error2.message);
-            // } else {
-            //   const updateContext = { Date: formattedDate, Title: movieOfTheDay.Title, Director: movieOfTheDay.Director, Year: parseInt(movieOfTheDay.Year), PosterPath: movieOfTheDay.PosterPath, Description: movieOfTheDay.Description, Rating: movieOfTheDay.Rating, tmdbID: movieOfTheDay.tmdbID }
-            //   setMovieOTD(updateContext);
-            //   console.log('Added a new film to the Movie of the Day table');
-            // }
-            console.log('idk what to tell u ....')
+            console.log('no movie of the day, internal error')
           }
           // something was there, update context for movieoftheday
           else {
@@ -196,41 +182,9 @@ export default function Recs() {
           }
       }
     } catch (error) {
-        console.error('Unexpected error:', error); 
+        console.error('Unexpected error get motd:'); 
     }
   }
-
-  // const getRequestsLeft = async () => {
-  //   const today = new Date().toISOString().split('T')[0];
-  
-  //   try {
-  //     const storedData = await AsyncStorage.getItem('requestCountData');
-  //     if (storedData) {
-  //       const { count, date } = JSON.parse(storedData);
-  //       if (date === today) {
-  //         setRequestCount(count);
-  //         return;
-  //       }
-  //     }
-  
-  //     const { data: existingRequest, error } = await supabase
-  //       .from('Requests')
-  //       .select('Count, Date')
-  //       .eq('UserID', userId)
-  //       .single();
-  
-  //     let requestsLeft = 25;
-  //     if (!error && existingRequest && existingRequest.Date === today) {
-  //       requestsLeft = 25 - existingRequest.Count;
-  //     }
-  
-  //     setRequestCount(requestsLeft);
-      
-  //     await AsyncStorage.setItem('requestCountData', JSON.stringify({ count: requestsLeft, date: today }));
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // };
 
   useFocusEffect(
     useCallback(() => {
@@ -267,97 +221,6 @@ export default function Recs() {
   
     }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
   );
-
-
-
-
-
-
-  const updateRequestsTable = async () => {
-    const today = new Date().toISOString().split('T')[0]; // Ensure date is in correct format (YYYY-MM-DD)
-
-    try {
-      // Check if user has an existing request count entry
-      const { data: existingRequest, error: fetchError } = await supabase
-        .from('Requests')
-        .select('Date, Count')
-        .eq('AuthID', userId)
-        // .eq('Date', today) // Ensure you're checking today's entry
-        .single();
-  
-      if (fetchError && fetchError.code !== 'PGRST116') { // Handle actual fetch errors
-        console.error('Error fetching request count:', fetchError);
-        return -1;
-      }
-
-  
-      if (existingRequest) {
-        let newCount;
-        if (today === existingRequest.Date) {
-          console.log('the same');
-          newCount = existingRequest.Count + 1;
-          if (newCount > 25) {
-            console.log("too many requests today!, table not updated");
-            return newCount;
-          }
-          const { data: updatedRequest, error: updateError } = await supabase
-            .from('Requests')
-            .update({ Count: newCount })
-            .eq('AuthID', userId)
-            .eq('Date', today)
-            .select();
-          if (updateError) {
-            console.error('Error updating request count:', updateError);
-            return -1;
-          } else {
-            console.log('Updated request count:', updatedRequest);
-          }
-          return newCount; 
-        }
-        else {
-          console.log('new day');
-          const { data: updatedRequest2, error: updateError2 } = await supabase
-            .from('Requests')
-            .update({ Count: 1, Date: today})
-            .eq('AuthID', userId)
-            .select();
-    
-          if (updateError2) {
-            console.error('Error updating request count:', updateError2);
-            return -1;
-          } else if (!updatedRequest2 || updatedRequest2.length === 0) {
-            console.log('Request limit reached! No update made.');
-          } else {
-            console.log('Updated request count:', updatedRequest2);
-            return 1;
-          }
-        }
-      } else {
-        // If no record exists, insert a new one
-        console.log("This is their first request ever.");
-        const { data: newRequest, error: insertError } = await supabase
-          .from('Requests')
-          .insert([{ Date: today, Count: 1 }]); // Set initial count to 1
-  
-        if (insertError) {
-          console.error('Error inserting new request record:', insertError);
-          return -1;
-        } else {
-          console.log('New request record created:', newRequest);
-          return 1;
-        }
-      }
-    } catch (error) {
-      console.error('Error updating requests table:', error);
-      return -1;
-    }
-  };
-
-  
-
-
-
-
 
 
   // this function does the following
@@ -398,7 +261,7 @@ export default function Recs() {
             .eq('AuthID', userId);
         
         if (error || watchlistError) {
-            console.error('Error fetching movies:', error || watchlistError);
+            console.error('Error fetching movies:');
             Alert.alert("Fatal error");
             setLoading(false);
             setText('');
@@ -472,7 +335,7 @@ export default function Recs() {
         console.log("The user said: ", text);
 
         // raw response from the api
-        console.log(responseText1);
+        // console.log(responseText1);
 
         // extract movies returned by following regex pattern, outlined in extractMovieList function 
         let movies1 = extractMovieList(responseText1);
@@ -494,7 +357,7 @@ export default function Recs() {
                 const detailedMovie = await fetchMovieDetails(movie.trim());
                 detailedMovies.push(detailedMovie || { Title: movie.trim(), error: true });
             } catch (error) {
-                console.error(`Error fetching details for ${movie}:`, error);
+                console.error(`Error fetching details for ${movie}:`);
                 detailedMovies.push({ Title: movie.trim(), error: true });
             }
         }
@@ -562,7 +425,7 @@ export default function Recs() {
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
             // raw second response
-            console.log(responseText2);
+            // console.log(responseText2);
 
             // get movies via regex pattern 
             let movies2 = extractMovieList(responseText2);
@@ -573,7 +436,7 @@ export default function Recs() {
                         const detailedMovie = await fetchMovieDetails(movie.trim());
                         detailedMovies2.push(detailedMovie || { Title: movie.trim(), error: true });
                     } catch (error) {
-                        console.error(`Error fetching details for ${movie}:`, error);
+                        console.error(`Error fetching details for ${movie}:`);
                         detailedMovies2.push({ Title: movie.trim(), error: true });
                     }
                 }
@@ -631,7 +494,7 @@ export default function Recs() {
         Keyboard.dismiss();
 
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error, they left the app or internal error');
         Alert.alert("Error, avoid leaving the app while suggestions generate!");
         setLoading(false);
         setText('');
@@ -695,7 +558,7 @@ export default function Recs() {
 
           <TextInput
             style={[styles.textInputBox, {backgroundColor: currentTheme.searchBar}]}
-            placeholder="Create a prompt..."
+            placeholder="Create a request..."
             placeholderTextColor="#888"
             value={text}
             onChangeText={setText}

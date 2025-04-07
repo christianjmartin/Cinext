@@ -18,7 +18,7 @@ export const createClient = async () => {
             const { data: sessionData, error: sessionError } = await supabase.auth.setSession(parsedSession);
 
             if (!sessionError && sessionData?.session) {
-                console.log("Session successfully restored:", sessionData.session);
+                console.log("Session successfully restored:");
 
                 // Use the existing user ID
                 return await fetchClientData(sessionData.session.user.id);
@@ -33,11 +33,11 @@ export const createClient = async () => {
         const { data: signInData, error: signInError } = await supabase.auth.signInAnonymously();
 
         if (signInError) {
-            console.error("Anonymous sign-in failed:", signInError);
+            console.error("Anonymous sign-in failed:");
             return null;
         }
 
-        console.log("Signed in anonymously:", signInData.user);
+        console.log("Signed in anonymously:");
 
         // retrieve the new session
         const { data: newSessionData } = await supabase.auth.getSession();
@@ -52,7 +52,7 @@ export const createClient = async () => {
         return await fetchClientData(signInData.user.id);
 
     } catch (error) {
-        console.error("Unexpected error in createClient:", error);
+        console.error("Unexpected error in createClient:");
         return null;
     }
 };
@@ -70,7 +70,7 @@ const fetchClientData = async (userId) => {
             .single();
 
         if (clientError && clientError.code !== 'PGRST116') {
-            console.error('Error retrieving client data:', clientError.message);
+            console.error('Error retrieving client data:');
             return null;
         }
 
@@ -82,14 +82,14 @@ const fetchClientData = async (userId) => {
                 .insert([{Color: 'dark', SuggestSeen: false, SuggestWatchlist: false }]);
 
             if (insertError) {
-                console.error('Error creating new client:', insertError.message);
+                console.error('Error creating new client:');
                 return null;
             }
 
             return { id: userId, color: 'dark', suggestSeen: false, suggestWatchlist: false };
         }
 
-        console.log('Client data loaded:', clientData);
+        console.log('Client data loaded:');
 
         return {
             id: userId,
@@ -99,7 +99,7 @@ const fetchClientData = async (userId) => {
         };
 
     } catch (error) {
-        console.error('Unexpected error retrieving or creating client:', error);
+        console.error('Unexpected error retrieving or creating client:');
         return null;
     }
 };
