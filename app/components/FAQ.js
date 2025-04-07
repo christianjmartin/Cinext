@@ -43,7 +43,7 @@ const FAQ = () => {
                 </View>
                 <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>What are the kinds of things I can ask for in a movie?</Text>
-                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>There is a very wide range of things to ask for! Some areas for example, but not limited to, are: Emotions, time periods, genres, niches, themes, directors, actors. Thinking outside the box and being detailed in your requests tends to yeild the best results!</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>There is a very wide range of things to ask for. Some areas for example, but not limited to, are: Emotions, time periods, genres, niches, themes, directors, actors. Thinking outside the box and being detailed in your requests tends to yeild the best results!</Text>
                 </View>
                 <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Where are the ratings coming from?</Text>
