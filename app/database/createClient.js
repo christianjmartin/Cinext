@@ -47,7 +47,11 @@ export const createClient = async () => {
             return null;
         }
 
-        await SecureStore.setItemAsync("session", JSON.stringify(newSessionData.session));
+        // await SecureStore.setItemAsync("session", JSON.stringify(newSessionData.session));
+        await SecureStore.setItemAsync("session", JSON.stringify({
+            access_token: newSessionData.session.access_token,
+            refresh_token: newSessionData.session.refresh_token
+          }));
 
         return await fetchClientData(signInData.user.id);
 

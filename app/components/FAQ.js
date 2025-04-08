@@ -51,7 +51,7 @@ const FAQ = () => {
                 </View>
                 <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>My requests just reset at an odd time?</Text>
-                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Requests per day reset at 12:00 AM UTC, so this will be different for users based on location</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Requests per day reset at 12:00 AM UTC, so this will be different for users based on location.</Text>
                 </View>
             </View>
         </ScrollView>
