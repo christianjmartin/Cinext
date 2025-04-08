@@ -241,7 +241,7 @@ export default function Recs() {
       return;
     }
     else if (text.length > 200) {
-      Alert.alert("cmon crode", "you done typed way too much lmao");
+      Alert.alert("Error", "You typed too many characters");
       return;
     }
     console.log(`Fetching movie recommendations...`);
@@ -335,7 +335,7 @@ export default function Recs() {
         console.log("The user said: ", text);
 
         // raw response from the api
-        // console.log(responseText1);
+        console.log("api response: ", responseText1);
 
         // extract movies returned by following regex pattern, outlined in extractMovieList function 
         let movies1 = extractMovieList(responseText1);

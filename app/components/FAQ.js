@@ -39,7 +39,7 @@ const FAQ = () => {
                 </View>
                 <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>Why did my request count for the day go down by 2 after one request?</Text>
-                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>If too many movies were filtered from the reccomendations, we need to get more to satisy the request to provide the best suggestions possible.</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>If too many movies were filtered from the recommendations, we need to get more to satisy the request to provide the best suggestions possible.</Text>
                 </View>
                 <View style={styles.QA}>
                     <Text style={[styles.infoContainer, styles.bold, {color: currentTheme.textColorSecondary}]}>What are the kinds of things I can ask for in a movie?</Text>
