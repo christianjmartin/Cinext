@@ -20,7 +20,7 @@ export const createClient = async () => {
             // const { data: sessionData, error: sessionError } = await supabase.auth.setSession("diosjsooj");
 
             if (!sessionError && sessionData?.session) {
-                console.log("Session successfully restored:");
+                console.log("Session successfully restored!!!:");
 
                 // Use the existing user ID
                 return await fetchClientData(sessionData.session.user.id);
