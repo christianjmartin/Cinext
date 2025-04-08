@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import * as SecureStore from 'expo-secure-store';
 import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
 import { supabase } from '../services/supabase.js';
@@ -26,7 +27,7 @@ export const PageProvider = ({ children }) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "TOKEN_REFRESHED" && session) {
-        console.log("Token refreshed, storing new values");
+        console.log("Token refreshed, storing new valuess");
         SecureStore.setItemAsync("session", JSON.stringify({
           access_token: session.access_token,
           refresh_token: session.refresh_token
