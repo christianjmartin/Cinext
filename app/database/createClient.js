@@ -17,6 +17,8 @@ export const createClient = async () => {
             // Restore session in Supabase
             const { data: sessionData, error: sessionError } = await supabase.auth.setSession(parsedSession);
 
+            // const { data: sessionData, error: sessionError } = await supabase.auth.setSession("diosjsooj");
+
             if (!sessionError && sessionData?.session) {
                 console.log("Session successfully restored:");
 

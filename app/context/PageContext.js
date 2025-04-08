@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
+import { supabase } from '../services/supabase.js';
 
 const PageContext = createContext();
 
@@ -23,6 +24,16 @@ export const PageProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);  
 
   useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "TOKEN_REFRESHED" && session) {
+        console.log("Token refreshed, storing new values");
+        SecureStore.setItemAsync("session", JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        }));
+      }
+    });
+
     const initializeClient = async () => {
         try {
             const preferences = await createClient();
@@ -50,9 +61,8 @@ export const PageProvider = ({ children }) => {
         }
     };
 
-    // if (userId) {
-        initializeClient();
-    // }
+    initializeClient();
+    return () => authListener.subscription?.unsubscribe();
   }, [setColorMode, setSuggestSeen, setSuggestWatchlist, setRequestCount]);
 
 

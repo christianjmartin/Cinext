@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { CONFIG } from '../../config';
 import { supabase } from '../services/supabase.js';
+import * as SecureStore from 'expo-secure-store';
 
 const BASE_URL = CONFIG.URL;
 
@@ -14,6 +15,11 @@ export const fetchLLMResponse = async (text, sentiment) => {
     if (!session || !session.access_token) {
       throw new Error("No valid session/token found");
     }
+
+    await SecureStore.setItemAsync("session", JSON.stringify({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token
+    }));
 
     const response = await axios.post(
       `${BASE_URL}/gemini`,
