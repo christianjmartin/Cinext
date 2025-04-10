@@ -6,8 +6,11 @@ import * as SecureStore from 'expo-secure-store';
 const BASE_URL = CONFIG.URL;
 
 // gemini
-export const fetchLLMResponse = async (text, sentiment) => {
+export const fetchLLMResponse = async (choice, sentiment, excludeList) => {
   try {
+    // console.log(choice)
+    // console.log(sentiment)
+    // console.log("exclude list-----", excludeList)
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -23,7 +26,7 @@ export const fetchLLMResponse = async (text, sentiment) => {
 
     const response = await axios.post(
       `${BASE_URL}/gemini`,
-      { text, sentiment }, 
+      { choice, sentiment, excludeList }, 
       {
         headers: {
           Authorization: `Bearer ${session.access_token}`, // 👈 pass token here

@@ -318,7 +318,7 @@ export default function Recs() {
         Choose from the following sentiment: ${text}`;
 
        
-        const result1 = await fetchLLMResponse(firstPrompt, text);
+        const result1 = await fetchLLMResponse(1, text, '');
 
         // error getting requests
         if (result1 == "err_getting_requests_wtf") {
@@ -411,7 +411,8 @@ export default function Recs() {
             Remember absolutely no repeating movies.
             Make sure there are no contraversial picks unless specifically asked for.`;
 
-            const result2 = await fetchLLMResponse(finalPrompt, text);
+            const result2 = await fetchLLMResponse(2, text, Array.from(excludeList).join(', '));
+            // console.log(result2);
 
 
             // error getting requests
@@ -445,7 +446,7 @@ export default function Recs() {
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
             // raw second response
-            // console.log(responseText2);
+            console.log("the second api response: ", responseText2);
 
             // get movies via regex pattern 
             let movies2 = extractMovieList(responseText2);
