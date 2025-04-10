@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import PageContext from '../context/PageContext';  
-import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';  
+import { View, Alert, Text, StyleSheet, TextInput, ScrollView, Dimensions, TouchableOpacity, Image, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator, AppState } from 'react-native';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { fetchLLMResponse } from '../services/apiComms.js';
+import { getRequestsLeft } from '../database/dbFuncs.js';
 import { fetchMovieDetails } from '../services/tmdbApi.js';
 import { supabase } from '../services/supabase.js';
 import { updateSuggestionSeenPreference } from '../database/preferences.js';
@@ -186,41 +187,58 @@ export default function Recs() {
     }
   }
 
+  const updateRQC = async () => {
+    const count = await getRequestsLeft();
+    setRequestCount(count);
+  }
+
+  const fetchMOTD = async () => {
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${month}-${day}`;
+
+    // FOR TESTING
+    // const formattedDate = "01-01";
+
+    // Check if today's movie is already in context
+    if (Object.keys(movieOTD).length > 0) {
+      if (movieOTD?.Date === formattedDate) {
+        console.log("movie exists in context and is up to date.");
+        return;
+      } else {
+        console.log("new day -> fetching today's motd...");
+        await getMOTD(formattedDate);
+        return;
+      }
+    }
+    else {
+      console.log("ts was not in context, it better be in the DB");
+      await getMOTD(formattedDate);
+      return; 
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      const fetchMOTD = async () => {
-        const today = new Date();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const formattedDate = `${month}-${day}`;
-  
-        // FOR TESTING
-        // const formattedDate = "01-01";
-    
-        // Check if today's movie is already in context
-        if (Object.keys(movieOTD).length > 0) {
-          if (movieOTD?.Date === formattedDate) {
-            console.log("movie exists in context and is up to date.");
-            return;
-          } else {
-            console.log("new day -> fetching today's motd...");
-            await getMOTD(formattedDate);
-            return;
-          }
-        }
-        else {
-          console.log("ts was not in context, it better be in the DB");
-          await getMOTD(formattedDate);
-          return; 
-        }
-      };
 
       fetchMOTD();
       getFilms(currSortSeen, currSortWatchlist);
-      // getRequestsLeft();
   
     }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
   );
+
+  useEffect(() => {
+  const subscription = AppState.addEventListener('change', (state) => {
+    if (state === 'active') {
+      console.log("app state listener fired")
+      fetchMOTD(); // or whatever needs refreshing
+      updateRQC();
+    }
+  });
+
+  return () => subscription.remove();
+}, []);
 
 
   // this function does the following

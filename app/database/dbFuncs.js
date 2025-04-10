@@ -192,6 +192,7 @@ const getRequestsLeft = async () => {
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   let userId = userData?.user?.id;
+  console.log("request getter fired");
   // const tomorrow = new Date();
   // tomorrow.setDate(tomorrow.getDate() + 1);
   // const today = tomorrow.toISOString().split('T')[0];
