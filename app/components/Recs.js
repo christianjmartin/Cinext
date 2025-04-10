@@ -222,6 +222,8 @@ export default function Recs() {
   useFocusEffect(
     useCallback(() => {
 
+      console.log("focus effect fired");
+      updateRQC();
       fetchMOTD();
       getFilms(currSortSeen, currSortWatchlist);
   
