@@ -356,6 +356,7 @@ export default function Recs() {
 
         // raw response from the api
         console.log("api response: ", responseText1);
+        console.log("update for 7");
 
         // extract movies returned by following regex pattern, outlined in extractMovieList function 
         let movies1 = extractMovieList(responseText1);
