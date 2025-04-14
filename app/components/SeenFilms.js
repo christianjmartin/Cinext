@@ -58,6 +58,12 @@ const SeenFilms = () => {
                 case 'Release Date 2':
                     query = query.order('Year', { ascending: true });
                     break;
+                case 'Rating 1':
+                    query = query.order('Rating', { ascending: false }).order('created_at', { ascending: false });
+                    break;
+                case 'Rating 2':
+                    query = query.order('Rating', { ascending: true }).order('created_at', { ascending: false });
+                    break;
                 default:
                     query = query.order('created_at', { ascending: false });
             }
@@ -89,6 +95,7 @@ const SeenFilms = () => {
             setSortingDropdownAvailable(false);
             arrowDirection();
             getFilms(currSortSeen);
+            console.log(currSortSeen);
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
     }, []));
@@ -189,7 +196,7 @@ const SeenFilms = () => {
     };
 
     const arrowDirection = () => {
-        if (currSortSeen === "Alphabetical 1" || currSortSeen === "Date Added 2" || currSortSeen === "Release Date 2") {
+        if (currSortSeen === "Alphabetical 1" || currSortSeen === "Date Added 2" || currSortSeen === "Release Date 2" || currSortSeen === "Rating 2") {
             setArrowDesc(false);
         }
         else { setArrowDesc(true); }

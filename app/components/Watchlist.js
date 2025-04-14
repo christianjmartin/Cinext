@@ -58,6 +58,12 @@ const Watchlist = () => {
                 case 'Release Date 2':
                     query = query.order('Year', { ascending: true });
                     break;
+                case 'Rating 1':
+                    query = query.order('Rating', { ascending: false }).order('created_at', { ascending: false });
+                    break;
+                case 'Rating 2':
+                    query = query.order('Rating', { ascending: true }).order('created_at', { ascending: false });
+                    break;
                 default:
                     query = query.order('created_at', { ascending: false });
             }
@@ -189,7 +195,7 @@ const Watchlist = () => {
     };
 
     const arrowDirection = () => {
-        if (currSortWatchlist === "Alphabetical 1" || currSortWatchlist === "Date Added 2" || currSortWatchlist === "Release Date 2") {
+        if (currSortWatchlist === "Alphabetical 1" || currSortWatchlist === "Date Added 2" || currSortWatchlist === "Release Date 2" || currSortWatchlist === "Rating 2") {
             setArrowDesc(false);
         }
         else { setArrowDesc(true); }

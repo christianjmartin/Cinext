@@ -303,20 +303,6 @@ export default function Recs() {
             watchlistData.forEach(m => alreadyInListsMovieIDs.add(m.tmdbID));
         }
 
-        // get 40 movies based on the sentiment
-        let firstPrompt = `Provide a list of 40 movie recommendations in this exact format:
-        1. title ^ year
-        2. title ^ year
-        ...
-        (Strictly follow this format—no extra information, no deviations.)
-        Ensure there are no repeats.
-        If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
-        Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot. 
-        Remember absolutely no repeating movies.
-        Make sure there are no contraversial picks unless specifically asked for.
-        If there are not 40 movies available given the sentiment, give as many as you can but no repeats.
-        Choose from the following sentiment: ${text}`;
-
        
         const result1 = await fetchLLMResponse(1, text, '');
 
@@ -397,20 +383,7 @@ export default function Recs() {
             console.log("Too many seen movies. Fetching another batch...");
             console.log("exclude list: ", excludeList);
 
-            // prompt AI API again, explicity telling to not include movies from first response
-            let finalPrompt = `Provide a list of 40 movie recommendations in this exact format:
-            1. title ^ year
-            2. title ^ year
-            ...
-            (Strictly follow this format—no extra information, no deviations.)
-            Choose from the following sentiment: ${text}.
-            DO NOT include these movies: [${Array.from(excludeList).join(', ')}].
-            If that list included everything possible, do NOT give me anything, that is okay. Just fill in the blanks if there are any. the 20 movies is just the max, it could be 0, 1, 5 or 20...
-            Ensure there are no repeats.
-            If a movie's official title includes intentional stylized spelling (such as numbers replacing letters, symbols, or unique formatting), preserve that as accurately as possible. However, do **not** invent stylization where it does not exist.
-            Special case: If a movie's title has a dot icon in it, put a period instead of providing the actual dot.
-            Remember absolutely no repeating movies.
-            Make sure there are no contraversial picks unless specifically asked for.`;
+            
 
             const result2 = await fetchLLMResponse(2, text, Array.from(excludeList).join(', '));
             // console.log(result2);

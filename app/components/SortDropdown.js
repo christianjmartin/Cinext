@@ -19,8 +19,16 @@ const SortDropdown = ({ option }) => {
             <TouchableOpacity style={styles.sortBtn} onPress={() => option({option: 'Release Date 2', desc: false})}>
                 <Text>Release Date - Oldest First</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.sortBtn, styles.darker, styles.radiusBottom]} onPress={() => option({option: 'Release Date 1', desc: true})}>
+            <TouchableOpacity style={[styles.sortBtn, styles.darker]} onPress={() => option({option: 'Release Date 1', desc: true})}>
                 <Text>Release Date - Newest First</Text>
+            </TouchableOpacity>
+            {/* arrow down */}
+            <TouchableOpacity style={styles.sortBtn} onPress={() => option({option: 'Rating 1', desc: true})}>
+                <Text>Average Rating - Highest First</Text>
+            </TouchableOpacity>
+            {/* arrow up */}
+            <TouchableOpacity style={[styles.sortBtn, styles.darker, styles.radiusBottom]} onPress={() => option({option: 'Rating 2', desc: false})}>
+                <Text>Average Rating - Lowest First</Text>
             </TouchableOpacity>
         </View>
     )
