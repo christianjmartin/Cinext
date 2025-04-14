@@ -577,20 +577,20 @@ export default function Recs() {
         {!loading && 
         <>
         <View style={styles.toggleSection}>
+        <TouchableOpacity onPress={toggleSuggestWatchlist} style={[suggestWatchlist ? [styles.yes, {backgroundColor: currentTheme.seenBtn}] : styles.no, styles.toggleContainer]}>
+              <Animated.View style={[styles.toggleCircle, animatedStyleWatchlist]}>
+                  {/* {suggestWatchlist? <Text></Text> : <Text></Text> } */}
+              </Animated.View>
+          </TouchableOpacity>
           <TouchableOpacity onPress={toggleSuggestSeen} style={[suggestSeen ? [styles.yes, {backgroundColor: currentTheme.seenBtn}] : styles.no, styles.toggleContainer]}>
               <Animated.View style={[styles.toggleCircle, animatedStyleSeen]}>
                   {/* {suggestSeen ? <Text></Text> : <Text></Text> } */}
               </Animated.View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={toggleSuggestWatchlist} style={[suggestWatchlist ? [styles.yes, {backgroundColor: currentTheme.seenBtn}] : styles.no, styles.toggleContainer]}>
-              <Animated.View style={[styles.toggleCircle, animatedStyleWatchlist]}>
-                  {/* {suggestWatchlist? <Text></Text> : <Text></Text> } */}
-              </Animated.View>
-          </TouchableOpacity>
         </View>
         <View style={styles.toggleSectionText}>
-          {suggestSeen ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text>}
           {suggestWatchlist ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text>}
+          {suggestSeen ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text>}
         </View>
         </>
         }
