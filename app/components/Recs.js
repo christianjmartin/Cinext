@@ -84,6 +84,12 @@ export default function Recs() {
           case 'Release Date 2':
               query = query.order('Year', { ascending: true });
               break;
+          case 'Rating 1':
+              query = query.order('Rating', { ascending: false }).order('created_at', { ascending: false });
+              break;
+          case 'Rating 2':
+              query = query.order('Rating', { ascending: true }).order('created_at', { ascending: false });
+              break;
           default:
               query = query.order('created_at', { ascending: false });
       }
@@ -132,6 +138,12 @@ export default function Recs() {
               break;
           case 'Release Date 2':
               query = query.order('Year', { ascending: true });
+              break;
+          case 'Rating 1':
+              query = query.order('Rating', { ascending: false }).order('created_at', { ascending: false });
+              break;
+          case 'Rating 2':
+              query = query.order('Rating', { ascending: true }).order('created_at', { ascending: false });
               break;
           default:
               query = query.order('created_at', { ascending: false });
@@ -597,7 +609,7 @@ export default function Recs() {
       
         <View style={[styles.box, {backgroundColor: currentTheme.backgroundSecondary, borderColor: currentTheme.border2, shadowColor: currentTheme.shadowColor2}]}>
             <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>Today in film</Text>
-            <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>{movieOTD.Date ? extractStringDate(movieOTD.Date) : null}, {movieOTD.Year ? movieOTD.Year : null}</Text>
+            <Text style={[{color: currentTheme.textColorSecondary}, styles.motdHeader]}>{movieOTD.Date ? extractStringDate(movieOTD.Date) : null} {movieOTD.Year ? movieOTD.Year : null}</Text>
 
 
     
