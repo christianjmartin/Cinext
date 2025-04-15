@@ -24,6 +24,9 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "splash": {
+      "backgroundColor": "#A44443"
     }
   }
 }
