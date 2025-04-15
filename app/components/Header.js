@@ -4,6 +4,7 @@ import camera5 from '../assets/camera5.png';
 import camera7 from '../assets/camera7.png';
 import camera8 from '../assets/camera8.png';
 import camera9 from '../assets/camera9.png';
+import camera10 from '../assets/camera10.png';
 import settings from '../assets/settings-2.png';
 import PageContext from '../context/PageContext';  
 import { useNavigation } from '@react-navigation/native';
@@ -15,7 +16,7 @@ export default function Header() {
     const navigation = useNavigation();
     return (
         <View style={styles.headerContainer}>
-            <Image source={camera9} style={styles.logo} /> 
+            <Image source={camera10} style={styles.logo} /> 
             <View style={styles.invisiblePadding}></View>
             <View style={styles.spacer}></View>
 
