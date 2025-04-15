@@ -60,12 +60,13 @@ export const PageProvider = ({ children }) => {
             if (preferences.suggestSeen !== undefined) setSuggestSeen(preferences.suggestSeen);
             if (preferences.suggestWatchlist !== undefined) setSuggestWatchlist(preferences.suggestWatchlist);
 
+            setInitialLoad(false);
         } catch (error) {
             console.error("Error initializing client:");
         }
-        finally {
-          setInitialLoad(false);
-        }
+        // finally {
+        //   setInitialLoad(false);
+        // }
     };
 
     initializeClient();
