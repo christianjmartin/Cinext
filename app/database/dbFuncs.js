@@ -187,7 +187,11 @@ const FilmInWatchlist = async (title, director, year, userId, tmdbID) => {
 };
 
 const getRequestsLeft = async () => {
-  const today = new Date().toISOString().split('T')[0];
+  // const today = new Date().toISOString().split('T')[0];
+
+  const today = new Date().toLocaleDateString('en-CA', {
+    timeZone: 'America/Chicago',
+});
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
