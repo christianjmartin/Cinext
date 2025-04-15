@@ -16,6 +16,7 @@ import DATA from './DATA';
 import CONTACT from './CONTACT';
 import ABOUT from './ABOUT';
 import FAQ from './FAQ';
+import OfflineScreen from './Offline';
 
 import Header from './Header';
 import NavBar from './NavBar';
@@ -40,24 +41,30 @@ export default function Page() {
 
       {/* Navigation Screens */}
       <View style={styles.main}>
-        <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
-          <Stack.Screen name="Recs" component={Recs} />
-          <Stack.Screen name="Watchlist" component={Watchlist} />
-          <Stack.Screen name="Seen Films" component={SeenFilms} />
-          <Stack.Screen name="Show Swiper" component={MovieSwiper} />
-          <Stack.Screen name="Static Movie" component={StaticMovie} />
-          <Stack.Screen name="Settings" component={Settings} />
-          <Stack.Screen name="DATA" component={DATA}/>
-          <Stack.Screen name="CONTACT" component={CONTACT}/>
-          <Stack.Screen name="ABOUT" component={ABOUT}/>
-          <Stack.Screen name="FAQ" component={FAQ}/>
-        </Stack.Navigator>
+        {page === "offline" ? (
+          <OfflineScreen />
+        ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Screen name="Recs" component={Recs} />
+            <Stack.Screen name="Watchlist" component={Watchlist} />
+            <Stack.Screen name="Seen Films" component={SeenFilms} />
+            <Stack.Screen name="Show Swiper" component={MovieSwiper} />
+            <Stack.Screen name="Static Movie" component={StaticMovie} />
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="DATA" component={DATA}/>
+            <Stack.Screen name="CONTACT" component={CONTACT}/>
+            <Stack.Screen name="ABOUT" component={ABOUT}/>
+            <Stack.Screen name="FAQ" component={FAQ}/>
+          </Stack.Navigator>
+        )}
       </View>
 
       {/* Bottom Navigation */}
-      <View>
-        {page !== "Show Swiper" && <NavBar />}
-      </View>
+      {page !== "Show Swiper" && page !== "offline" && (
+        <View>
+          <NavBar />
+        </View>
+      )}
 
     </View>
   );

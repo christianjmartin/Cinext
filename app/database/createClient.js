@@ -1,5 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { supabase } from '../services/supabase.js';
+import NetInfo from '@react-native-community/netinfo';
+
 
 /**
  * Fetches client data from Supabase or creates a new entry if none exists.
@@ -7,6 +9,13 @@ import { supabase } from '../services/supabase.js';
  */
 export const createClient = async () => {
     try {
+        const net = await NetInfo.fetch();
+
+        if (!net.isConnected) {
+            console.warn("🚫 No internet connection — skipping session setup.");
+            return { offline: true };; // or return a fallback config like { id: null, color: "dark", ... }
+        }
+
         // restore an existing session
         const storedSession = await SecureStore.getItemAsync("session");
 

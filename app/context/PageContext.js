@@ -38,6 +38,12 @@ export const PageProvider = ({ children }) => {
     const initializeClient = async () => {
         try {
             const preferences = await createClient();
+
+            if (preferences?.offline) {
+              console.log("🌐 App launched offline — skipping Supabase setup.");
+              setPage("offline");
+              return;
+            }
             if (preferences.id) setUserId(preferences.id);
             const reqs = await getRequestsLeft();
             setRequestCount(reqs);
