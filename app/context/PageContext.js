@@ -38,20 +38,13 @@ export const PageProvider = ({ children }) => {
 
     const initializeClient = async () => {
         try {
+
             const preferences = await createClient();
 
             if (preferences?.offline) {
               console.log("🌐 App launched offline — skipping Supabase setup.");
               setPage("offline");
               return;
-            }
-            if (preferences.id) setUserId(preferences.id);
-            const reqs = await getRequestsLeft();
-            setRequestCount(reqs);
-
-            if (!preferences) {
-                console.error("Error: createClient() returned null or undefined.");
-                return;
             }
 
             const today = new Date();
@@ -60,6 +53,15 @@ export const PageProvider = ({ children }) => {
             const formattedDate = `${month}-${day}`;
             const todaysFilm = await getMOTD(formattedDate);
             setMovieOTD(todaysFilm);
+
+            if (preferences.id) setUserId(preferences.id);
+            const reqs = await getRequestsLeft();
+            setRequestCount(reqs);
+
+            if (!preferences) {
+                console.error("Error: createClient() returned null or undefined.");
+                return;
+            }
 
             console.log("Loaded Preferences:");
             
@@ -75,7 +77,7 @@ export const PageProvider = ({ children }) => {
         finally {
           setTimeout(() => {
             setInitialLoad(false);
-          }, 1000);
+          }, 1500);
         }
     };
 

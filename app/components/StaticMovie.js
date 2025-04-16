@@ -7,7 +7,7 @@ import PageContext from '../context/PageContext';
 import arrow from '../assets/arrow.webp';
 import arrow2 from '../assets/arrow2.png';
 import theme from '../services/theme';
-import check from '../assets/check.png';
+import check from '../assets/checkmark.png';
 import { useNavigation } from '@react-navigation/native';
 
 const StaticMovie = () => {
@@ -222,12 +222,13 @@ const styles = StyleSheet.create({
       alignItems: 'center', 
     },
     checkmark: {
-      width: 50,
-      height: 50,
+      width: 40,
+      height: 40,
       resizeMode: 'cover',
       position: 'absolute',
-      right: 0,
-      opacity: 0.4,
+      right: 5,
+      top: 2.5,
+      opacity: 0.3,
     }
   });
 

@@ -336,12 +336,12 @@ const styles = StyleSheet.create({
     xBtn: {
         position: 'absolute',
         zIndex: 20,
-        top: 8.5,
+        top: 5.5,
         right: 7,
     },
     xImage: {
-        height: 24,
-        width: 24,
+        height: 30,
+        width: 30,
     },
     row: {
         justifyContent: 'flex-start',
