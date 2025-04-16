@@ -11,6 +11,7 @@ import { supabase } from '../services/supabase.js';
 import { updateSuggestionSeenPreference } from '../database/preferences.js';
 import { updateSuggestionWatchlistPreference } from '../database/preferences.js';
 import { useNavigation } from '@react-navigation/native';
+import { getMOTD } from '../database/dbFuncs.js';
 import imdb from '../assets/IMDB.svg.png';
 import tmdb2 from '../assets/tmdb2.png';
 import MOTD from '../services/MOTD.json';
@@ -172,32 +173,32 @@ export default function Recs() {
 
  
   // gets the film of the day and updates it in context api "movieOTD" object
-  const getMOTD = async (formattedDate) => {
-    const motd = MOTD[formattedDate].title;
-    // console.log(motd);
-    try {
-      const { data, error } = await supabase
-        .from('MovieOfTheDay')
-        .select('Date, Title, PosterPath, Director, Year, Rating, Description, tmdbID')
-        .eq('Date', formattedDate);
+  // const getMOTD = async (formattedDate) => {
+  //   const motd = MOTD[formattedDate].title;
+  //   // console.log(motd);
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from('MovieOfTheDay')
+  //       .select('Date, Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+  //       .eq('Date', formattedDate);
 
-      if (error) {
-          console.error('Error fetching SeenFilms:');
-      } else {
-          // nothing exists in the database for this day 
-          if (data.length === 0) {
-            console.log('no movie of the day, internal error')
-          }
-          // something was there, update context for movieoftheday
-          else {
-            const movieOfTheDay = data[0];
-            setMovieOTD(movieOfTheDay);
-          }
-      }
-    } catch (error) {
-        console.error('Unexpected error get motd:'); 
-    }
-  }
+  //     if (error) {
+  //         console.error('Error fetching SeenFilms:');
+  //     } else {
+  //         // nothing exists in the database for this day 
+  //         if (data.length === 0) {
+  //           console.log('no movie of the day, internal error')
+  //         }
+  //         // something was there, update context for movieoftheday
+  //         else {
+  //           const movieOfTheDay = data[0];
+  //           setMovieOTD(movieOfTheDay);
+  //         }
+  //     }
+  //   } catch (error) {
+  //       console.error('Unexpected error get motd:'); 
+  //   }
+  // }
 
   const updateRQC = async () => {
     const count = await getRequestsLeft();
@@ -220,13 +221,15 @@ export default function Recs() {
         return;
       } else {
         console.log("new day -> fetching today's motd...");
-        await getMOTD(formattedDate);
+        const todaysFilm = await getMOTD(formattedDate);
+        setMovieOTD(todaysFilm);
         return;
       }
     }
     else {
       console.log("ts was not in context, it better be in the DB");
-      await getMOTD(formattedDate);
+      const todaysFilm = await getMOTD(formattedDate);
+      setMovieOTD(todaysFilm);
       return; 
     }
   };

@@ -219,4 +219,35 @@ const getRequestsLeft = async () => {
   }
 };
 
-export { addToWatchlist, addToSeen, getRequestsLeft };
+// gets the film of the day and updates it in context api "movieOTD" object
+const getMOTD = async (formattedDate) => {
+  // const motd = MOTD[formattedDate].title;
+  // console.log(motd);
+  try {
+    const { data, error } = await supabase
+      .from('MovieOfTheDay')
+      .select('Date, Title, PosterPath, Director, Year, Rating, Description, tmdbID')
+      .eq('Date', formattedDate);
+
+    if (error) {
+        console.error('Error fetching SeenFilms:');
+        return null;
+    } else {
+        // nothing exists in the database for this day 
+        if (data.length === 0) {
+          console.log('no movie of the day, internal error')
+          return null;
+        }
+        // something was there, update context for movieoftheday
+        else {
+          const movieOfTheDay = data[0];
+          return movieOfTheDay;
+        }
+    }
+  } catch (error) {
+      console.error('Unexpected error get motd:'); 
+      return null;
+  }
+}
+
+export { addToWatchlist, addToSeen, getRequestsLeft, getMOTD };

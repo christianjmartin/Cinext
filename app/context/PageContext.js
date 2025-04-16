@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
 import { supabase } from '../services/supabase.js';
+import { getMOTD } from '../database/dbFuncs';
 
 const PageContext = createContext();
 
@@ -53,6 +54,13 @@ export const PageProvider = ({ children }) => {
                 return;
             }
 
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const formattedDate = `${month}-${day}`;
+            const todaysFilm = await getMOTD(formattedDate);
+            setMovieOTD(todaysFilm);
+
             console.log("Loaded Preferences:");
             
             // Update context states safely
@@ -62,7 +70,7 @@ export const PageProvider = ({ children }) => {
 
             // setInitialLoad(false);
         } catch (error) {
-            console.error("Error initializing client:");
+            console.error("Error initializing client:", error);
         }
         finally {
           setTimeout(() => {
@@ -72,8 +80,9 @@ export const PageProvider = ({ children }) => {
     };
 
     initializeClient();
+
     return () => authListener.subscription?.unsubscribe();
-  }, [setColorMode, setSuggestSeen, setSuggestWatchlist, setRequestCount]);
+  }, [setColorMode, setSuggestSeen, setSuggestWatchlist, setRequestCount, setMovieOTD]);
 
 
 

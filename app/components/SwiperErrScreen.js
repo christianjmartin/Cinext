@@ -31,7 +31,7 @@ const SwiperErrScreen = () => {
             </TouchableOpacity>
         </View>
         <View style={[styles.body, {backgroundColor: currentTheme.swiperBackground}]}>
-            <Text style={[styles.text, {color: currentTheme.textColorSecondary}]}>Your request could not be fufilled. There may have not been enough films to reccomend based on what you said. Additionally, Requests completely unrelated to film content, or containing overly foul language or gibberish may not be fufilled. Please try again with something different!</Text>
+            <Text style={[styles.text, {color: currentTheme.textColorSecondary}]}>Your request could not be fufilled. There may have not been enough films to recommend based on what you said. Additionally, Requests completely unrelated to film content, or containing overly foul language or gibberish may not be fufilled. Please try again with something different!</Text>
         </View>
         </>
     );
