@@ -30,6 +30,9 @@ export const fetchMovieDetails = async (query) => {
     else if (query === "Seven ^ 1995") {
       movie = movies.find(m=>m.title === "Se7en" || null);
     }
+    else if (query === "Victory ^ 1981") {
+      movie = movies.find(m=>m.title === "Escape to Victory" || null);
+    }
     else if (query === "Insomnia ^ 2002") {
       movie = movies.find(m=>m.release_date === "2002-05-24" || null);
     }
