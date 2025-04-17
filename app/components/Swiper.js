@@ -4,6 +4,7 @@ import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
 import tmdb2 from '../assets/tmdb2.png';
 import { addToSeen, addToWatchlist } from '../database/dbFuncs';
+import Disclaimer from './Disclaimer';
 import theme from '../services/theme';
 import check from '../assets/checkmark.png';
 import { useNavigation } from '@react-navigation/native';
@@ -87,6 +88,7 @@ const MovieList = () => {
         >
           <Text style={styles.buttonText}>Exit</Text>
         </TouchableOpacity>
+        <Disclaimer/>
 
         {/* Movie List */}
         <FlatList

@@ -16,6 +16,7 @@ import DATA from './DATA';
 import CONTACT from './CONTACT';
 import ABOUT from './ABOUT';
 import FAQ from './FAQ';
+import PRIVACY from './PRIVACY';
 import OfflineScreen from './Offline';
 
 import Header from './Header';
@@ -55,6 +56,7 @@ export default function Page() {
             <Stack.Screen name="CONTACT" component={CONTACT}/>
             <Stack.Screen name="ABOUT" component={ABOUT}/>
             <Stack.Screen name="FAQ" component={FAQ}/>
+            <Stack.Screen name="PRIVACY" component={PRIVACY}/>
           </Stack.Navigator>
         )}
       </View>

@@ -27,28 +27,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: '100%',
     },
-    backBtn: {
-        width: 70,
-        height: 70,
-        resizeMode: 'contain',
-        opacity: 0.42,
-        borderRadius: 20,
-    },
     infoContainer: {
         textAlign: 'center',
         width: Dimensions.get('window').width * 0.8,
         fontSize: 20,
+        marginTop: 50,
     },
-    tmdbLogo: {
-        width: Dimensions.get('window').width * 0.8,
-        resizeMode: 'contain',
-        marginTop: -80,
-    },
-    exitButton: {
-        left: -10,
-    },
-
-
 });
 
 export default Offline;

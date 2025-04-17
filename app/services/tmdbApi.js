@@ -36,6 +36,9 @@ export const fetchMovieDetails = async (query) => {
     else if (query === "Insomnia ^ 2002") {
       movie = movies.find(m=>m.release_date === "2002-05-24" || null);
     }
+    else if (query === "WALL-E ^ 2008") {
+      movie = movies.find(m=>m.release_date === "2008-06-22" || null);
+    }
     else {
       movie = exactMatch || movies[0];
     }

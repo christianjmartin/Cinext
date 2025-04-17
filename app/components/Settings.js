@@ -56,6 +56,11 @@ const Settings = () => {
                     <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>Contact</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.faqBtn} onPress={() => {
+                    navigation.navigate("PRIVACY");
+                }}>
+                    <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>Privacy</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.faqBtn} onPress={() => {
                     navigation.navigate("ABOUT");
                 }}>
                     <Text style={[styles.faqText, {color: currentTheme.textColorSecondary}]}>About</Text>
@@ -103,7 +108,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 2,
-        marginBottom: 200,
+        marginBottom: 240,
     },
     toggleCircle: {
         width: 90,

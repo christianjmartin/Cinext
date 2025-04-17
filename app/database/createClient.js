@@ -12,7 +12,7 @@ export const createClient = async () => {
         const net = await NetInfo.fetch();
 
         if (!net.isConnected) {
-            console.warn("🚫 No internet connection — skipping session setup.");
+            console.warn("No internet connection — skipping session setup.");
             return { offline: true };; // or return a fallback config like { id: null, color: "dark", ... }
         }
 
