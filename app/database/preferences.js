@@ -10,7 +10,7 @@ export const updateColorPreference = async ( color, userId ) => {
             .update({Color: color})
             .eq('AuthID', userId)
 
-        console.log("updating color pref");
+        // console.log("updating color pref");
     }
     catch (error) {
         console.error("error updating color pref");
@@ -24,7 +24,7 @@ export const updateSuggestionSeenPreference = async ( bool, userId ) => {
             .update({SuggestSeen: bool})
             .eq('AuthID', userId)
 
-        console.log("updating seen films inclusion pref");
+        // console.log("updating seen films inclusion pref");
     }
     catch (error) {
         console.error("error updating seen pref");
@@ -41,7 +41,7 @@ export const updateSuggestionWatchlistPreference = async (bool, userId) => {
 
         if (error) throw error;
 
-        console.log("Updating watchlist inclusion pref");
+        // console.log("Updating watchlist inclusion pref");
     } catch (error) {
         console.error("error updating watchlist pref");
     }

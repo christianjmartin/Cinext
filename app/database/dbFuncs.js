@@ -196,7 +196,7 @@ const getRequestsLeft = async () => {
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   let userId = userData?.user?.id;
-  console.log("request getter fired");
+  // console.log("request getter fired");
   // const tomorrow = new Date();
   // tomorrow.setDate(tomorrow.getDate() + 1);
   // const today = tomorrow.toISOString().split('T')[0];
@@ -235,7 +235,7 @@ const getMOTD = async (formattedDate) => {
     } else {
         // nothing exists in the database for this day 
         if (data.length === 0) {
-          console.log('no movie of the day, internal error')
+          // console.log('no movie of the day, internal error')
           return null;
         }
         // something was there, update context for movieoftheday

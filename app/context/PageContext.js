@@ -28,7 +28,7 @@ export const PageProvider = ({ children }) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "TOKEN_REFRESHED" && session) {
-        console.log("Token refreshed, storing new valuess");
+        // console.log("Token refreshed, storing new valuess");
         SecureStore.setItemAsync("session", JSON.stringify({
           access_token: session.access_token,
           refresh_token: session.refresh_token
@@ -42,7 +42,7 @@ export const PageProvider = ({ children }) => {
             const preferences = await createClient();
 
             if (preferences?.offline) {
-              console.log("🌐 App launched offline — skipping Supabase setup.");
+              // console.log("App launched offline — skipping Supabase setup.");
               setPage("offline");
               return;
             }
@@ -63,7 +63,7 @@ export const PageProvider = ({ children }) => {
                 return;
             }
 
-            console.log("Loaded Preferences:");
+            // console.log("Loaded Preferences:");
             
             // Update context states safely
             if (preferences.color) setColorMode(preferences.color);
@@ -97,7 +97,7 @@ export const PageProvider = ({ children }) => {
   };
 
   const updateMovieList = (newList) => {
-    console.log("updating list of movies for context");
+    // console.log("updating list of movies for context");
     setList(newList);
   };
 

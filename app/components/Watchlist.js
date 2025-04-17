@@ -77,11 +77,11 @@ const Watchlist = () => {
                 // console.log("data", data);
                 // console.log("Watchlist", watchlist)
                 if (!_.isEqual(data, watchlist)) {
-                    console.log("There were changes in Watchlist, updating Watchlist...");
+                    // console.log("There were changes in Watchlist, updating Watchlist...");
                     setWatchlist(data || []);
                 }
                 else {
-                    console.log('no changes in Watchlist, nothing to do!');
+                    // console.log('no changes in Watchlist, nothing to do!');
                 }
             }
         } catch (error) {
@@ -209,7 +209,7 @@ const Watchlist = () => {
                 try {
                     if (item.tmdbID) {
                         // const directors = await fetchMovieCredits(item.tmdbID);
-                        console.log("searched for a movie, clicked, and need directors");
+                        // console.log("searched for a movie, clicked, and need directors");
                         const directors = await fetchMovieDirectors(item.tmdbID);
                         item.Director = directors; // add the director(s) to the film object 
                     }

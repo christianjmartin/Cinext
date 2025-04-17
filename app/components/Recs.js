@@ -104,11 +104,11 @@ export default function Recs() {
             // console.log("data", data);
             // console.log("Watchlist", watchlist)
             if (!_.isEqual(data, watchlist)) {
-                console.log("There were changes in Watchlist, updating Watchlist...");
+                // console.log("There were changes in Watchlist, updating Watchlist...");
                 setWatchlist(data || []);
             }
             else {
-                console.log('no changes in Watchlist, nothing to do!');
+                // console.log('no changes in Watchlist, nothing to do!');
             }
         }
     } catch (error) {
@@ -159,11 +159,11 @@ export default function Recs() {
               // console.log("data", data);
               // console.log("seenFilms", seenFilms)
               if (!_.isEqual(data, seenFilms)) {
-                  console.log("There were changes in seenfilms, updating seenfilms...");
+                  // console.log("There were changes in seenfilms, updating seenfilms...");
                   setSeenFilms(data || []);
               }
               else {
-                  console.log('no changes in seenfilms, nothing to do!');
+                  // console.log('no changes in seenfilms, nothing to do!');
               }
           }
       } catch (error) {
@@ -217,17 +217,17 @@ export default function Recs() {
     // Check if today's movie is already in context
     if (Object.keys(movieOTD).length > 0) {
       if (movieOTD?.Date === formattedDate) {
-        console.log("movie exists in context and is up to date.");
+        // console.log("movie exists in context and is up to date.");
         return;
       } else {
-        console.log("new day -> fetching today's motd...");
+        // console.log("new day -> fetching today's motd...");
         const todaysFilm = await getMOTD(formattedDate);
         setMovieOTD(todaysFilm);
         return;
       }
     }
     else {
-      console.log("ts was not in context, it better be in the DB");
+      // console.log("ts was not in context, it better be in the DB");
       const todaysFilm = await getMOTD(formattedDate);
       setMovieOTD(todaysFilm);
       return; 
@@ -237,7 +237,7 @@ export default function Recs() {
   useFocusEffect(
     useCallback(() => {
 
-      console.log("focus effect fired");
+      // console.log("focus effect fired");
       updateRQC();
       fetchMOTD();
       getFilms(currSortSeen, currSortWatchlist);
@@ -248,7 +248,7 @@ export default function Recs() {
   useEffect(() => {
   const subscription = AppState.addEventListener('change', (state) => {
     if (state === 'active') {
-      console.log("app state listener fired")
+      // console.log("app state listener fired")
       fetchMOTD(); // or whatever needs refreshing
       updateRQC();
     }
@@ -279,7 +279,7 @@ export default function Recs() {
       Alert.alert("Error", "You typed too many characters");
       return;
     }
-    console.log(`Fetching movie recommendations...`);
+    // console.log(`Fetching movie recommendations...`);
     // setRequestCount(prevCount => prevCount - 1);
     setLoading(true);
 
@@ -353,10 +353,10 @@ export default function Recs() {
 
         
         // what the user asked for 
-        console.log("The user said: ", text);
+        // console.log("The user said: ", text);
 
         // raw response from the api
-        console.log("api response: ", responseText1);
+        // console.log("api response: ", responseText1);
 
         // extract movies returned by following regex pattern, outlined in extractMovieList function 
         let movies1 = extractMovieList(responseText1);
@@ -390,12 +390,12 @@ export default function Recs() {
         let excludeList = new Set(detailedMovies.map(movie => movie.Title));
 
         // console.log(excludeList);
-        console.log("The number of new films to the user:", uniqueMovies.length);
+        // console.log("The number of new films to the user:", uniqueMovies.length);
 
         // if there arent enough unqiue movies after filtering, try again
         if (uniqueMovies.length < 5) { 
-            console.log("Too many seen movies. Fetching another batch...");
-            console.log("exclude list: ", excludeList);
+            // console.log("Too many seen movies. Fetching another batch...");
+            // console.log("exclude list: ", excludeList);
 
             
 
@@ -434,7 +434,7 @@ export default function Recs() {
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
             // raw second response
-            console.log("the second api response: ", responseText2);
+            // console.log("the second api response: ", responseText2);
 
             // get movies via regex pattern 
             let movies2 = extractMovieList(responseText2);
@@ -485,7 +485,7 @@ export default function Recs() {
         if (uniqueMovies.length > 24) {
           let cutoffAmount = uniqueMovies.length % 24;
           uniqueMovies = uniqueMovies.slice(0, -cutoffAmount);
-          console.log("The number of films actually displayed (it was over 24):", uniqueMovies.length);
+          // console.log("The number of films actually displayed (it was over 24):", uniqueMovies.length);
         }
 
         // update the movieList for context

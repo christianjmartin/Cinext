@@ -77,11 +77,11 @@ const SeenFilms = () => {
                 // console.log("data", data);
                 // console.log("seenFilms", seenFilms)
                 if (!_.isEqual(data, seenFilms)) {
-                    console.log("There were changes in seenfilms, updating seenfilms...");
+                    // console.log("There were changes in seenfilms, updating seenfilms...");
                     setSeenFilms(data || []);
                 }
                 else {
-                    console.log('no changes in seenfilms, nothing to do!');
+                    // console.log('no changes in seenfilms, nothing to do!');
                 }
             }
         } catch (error) {
@@ -95,7 +95,7 @@ const SeenFilms = () => {
             setSortingDropdownAvailable(false);
             arrowDirection();
             getFilms(currSortSeen);
-            console.log(currSortSeen);
+            // console.log(currSortSeen);
         // console.log("color mode is", colorMode);
         // console.log(currentTheme.background);
     }, []));
@@ -210,7 +210,7 @@ const SeenFilms = () => {
                 try {
                     if (item.tmdbID) {
                         // const directors = await fetchMovieCredits(item.tmdbID);
-                        console.log("searched for a movie, clicked, and need directors");
+                        // console.log("searched for a movie, clicked, and need directors");
                         const directors = await fetchMovieDirectors(item.tmdbID);
                         item.Director = directors; // add the director(s) to the film object 
                     }

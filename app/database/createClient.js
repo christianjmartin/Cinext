@@ -20,7 +20,7 @@ export const createClient = async () => {
         const storedSession = await SecureStore.getItemAsync("session");
 
         if (storedSession) {
-            console.log("Restoring existing session...");
+            // console.log("Restoring existing session...");
             const parsedSession = JSON.parse(storedSession);
 
             // Restore session in Supabase
@@ -29,7 +29,7 @@ export const createClient = async () => {
             // const { data: sessionData, error: sessionError } = await supabase.auth.setSession("diosjsooj");
 
             if (!sessionError && sessionData?.session) {
-                console.log("Session successfully restored!!!:");
+                // console.log("Session successfully restored!!!:");
 
                 // Use the existing user ID
                 return await fetchClientData(sessionData.session.user.id);
@@ -40,7 +40,7 @@ export const createClient = async () => {
         }
 
         // no valid session, sign in anonymously
-        console.log("No session found, signing in anonymously...");
+        // console.log("No session found, signing in anonymously...");
         const { data: signInData, error: signInError } = await supabase.auth.signInAnonymously();
 
         if (signInError) {
@@ -48,7 +48,7 @@ export const createClient = async () => {
             return null;
         }
 
-        console.log("Signed in anonymously:");
+        // console.log("Signed in anonymously:");
 
         // retrieve the new session
         const { data: newSessionData } = await supabase.auth.getSession();
@@ -91,7 +91,7 @@ const fetchClientData = async (userId) => {
 
         // If user does not exist, insert default settings
         if (!clientData) {
-            console.log('New client detected, inserting default settings...');
+            // console.log('New client detected, inserting default settings...');
             const { error: insertError } = await supabase
                 .from('Client')
                 .insert([{Color: 'dark', SuggestSeen: false, SuggestWatchlist: false }]);
@@ -104,7 +104,7 @@ const fetchClientData = async (userId) => {
             return { id: userId, color: 'dark', suggestSeen: false, suggestWatchlist: false };
         }
 
-        console.log('Client data loaded:');
+        // console.log('Client data loaded:');
 
         return {
             id: userId,
