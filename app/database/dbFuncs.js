@@ -191,7 +191,7 @@ const getRequestsLeft = async () => {
 
   const today = new Date().toLocaleDateString('en-CA', {
     timeZone: 'America/Chicago',
-});
+  });
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { useRef, createContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
@@ -23,7 +23,12 @@ export const PageProvider = ({ children }) => {
   const [currSortSeen, setCurrSortSeen] = useState('Date Added 1');
   const [currSortWatchlist, setCurrSortWatchlist] = useState('Date Added 1');
   const [requestCount, setRequestCount] = useState();
-  const [loading, setLoading] = useState(false);  
+  const [requestCountDate, setRequestCountDate] = useState();
+  const [loading, setLoading] = useState(false);
+  const [listInit, setListInit] = useState(false);
+  const lastSeenFilmsFetch = useRef(0);
+  const lastWatchlistFetch = useRef(0); 
+
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
@@ -57,6 +62,10 @@ export const PageProvider = ({ children }) => {
             if (preferences.id) setUserId(preferences.id);
             const reqs = await getRequestsLeft();
             setRequestCount(reqs);
+            const todayCST = new Date().toLocaleDateString('en-CA', {
+              timeZone: 'America/Chicago',
+            });
+            setRequestCountDate(todayCST);
 
             if (!preferences) {
                 console.error("Error: createClient() returned null or undefined.");
@@ -111,7 +120,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount, loading, setLoading}}>
+    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount, loading, setLoading, listInit, setListInit, requestCountDate, setRequestCountDate, lastSeenFilmsFetch, lastWatchlistFetch}}>
       {children}
     </PageContext.Provider>
   );

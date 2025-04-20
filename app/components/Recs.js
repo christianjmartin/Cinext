@@ -20,7 +20,7 @@ import theme from '../services/theme.js';
 import _ from 'lodash';
 
 export default function Recs() {
-  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist, requestCount, setRequestCount, loading, setLoading} = useContext(PageContext);  
+  const {updatePage, updateMovieList, userId, colorMode, movieOTD, setMovieOTD, setStaticMovie, watchlist, setWatchlist, seenFilms, setSeenFilms, suggestSeen, setSuggestSeen, suggestWatchlist, setSuggestWatchlist, currSortSeen, currSortWatchlist, requestCount, setRequestCount, loading, setLoading, listInit, setListInit, requestCountDate, setRequestCountDate} = useContext(PageContext);  
   const [text, setText] = useState('');  
   // const [loading, setLoading] = useState(false);  
   const [isTyping, setIsTyping] = useState(false);
@@ -201,8 +201,18 @@ export default function Recs() {
   // }
 
   const updateRQC = async () => {
-    const count = await getRequestsLeft();
-    setRequestCount(count);
+    const todayCST = new Date().toLocaleDateString('en-CA', {
+      timeZone: 'America/Chicago',
+    });
+    if (todayCST === requestCountDate) {
+      // console.log("dont gotta refetch request count")
+      return;
+    }
+    else {
+      const count = await getRequestsLeft();
+      setRequestCount(count);
+      setRequestCountDate(todayCST);
+    }
   }
 
   const fetchMOTD = async () => {
@@ -240,22 +250,29 @@ export default function Recs() {
       // console.log("focus effect fired");
       updateRQC();
       fetchMOTD();
-      getFilms(currSortSeen, currSortWatchlist);
+      // getFilms(currSortSeen, currSortWatchlist);
   
     }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
   );
 
   useEffect(() => {
-  const subscription = AppState.addEventListener('change', (state) => {
-    if (state === 'active') {
-      // console.log("app state listener fired")
-      fetchMOTD(); // or whatever needs refreshing
-      updateRQC();
+    if (!listInit) {
+      // console.log("one and done")
+      setListInit(true);
+      getFilms(currSortSeen, currSortWatchlist);
     }
-  });
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        // console.log("app state listener fired")
+        fetchMOTD(); // or whatever needs refreshing
+        updateRQC();
+      }
+    });
 
-  return () => subscription.remove();
-}, []);
+    return () => subscription.remove();
+  }, []);
+
+ 
 
 
   // this function does the following
@@ -347,6 +364,10 @@ export default function Recs() {
         }
 
         setRequestCount(prevCount => prevCount - 1);
+        const todayCST1 = new Date().toLocaleDateString('en-CA', {
+          timeZone: 'America/Chicago',
+        });
+        setRequestCountDate(todayCST1);
         
     
         const responseText1 = result1?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
@@ -428,7 +449,13 @@ export default function Recs() {
               return;
             }
 
+
             setRequestCount(prevCount => prevCount - 1);
+            const todayCST2 = new Date().toLocaleDateString('en-CA', {
+              timeZone: 'America/Chicago',
+            });
+            setRequestCountDate(todayCST2);
+            
             // Alert.alert("Due to your filtering needs, 2 requests are needed for this request.");
         
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';

@@ -17,7 +17,7 @@ import theme from '../services/theme';
 import { useNavigation } from '@react-navigation/native';
 
 const Watchlist = () => {
-    const { userId, setStaticMovie, updatePage, colorMode, watchlist, setWatchlist, currSortWatchlist, setCurrSortWatchlist} = useContext(PageContext);
+    const { userId, setStaticMovie, updatePage, colorMode, watchlist, setWatchlist, currSortWatchlist, setCurrSortWatchlist, lastWatchlistFetch} = useContext(PageContext);
     // const [watchlist, setWatchlist] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
@@ -59,10 +59,10 @@ const Watchlist = () => {
                     query = query.order('Year', { ascending: true });
                     break;
                 case 'Rating 1':
-                    query = query.order('Rating', { ascending: false }).order('created_at', { ascending: false });
+                    query = query.order('Rating', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false });
                     break;
                 case 'Rating 2':
-                    query = query.order('Rating', { ascending: true }).order('created_at', { ascending: false });
+                    query = query.order('Rating', { ascending: true, nullsFirst: false}).order('created_at', { ascending: false });
                     break;
                 default:
                     query = query.order('created_at', { ascending: false });
@@ -94,11 +94,21 @@ const Watchlist = () => {
         useCallback(() => {
             setSortingDropdownAvailable(false);
             arrowDirection();
+            const now = Date.now();
+            const secondsSinceLastFetch = (now - lastWatchlistFetch.current) / 1000;
+        
+            if (secondsSinceLastFetch < 3) {
+                // console.log(`Blocked getFilms watchlist — only ${secondsSinceLastFetch.toFixed(2)}s since last fetch`);
+                return;
+            }
+        
+            lastWatchlistFetch.current = now;
+            // console.log("getFilms watchlist called");
+        
             getFilms(currSortWatchlist);
-        // console.log("color mode is", colorMode);
-        // console.log(currentTheme.background);
-    }, []));
-    
+      
+        }, [])
+      );
 
     // if searching, update the UI to display search 
     const handleSearch = async (query) => {
@@ -201,50 +211,71 @@ const Watchlist = () => {
         else { setArrowDesc(true); }
     }
 
-    // render a film card
-    const renderFilm = ({ item }) => (
-        <TouchableOpacity style={[styles.gridItem, {backgroundColor: currentTheme.gridItemColor, shadowColor: currentTheme.shadowColor, borderColor: currentTheme.border}]} onPress={async () => {
-            // make sure it holds director so when user clicks it to go to static movie page, necessary info is there
-            if (!item.Director) {
-                try {
-                    if (item.tmdbID) {
-                        // const directors = await fetchMovieCredits(item.tmdbID);
-                        // console.log("searched for a movie, clicked, and need directors");
-                        const directors = await fetchMovieDirectors(item.tmdbID);
-                        item.Director = directors; // add the director(s) to the film object 
-                    }
-                } catch (error) {
-                    console.error('Error fetching directors:');
-                    item.Director = 'Unknown';
-                }
+    const FilmCard = React.memo(({ item, currentTheme, navigation, editMode, selectedMovies, addItemForDeletion, setStaticMovie, updatePage }) => {
+        const handlePress = async () => {
+          if (!item.Director && item.tmdbID) {
+            try {
+              const directors = await fetchMovieDirectors(item.tmdbID);
+              item.Director = directors;
+            } catch {
+              item.Director = 'Unknown';
             }
-            setStaticMovie(item);
-            updatePage("NULL");
-            navigation.navigate("Static Movie");
-        }}>  
-            {/* handle a case where a movie doesnt have a poster gracefully  */}
+          }
+          setStaticMovie(item);
+          updatePage("NULL");
+          navigation.navigate("Static Movie");
+        };
+      
+        return (
+          <TouchableOpacity
+            style={[
+              styles.gridItem,
+              {
+                backgroundColor: currentTheme.gridItemColor,
+                shadowColor: currentTheme.shadowColor,
+                borderColor: currentTheme.border,
+              },
+            ]}
+            onPress={handlePress}
+          >
             {item.PosterPath ? (
-                <Image 
-                    source={{ uri: `https://image.tmdb.org/t/p/w500${item.PosterPath}` }} 
-                    style={styles.poster}
-                />
+              <Image source={{ uri: `https://image.tmdb.org/t/p/w185${item.PosterPath}` }} style={styles.poster} />
             ) : (
-                <View style={styles.placeholder}>
-                    <Text style={styles.placeholderText}>No Image</Text>
-                </View>
+              <View style={styles.placeholder}>
+                <Text style={[styles.placeholderText, { color: currentTheme.textColorSecondary }]}>No Image</Text>
+              </View>
             )}
-            <Text style={[styles.title, {color: currentTheme.textColor}]}>{item.Title.length > 25 ? item.Title.slice(0, 25) + '...' : item.Title}</Text>
+      
+            <Text style={[styles.title, { color: currentTheme.textColor }]}>
+              {item.Title.length > 25 ? item.Title.slice(0, 25) + '...' : item.Title}
+            </Text>
+      
+            {editMode && (
+              <TouchableOpacity style={styles.deleteButton} onPress={() => addItemForDeletion(item.tmdbID)}>
+                <Text style={styles.deleteText}>
+                  {selectedMovies.includes(item.tmdbID) ? 'Undo' : 'X'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
+        );
+      });
 
-            {editMode && ( // Show X button when editing
-                <TouchableOpacity 
-                    style={styles.deleteButton} 
-                    onPress={() => addItemForDeletion(item.tmdbID)}
-                >
-                    <Text style={styles.deleteText}>{selectedMovies.includes(item.tmdbID) ? "Undo" : "X"}</Text>
-                </TouchableOpacity>
-            )}
-        </TouchableOpacity>
-    );
+    const renderFilm = useCallback(
+        ({ item }) => (
+          <FilmCard
+            item={item}
+            currentTheme={currentTheme}
+            navigation={navigation}
+            editMode={editMode}
+            selectedMovies={selectedMovies}
+            addItemForDeletion={addItemForDeletion}
+            setStaticMovie={setStaticMovie}
+            updatePage={updatePage}
+          />
+        ),
+        [editMode, selectedMovies, currentTheme]
+      );
 
     return (
         // Watchlist films screen
@@ -287,19 +318,21 @@ const Watchlist = () => {
                 </View>
                 <FlatList
                     data={searching ? searchResults : watchlist}
-                    keyExtractor={(item, index) => index.toString()}
+                    keyExtractor={(item, index) => item.tmdbID?.toString() || index.toString()}
                     renderItem={renderFilm}
                     numColumns={3}
-                    horizontal={false}
-                    scrollEnabled={true}
                     columnWrapperStyle={styles.row}
+                    initialNumToRender={9}
+                    maxToRenderPerBatch={6}
+                    windowSize={7}
+                    removeClippedSubviews={true}
                 />
                 <View style={styles.bottomSpacer}></View>
             </View>
         </TouchableWithoutFeedback>
     );
 };
-
+ 
 const styles = StyleSheet.create({
     container: {
         // marginTop: 15,
@@ -366,12 +399,12 @@ const styles = StyleSheet.create({
     placeholder: {
         width: Dimensions.get('window').width / 3 - 15,
         height: Dimensions.get('window').width / 3 + 15,
-        backgroundColor: '#ccc',
+        // backgroundColor: '#ccc',
         justifyContent: 'center',
         alignItems: 'center',
     },
     placeholderText: {
-        color: '#555',
+        // color: '#555',
         fontSize: 14,
     },
     title: {
