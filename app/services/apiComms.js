@@ -88,3 +88,13 @@ export const fetchMovieSearch = async (searchQuery) => {
   }
 };
 
+export const getAppStatus = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/appStatus`, {});
+    return response.data;
+  } catch (error) {
+    console.error('Error getting app status');
+    throw error;
+  }
+}
+

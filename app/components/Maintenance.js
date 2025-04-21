@@ -3,14 +3,14 @@ import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'rea
 import theme from '../services/theme.js';
 
 
-const Offline = () => {
+const Maintenance = () => {
     const currentTheme = theme["dark"];
     
     return (
         <>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
             <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>
-                    You are offline, please go online and restart the app to use Cinext!
+                    Cinext is currently undergoing maintenance, please check back later!
             </Text>
         </View>
         </>
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Offline;
+export default Maintenance;

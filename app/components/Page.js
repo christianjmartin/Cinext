@@ -18,6 +18,7 @@ import ABOUT from './ABOUT';
 import FAQ from './FAQ';
 import PRIVACY from './PRIVACY';
 import OfflineScreen from './Offline';
+import MaintenanceScreen from './Maintenance';
 
 import Header from './Header';
 import NavBar from './NavBar';
@@ -44,7 +45,13 @@ export default function Page() {
       <View style={styles.main}>
         {page === "offline" ? (
           <OfflineScreen />
-        ) : (
+        ) : 
+
+        page === "maintenance" ? (
+          <MaintenanceScreen/>
+        ) :
+        
+        (
           <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
             <Stack.Screen name="Recs" component={Recs} />
             <Stack.Screen name="Watchlist" component={Watchlist} />
@@ -62,7 +69,7 @@ export default function Page() {
       </View>
 
       {/* Bottom Navigation */}
-      {page !== "Show Swiper" && page !== "offline" && (
+      {page !== "Show Swiper" && page !== "offline" && page !== "maintenance" && (
         <View>
           <NavBar />
         </View>

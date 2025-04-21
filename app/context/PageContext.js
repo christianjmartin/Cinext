@@ -4,6 +4,8 @@ import { getRequestsLeft } from '../database/dbFuncs';
 import { createClient } from '../database/createClient';
 import { supabase } from '../services/supabase.js';
 import { getMOTD } from '../database/dbFuncs';
+import { getAppStatus } from '../services/apiComms.js';
+import { Alert } from 'react-native';
 
 const PageContext = createContext();
 
@@ -28,9 +30,37 @@ export const PageProvider = ({ children }) => {
   const [listInit, setListInit] = useState(false);
   const lastSeenFilmsFetch = useRef(0);
   const lastWatchlistFetch = useRef(0); 
+  const initStatusCheck = useRef(true);
+  const alertedStatusDown = useRef(false);
 
 
   useEffect(() => {
+    const appStatusChecker = async () => {
+      const status = await getAppStatus();
+      // console.log("checking status ...")
+      // console.log(initStatusCheck.current);
+      if (status.off) {
+        // console.log(alertedStatusDown.current);
+        if (initStatusCheck.current) {
+          initStatusCheck.current = false;
+          alertedStatusDown.current = true;
+          setPage("maintenance");
+        }
+        else if (!alertedStatusDown.current) {
+          Alert.alert("Cinext will shut down in 3 minutes for maintenance");
+          alertedStatusDown.current = true;
+          setTimeout(() => {
+            setPage("maintenance");
+          }, 180000);
+        }
+        return;
+      }
+      initStatusCheck.current = false;
+    }
+    appStatusChecker();
+
+    const intervalId = setInterval(appStatusChecker, 3 * 60 * 1000);
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "TOKEN_REFRESHED" && session) {
         // console.log("Token refreshed, storing new valuess");
@@ -92,7 +122,10 @@ export const PageProvider = ({ children }) => {
 
     initializeClient();
 
-    return () => authListener.subscription?.unsubscribe();
+    return () => {
+      authListener.subscription?.unsubscribe();
+      clearInterval(intervalId); 
+    }
   }, [setColorMode, setSuggestSeen, setSuggestWatchlist, setRequestCount, setMovieOTD]);
 
 

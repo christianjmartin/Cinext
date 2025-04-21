@@ -252,7 +252,7 @@ export default function Recs() {
       fetchMOTD();
       // getFilms(currSortSeen, currSortWatchlist);
   
-    }, [userId]) // ✅ Will re-run when `userId` changes OR when screen is focused
+    }, [userId])
   );
 
   useEffect(() => {
