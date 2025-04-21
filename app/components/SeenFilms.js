@@ -107,7 +107,7 @@ const SeenFilms = () => {
             // console.log("getFilms seenfilms called");
         
             getFilms(currSortSeen);
-        }, [])
+        }, [currSortSeen])
       );
     
 

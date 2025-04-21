@@ -107,7 +107,7 @@ const Watchlist = () => {
         
             getFilms(currSortWatchlist);
       
-        }, [])
+        }, [currSortWatchlist])
       );
 
     // if searching, update the UI to display search 
