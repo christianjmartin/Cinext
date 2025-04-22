@@ -97,14 +97,15 @@ const Watchlist = () => {
             const now = Date.now();
             const secondsSinceLastFetch = (now - lastWatchlistFetch.current) / 1000;
         
-            if (secondsSinceLastFetch < 3) {
+            if (secondsSinceLastFetch < 1.5) {
                 // console.log(`Blocked getFilms watchlist — only ${secondsSinceLastFetch.toFixed(2)}s since last fetch`);
                 return;
             }
         
+            
             lastWatchlistFetch.current = now;
             // console.log("getFilms watchlist called");
-        
+            
             getFilms(currSortWatchlist);
       
         }, [currSortWatchlist])

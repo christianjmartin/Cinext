@@ -98,7 +98,7 @@ const SeenFilms = () => {
             const now = Date.now();
             const secondsSinceLastFetch = (now - lastSeenFilmsFetch.current) / 1000;
         
-            if (secondsSinceLastFetch < 3) {
+            if (secondsSinceLastFetch < 1.5) {
                 // console.log(`Blocked getFilms seenfilms — only ${secondsSinceLastFetch.toFixed(2)}s since last fetch`);
                 return;
             }
