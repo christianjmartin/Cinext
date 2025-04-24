@@ -285,7 +285,7 @@ const SeenFilms = () => {
                 <View style={styles.headerContainer}>
                     {editModeAvailable && (
                     <TouchableOpacity style={styles.alignSortingSection} onPress={openSortingOptions}>
-                        <Text style={{fontWeight: '500', color: currentTheme.textColorSecondary}}>{currSortSeen.slice(0,-2)}</Text>
+                        <Text allowFontScaling={false} style={{fontWeight: '500', color: currentTheme.textColorSecondary}}>{currSortSeen.slice(0,-2)}</Text>
                         {colorMode === 'dark' ? 
                             <Image style={styles.sortingIcon} source={arrowDesc ? waDown : waUp}/> 
                         : <Image style={styles.sortingIcon} source={arrowDesc ? baDown : baUp}/>}
@@ -296,11 +296,11 @@ const SeenFilms = () => {
                             option={handleSort}>
                         </SortDropdown>
                     )}
-                    <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]}>Seen Movies</Text>
+                    <Text style={[styles.header, {backgroundColor: currentTheme.headerColor, color: currentTheme.textColor}]} allowFontScaling={false}>Seen Movies</Text>
                     {/* make the edit button appear only when the user is NOT searching for something */}
                     {editModeAvailable && 
                     (<TouchableOpacity style={[styles.editButton, {backgroundColor: currentTheme.editBtn}]} onPress={handleEditMode}>
-                        <Text>{getEditButtonText()}</Text>
+                        <Text allowFontScaling={false}>{getEditButtonText()}</Text>
                     </TouchableOpacity>)}
                 </View>
                 <View>

@@ -102,11 +102,11 @@ const StaticMovie = () => {
               {/* Buttons at the Bottom */}
               <View style={styles.btnContainer}>
               <TouchableOpacity style={[styles.watchlistButton, {backgroundColor: currentTheme.watchlistBtn}]} onPress={handleAddToWatchlist}>
-                  <Text style={styles.buttonText}>Add to Watchlist</Text>
+                  <Text allowFontScaling={false} style={styles.buttonText}>Add to Watchlist</Text>
                   {toWatch ? <Image style={styles.checkmark} source={check}></Image> : null}
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.seenButton, {backgroundColor: currentTheme.seenBtn}]} onPress={handleAddToSeen}>
-                  <Text style={styles.buttonText}>I've Seen This</Text>
+                  <Text allowFontScaling={false} style={styles.buttonText}>I've Seen This</Text>
                   {seenFilms?.some(movie => movie.tmdbID === staticMovie.tmdbID) || seen ? <Image style={styles.checkmark} source={check}></Image> : null}
                 </TouchableOpacity>
               </View>

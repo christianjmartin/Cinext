@@ -16,6 +16,7 @@ export const PageProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [staticMovie, setStaticMovie] = useState(null);
   const [colorMode, setColorMode] = useState("dark");
+  const [navColorMode, setNavColorMode] = useState("black"); // background color for dark mode
   const [movieOTD, setMovieOTD] = useState({});
   const [seenFilms, setSeenFilms] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
@@ -105,6 +106,7 @@ export const PageProvider = ({ children }) => {
             // console.log("Loaded Preferences:");
             
             // Update context states safely
+            if (preferences.navColor) setNavColorMode(preferences.navColor)
             if (preferences.color) setColorMode(preferences.color);
             if (preferences.suggestSeen !== undefined) setSuggestSeen(preferences.suggestSeen);
             if (preferences.suggestWatchlist !== undefined) setSuggestWatchlist(preferences.suggestWatchlist);
@@ -153,7 +155,7 @@ export const PageProvider = ({ children }) => {
   }
 
   return (
-    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount, loading, setLoading, listInit, setListInit, requestCountDate, setRequestCountDate, lastSeenFilmsFetch, lastWatchlistFetch}}>
+    <PageContext.Provider value={{ page, updatePage, movieList, updateMovieList, userId, staticMovie, setStaticMovie, updateColorMode, colorMode, movieOTD, setMovieOTD, seenFilms, setSeenFilms, watchlist, setWatchlist, suggestSeen, suggestWatchlist, setSuggestSeen, setSuggestWatchlist, initialLoad, currSortSeen, setCurrSortSeen, currSortWatchlist, setCurrSortWatchlist, requestCount, setRequestCount, loading, setLoading, listInit, setListInit, requestCountDate, setRequestCountDate, lastSeenFilmsFetch, lastWatchlistFetch, navColorMode, setNavColorMode}}>
       {children}
     </PageContext.Provider>
   );

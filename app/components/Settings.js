@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { updateColorPreference } from '../database/preferences.js';
+import { updateColorPreference, updateNavColorPreference } from '../database/preferences.js';
 import { useNavigation } from '@react-navigation/native';
 import PageContext from '../context/PageContext';
 import vader from '../assets/vader.png';
@@ -11,10 +11,11 @@ import arrow from '../assets/arrow.webp';
 import arrow2 from '../assets/arrow2.png';
 
 const Settings = () => {
-    const { colorMode, updateColorMode, userId, updatePage} = useContext(PageContext);
+    const { colorMode, updateColorMode, userId, updatePage, navColorMode, setNavColorMode} = useContext(PageContext);
     const currentTheme = theme[colorMode];
     const navigation = useNavigation();
     const togglePosition = useSharedValue(colorMode === 'dark' ? 105 : 5);
+    const navTogglePosition = useSharedValue(navColorMode === 'black' ? 105 : 5);
 
     // toggles between light and dark mode, calling updateColorMode from context 
     const toggleTheme = () => {
@@ -29,9 +30,20 @@ const Settings = () => {
         updateColorMode(); 
     };
 
+    const toggleNavTheme = () => {
+        const newColor = navColorMode === 'black' ? 'red' : 'black';
+        navTogglePosition.value = withTiming(newColor === 'red' ? 5 : 105, { duration: 250 });
+        updateNavColorPreference(newColor, userId);
+        setNavColorMode(newColor);
+    };
+
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: togglePosition.value }],
     }));
+
+    const navAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: navTogglePosition.value }],
+      }));
 
     return (
         <>
@@ -72,10 +84,20 @@ const Settings = () => {
                 </TouchableOpacity>
             </View>
         </View>
-        <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
+        <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
             <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
                 <Animated.View style={[styles.toggleCircle, animatedStyle]}>
-                    <Text style={styles.emoji}>{colorMode === 'dark' ? <Text>🌙</Text>: <Text>🌞</Text>}</Text>
+                <Text allowFontScaling={false} style={styles.emoji}>{colorMode === 'dark' ? '🌙' : '🌞'}</Text>
+                </Animated.View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={toggleNavTheme} style={styles.toggleContainer}>
+                <Animated.View style={[styles.toggleCircle, navAnimatedStyle]}>
+                <View style={[navColorMode === 'black' ? styles.emojiBlack : styles.emojiRed]}>
+                    <Text allowFontScaling={false} style={styles.emoji}>
+                    {navColorMode === 'black' ? '⚫' : '🔴'}
+                    </Text>
+                </View>
                 </Animated.View>
             </TouchableOpacity>
         </View>
@@ -96,9 +118,11 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        display: 'flex',
+        paddingTop: 30,
+        paddingBottom: 240,
         alignItems: 'center',
         justifyContent: 'center',
+        gap: 50,
     },
     toggleContainer: {
         width: 200,
@@ -108,7 +132,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 2,
-        marginBottom: 240,
+        marginBottom: 0,
     },
     toggleCircle: {
         width: 90,
@@ -121,6 +145,15 @@ const styles = StyleSheet.create({
     },
     emoji: {
         fontSize: 50,
+    },
+    emojiBlack: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 3,
+    },
+    emojiRed: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     exitButton: {
         left: -10,

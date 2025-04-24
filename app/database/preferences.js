@@ -17,6 +17,22 @@ export const updateColorPreference = async ( color, userId ) => {
     }
 }
 
+export const updateNavColorPreference = async ( navColor, userId ) => {
+    // console.log(color);
+    try {
+        const {data, error} = await supabase
+            .from('Client')
+            .update({NavColor: navColor})
+            .eq('AuthID', userId)
+
+        // console.log("updating color pref");
+    }
+    catch (error) {
+        console.error("error updating color pref");
+    }
+}
+
+
 export const updateSuggestionSeenPreference = async ( bool, userId ) => {
     try {
         const {data, error} = await supabase

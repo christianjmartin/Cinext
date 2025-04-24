@@ -80,7 +80,7 @@ const fetchClientData = async (userId) => {
         // Fetch existing user settings from the "Client" table
         const { data: clientData, error: clientError } = await supabase
             .from('Client')
-            .select('Color, SuggestSeen, SuggestWatchlist')
+            .select('Color, SuggestSeen, SuggestWatchlist, NavColor')
             .eq('AuthID', userId)
             .single();
 
@@ -94,14 +94,14 @@ const fetchClientData = async (userId) => {
             // console.log('New client detected, inserting default settings...');
             const { error: insertError } = await supabase
                 .from('Client')
-                .insert([{Color: 'dark', SuggestSeen: false, SuggestWatchlist: false }]);
+                .insert([{Color: 'dark', SuggestSeen: false, SuggestWatchlist: false, NavColor: 'black' }]);
 
             if (insertError) {
                 console.error('Error creating new client:');
                 return null;
             }
 
-            return { id: userId, color: 'dark', suggestSeen: false, suggestWatchlist: false };
+            return { id: userId, color: 'dark', suggestSeen: false, suggestWatchlist: false, navColor: 'black' };
         }
 
         // console.log('Client data loaded:');
@@ -109,6 +109,7 @@ const fetchClientData = async (userId) => {
         return {
             id: userId,
             color: clientData.Color,
+            navColor: clientData.NavColor,
             suggestSeen: clientData.SuggestSeen,
             suggestWatchlist: clientData.SuggestWatchlist
         };

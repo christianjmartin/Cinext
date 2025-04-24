@@ -45,4 +45,11 @@ const theme = {
     }
 };
 
+export const getNavColorHex = (navColorMode) => {
+    return navColorMode === 'red' ? '#a44443' : 'black';
+};
+
 export default theme;
+
+
+// SALMON COLOR ON THE LOGO IS FFD4D4

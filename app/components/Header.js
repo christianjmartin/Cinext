@@ -8,14 +8,24 @@ import camera10 from '../assets/camera10.png';
 import settings from '../assets/settings-2.png';
 import PageContext from '../context/PageContext';  
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
+import { View, Text, StyleSheet, Image, TouchableOpacity, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getNavColorHex } from '../services/theme';
 
 // header for app (red)
 export default function Header() {
-    const {updatePage, page} = useContext(PageContext);
+    const {updatePage, page, navColorMode} = useContext(PageContext);
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
+
     return (
-        <View style={styles.headerContainer}>
+        <>
+        <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+        />
+        <View style={[styles.headerContainer, {backgroundColor: getNavColorHex(navColorMode), paddingTop: insets.top, marginTop: -insets.top}]}>
             <Image source={camera10} style={styles.logo} /> 
             <View style={styles.invisiblePadding}></View>
             <View style={styles.spacer}></View>
@@ -31,6 +41,7 @@ export default function Header() {
             </TouchableOpacity>
             {/* : null } */}
         </View>
+        </>
     );
 };
 
@@ -39,7 +50,7 @@ const styles = StyleSheet.create ({
         display: 'flex',
         flexDirection: 'row',
         padding: 4,
-        backgroundColor: '#A44443',
+        backgroundColor: '#0f0f0f',
     },
     title: {
         fontFamily: 'Jakarta-sans',

@@ -414,7 +414,8 @@ export default function Recs() {
         // console.log("The number of new films to the user:", uniqueMovies.length);
 
         // if there arent enough unqiue movies after filtering, try again
-        if (uniqueMovies.length < 5) { 
+        // console.log("detailed movie length: ", detailedMovies.length)
+        if (uniqueMovies.length < 5 && detailedMovies.length >= 25) { 
             // console.log("Too many seen movies. Fetching another batch...");
             // console.log("exclude list: ", excludeList);
 
@@ -618,8 +619,8 @@ export default function Recs() {
           </TouchableOpacity>
         </View>
         <View style={styles.toggleSectionText}>
-          {suggestWatchlist ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include watchlist films</Text>}
-          {suggestSeen ? <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text> :  <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Include my seen films</Text>}
+          {suggestWatchlist ? <Text style={{fontSize: 11.5, color: currentTheme.textColorSecondary, maxWidth: Dimensions.get('window').width * 0.39, textAlign: 'center'}}>Include watchlist films</Text> :  <Text style={{fontSize: 11.5, color: currentTheme.textColorSecondary, maxWidth: Dimensions.get('window').width * 0.39, textAlign: 'center'}}>Include watchlist films</Text>}
+          {suggestSeen ? <Text style={{fontSize: 11.5, color: currentTheme.textColorSecondary, maxWidth: Dimensions.get('window').width * 0.39, textAlign: 'center'}}>Include my seen films</Text> :  <Text style={{fontSize: 11.5, color: currentTheme.textColorSecondary, maxWidth: Dimensions.get('window').width * 0.39, textAlign: 'center'}}>Include my seen films</Text>}
         </View>
         </>
         }
@@ -627,7 +628,7 @@ export default function Recs() {
         {loading ? <ActivityIndicator style={styles.padding} size="large" color="#A44443"></ActivityIndicator> :
         <>
         <TouchableOpacity style={[styles.submitButton, {borderColor: currentTheme.submitBtnBorder, backgroundColor: currentTheme.submitBtn}]} onPress={handleSubmit} disabled={loading}>
-          <Text style={styles.submitButtonText}> Submit</Text>
+          <Text allowFontScaling={false} style={styles.submitButtonText}> Submit</Text>
         </TouchableOpacity>
 
         <Text style={{fontSize: 12.5, color: currentTheme.textColorSecondary}}>Requests left today: {requestCount}</Text>
@@ -661,12 +662,12 @@ export default function Recs() {
 
             <View style={styles.spaceAround}>
                 <View style={styles.ratingContainer}>
-                    <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                    <Text style={[styles.cardText, {color: currentTheme.textColorSecondary, maxWidth: Dimensions.get('window').width * 0.41}]}>
                       Rating: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Rating ? movieOTD.Rating : noRating}</Text>
                     </Text>
                     <Image style={styles.imdbLogo} source={tmdb2}></Image>
                 </View>
-                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary, maxWidth: Dimensions.get('window').width * 0.41}]}>
                   Released: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{movieOTD.Year}</Text>
                 </Text>
             </View>

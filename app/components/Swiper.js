@@ -86,7 +86,7 @@ const MovieList = () => {
           }}
           disabled={isDisabled}
         >
-          <Text style={styles.buttonText}>Exit</Text>
+          <Text allowFontScaling={false} style={styles.buttonText}>Exit</Text>
         </TouchableOpacity>
         <Disclaimer/>
 
@@ -136,7 +136,7 @@ const MovieList = () => {
                 style={[styles.watchlistButton, { backgroundColor: currentTheme.watchlistBtn }]}
                 onPress={() => handleAddToWatchlist(item)}
               >
-                <Text style={styles.buttonText}>Add to Watchlist</Text>
+                <Text style={styles.buttonText} allowFontScaling={false} >Add to Watchlist</Text>
                 {watchlistMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
               </TouchableOpacity>
               
@@ -144,7 +144,7 @@ const MovieList = () => {
                 style={[styles.seenButton, { backgroundColor: currentTheme.seenBtn }]}
                 onPress={() => handleAddToSeen(item)}
               >
-                <Text style={styles.buttonText}>I've Seen This</Text>
+                <Text style={styles.buttonText} allowFontScaling={false} >I've Seen This</Text>
                 {seenMovies[item.tmdbID] ? <Image style={styles.checkmark} source={check} /> : null}
               </TouchableOpacity>
 

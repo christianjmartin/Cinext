@@ -5,22 +5,25 @@ import PageContext from '../context/PageContext';
 import bookmark from '../assets/bookmark.png';
 import bulb from '../assets/lightbulb.png';
 import eyeball from '../assets/eyeball.png';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getNavColorHex } from '../services/theme';
 
 export default function NavBar() {
-    const {updatePage} = useContext(PageContext);
+    const {updatePage, navColorMode} = useContext(PageContext);
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
 
     const navigateWithReset = (screen) => {
         navigation.dispatch(
             CommonActions.reset({
                 index: 0,
-                routes: [{ name: screen }], // ✅ Clears stack & starts fresh
+                routes: [{ name: screen }],
             })
         );
     };
     
     return (
-        <View style={styles.navBar}>
+        <View style={[styles.navBar, {backgroundColor: getNavColorHex(navColorMode), paddingBottom: insets.bottom, marginBottom: -insets.bottom}]}>
             <View style={styles.btnContainer}>
 
                 {/* RECS */}
@@ -68,7 +71,6 @@ const styles = StyleSheet.create({
         // bottom: 0,
         // left: 0,
         // right: 0,
-        backgroundColor: '#A44443',
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
