@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getNavColorHex } from '../services/theme';
 
 // header for app (red)
-export default function Header() {
+export default function BlankHeader() {
     const {updatePage, page, navColorMode} = useContext(PageContext);
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
@@ -25,20 +25,14 @@ export default function Header() {
         backgroundColor="transparent"
         barStyle="light-content"
         />
-        <View style={[styles.headerContainer, {backgroundColor: getNavColorHex(navColorMode), paddingTop: insets.top, marginTop: -insets.top}]}>
+        <View style={[styles.headerContainer, {backgroundColor: 'black', paddingTop: insets.top, marginTop: -insets.top}]}>
             <Image source={camera10} style={styles.logo} /> 
             <View style={styles.invisiblePadding}></View>
             <View style={styles.spacer}></View>
 
             {/* only allow user to leave reccomendation screen by exit button, since theres no going back wihtout re-entry */}
             {/* {page != "Show Swiper" ?  */}
-            <TouchableOpacity onPress={() => {
-                navigation.navigate("Settings");
-                updatePage("Settings");
-            }}>
-            {page != "Settings" && page != "Show Swiper" && page != "offline" && page != "maintenance" ? <Image source={settings} style={[styles.image, styles.settings]}></Image> : null}
-            
-            </TouchableOpacity>
+         
             {/* : null } */}
         </View>
         </>

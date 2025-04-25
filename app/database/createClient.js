@@ -7,7 +7,7 @@ import NetInfo from '@react-native-community/netinfo';
  * Fetches client data from Supabase or creates a new entry if none exists.
  * Updates context state accordingly.
  */
-export const createClient = async () => {
+export const createClient = async (colorScheme) => {
     try {
         const net = await NetInfo.fetch();
 
@@ -64,7 +64,7 @@ export const createClient = async () => {
             refresh_token: newSessionData.session.refresh_token
           }));
 
-        return await fetchClientData(signInData.user.id);
+        return await fetchClientData(signInData.user.id, colorScheme);
 
     } catch (error) {
         console.error("Unexpected error in createClient:");
@@ -75,7 +75,7 @@ export const createClient = async () => {
 /**
  * Fetches user settings from Supabase or inserts default settings if user is new.
  */
-const fetchClientData = async (userId) => {
+const fetchClientData = async (userId, colorScheme) => {
     try {
         // Fetch existing user settings from the "Client" table
         const { data: clientData, error: clientError } = await supabase
@@ -91,17 +91,19 @@ const fetchClientData = async (userId) => {
 
         // If user does not exist, insert default settings
         if (!clientData) {
+            const defaultColor = colorScheme === 'dark' ? 'dark' : 'light';
+            const defaultNavColor = colorScheme === 'dark' ? 'black' : 'red';
             // console.log('New client detected, inserting default settings...');
             const { error: insertError } = await supabase
                 .from('Client')
-                .insert([{Color: 'dark', SuggestSeen: false, SuggestWatchlist: false, NavColor: 'black' }]);
+                .insert([{Color: defaultColor, SuggestSeen: false, SuggestWatchlist: false, NavColor: defaultNavColor }]);
 
             if (insertError) {
                 console.error('Error creating new client:');
                 return null;
             }
 
-            return { id: userId, color: 'dark', suggestSeen: false, suggestWatchlist: false, navColor: 'black' };
+            return { id: userId, color: defaultColor, suggestSeen: false, suggestWatchlist: false, navColor: defaultNavColor };
         }
 
         // console.log('Client data loaded:');

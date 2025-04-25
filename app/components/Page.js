@@ -19,6 +19,9 @@ import FAQ from './FAQ';
 import PRIVACY from './PRIVACY';
 import OfflineScreen from './Offline';
 import MaintenanceScreen from './Maintenance';
+import BlankNavBar from './BlankNavBar';
+import BlankNavBar2 from './BlankNavBar2';
+import BlankHeader from './BlankHeader';
 
 import Header from './Header';
 import NavBar from './NavBar';
@@ -37,9 +40,15 @@ export default function Page() {
     <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
       
       {/* Header - Always Visible */}
+      {(page !== "maintenance" && page !== "offline")? 
       <View>
         <Header />
       </View>
+      :
+      <View>
+        <BlankHeader/>
+      </View>
+      }
 
       {/* Navigation Screens */}
       <View style={styles.main}>
@@ -72,6 +81,16 @@ export default function Page() {
       {page !== "Show Swiper" && page !== "offline" && page !== "maintenance" && (
         <View>
           <NavBar />
+        </View>
+      )}
+      {page === "Show Swiper" && (
+        <View>
+          <BlankNavBar />
+        </View>
+      )}
+      {(page === "maintenance" || page === "offline") && (
+        <View>
+          <BlankNavBar2 />
         </View>
       )}
 

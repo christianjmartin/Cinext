@@ -6,6 +6,7 @@ import { supabase } from '../services/supabase.js';
 import { getMOTD } from '../database/dbFuncs';
 import { getAppStatus } from '../services/apiComms.js';
 import { Alert } from 'react-native';
+import { useColorScheme } from 'react-native';
 
 const PageContext = createContext();
 
@@ -16,6 +17,7 @@ export const PageProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [staticMovie, setStaticMovie] = useState(null);
   const [colorMode, setColorMode] = useState("dark");
+  const colorScheme = useColorScheme();
   const [navColorMode, setNavColorMode] = useState("black"); // background color for dark mode
   const [movieOTD, setMovieOTD] = useState({});
   const [seenFilms, setSeenFilms] = useState([]);
@@ -74,8 +76,7 @@ export const PageProvider = ({ children }) => {
 
     const initializeClient = async () => {
         try {
-
-            const preferences = await createClient();
+            const preferences = await createClient(colorScheme);
 
             if (preferences?.offline) {
               // console.log("App launched offline — skipping Supabase setup.");

@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet, Dimensions } from 'react-native';
+import { View, Animated, StyleSheet, Dimensions, useColorScheme } from 'react-native';
 import logo3 from '../assets/logo3.png';
 
 const Loading = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const colorScheme = useColorScheme();
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,7 +20,7 @@ const Loading = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: colorScheme === 'dark' ? 'black' : 'white',}]}>
       <Animated.Image
         source={logo3}
         style={[styles.logo, { opacity: fadeAnim }]}
@@ -32,7 +34,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
   },
   logo: {
     height: '100%',

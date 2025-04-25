@@ -10,7 +10,7 @@ const Maintenance = () => {
         <>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
             <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>
-                    Cinext is currently undergoing maintenance, please check back later!
+                    Cinext is currently undergoing maintenance, please check back later and be sure to fully restart the app!
             </Text>
         </View>
         </>
