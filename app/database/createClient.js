@@ -13,7 +13,7 @@ export const createClient = async (colorScheme) => {
 
         if (!net.isConnected) {
             console.warn("No internet connection — skipping session setup.");
-            return { offline: true };; // or return a fallback config like { id: null, color: "dark", ... }
+            return { offline: true }; // or return a fallback config like { id: null, color: "dark", ... }
         }
 
         // restore an existing session
