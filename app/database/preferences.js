@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../services/supabase.js';
-import { v4 as uuidv4, validate as isUUID } from 'uuid';
+// import { v4 as uuidv4, validate as isUUID } from 'uuid';
 
 export const updateColorPreference = async ( color, userId ) => {
     // console.log(color);

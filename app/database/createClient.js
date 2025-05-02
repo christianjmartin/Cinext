@@ -7,13 +7,26 @@ import NetInfo from '@react-native-community/netinfo';
  * Fetches client data from Supabase or creates a new entry if none exists.
  * Updates context state accordingly.
  */
+
+const checkInternetConnection = async () => {
+    try {
+        const response = await fetch("https://clients3.google.com/generate_204", {
+            method: "GET",
+            cache: "no-cache"
+        });
+        return response.status === 204;
+    } catch (e) {
+        return false;
+    }
+};
+
+
 export const createClient = async (colorScheme) => {
     try {
-        const net = await NetInfo.fetch();
-
-        if (!net.isConnected) {
-            console.warn("No internet connection — skipping session setup.");
-            return { offline: true }; // or return a fallback config like { id: null, color: "dark", ... }
+        const hasConnection = await checkInternetConnection();
+        if (!hasConnection) {
+            console.warn("Confirmed no internet — skipping Supabase calls.");
+            return { offline: true };
         }
 
         // restore an existing session

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { updateColorPreference, updateNavColorPreference } from '../database/preferences.js';
@@ -13,28 +13,42 @@ import arrow2 from '../assets/arrow2.png';
 const Settings = () => {
     const { colorMode, updateColorMode, userId, updatePage, navColorMode, setNavColorMode} = useContext(PageContext);
     const currentTheme = theme[colorMode];
+    const [themeCooldown, setThemeCooldown] = useState(false);
+    const [navThemeCooldown, setNavThemeCooldown] = useState(false);
     const navigation = useNavigation();
     const togglePosition = useSharedValue(colorMode === 'dark' ? 105 : 5);
     const navTogglePosition = useSharedValue(navColorMode === 'black' ? 105 : 5);
 
     // toggles between light and dark mode, calling updateColorMode from context 
     const toggleTheme = () => {
+        if (themeCooldown) {
+            // console.log("no DB call theme");
+            return;
+        }
+        setThemeCooldown(true);
+    
         togglePosition.value = withTiming(colorMode === 'dark' ? 5 : 105, { duration: 250 });
-        // console.log(colorMode);
-        let updatedColor;
-        if (colorMode === 'dark') {
-            updatedColor = 'light';
-        } else { updatedColor = 'dark'; }
-        // console.log("updated color is" , updatedColor)
+    
+        let updatedColor = colorMode === 'dark' ? 'light' : 'dark';
         updateColorPreference(updatedColor, userId);
         updateColorMode(); 
+    
+        setTimeout(() => setThemeCooldown(false), 2000);
     };
-
+    
     const toggleNavTheme = () => {
+        if (navThemeCooldown) {
+            // console.log("no DB call nav");
+            return;
+        }
+        setNavThemeCooldown(true);
+    
         const newColor = navColorMode === 'black' ? 'red' : 'black';
         navTogglePosition.value = withTiming(newColor === 'red' ? 5 : 105, { duration: 250 });
         updateNavColorPreference(newColor, userId);
         setNavColorMode(newColor);
+    
+        setTimeout(() => setNavThemeCooldown(false), 2000);
     };
 
     const animatedStyle = useAnimatedStyle(() => ({
@@ -85,13 +99,13 @@ const Settings = () => {
             </View>
         </View>
         <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
-            <TouchableOpacity onPress={toggleTheme} style={styles.toggleContainer}>
+            <TouchableOpacity onPress={toggleTheme} style={[styles.toggleContainer, { opacity: themeCooldown ? 0.4 : 1 }]}>
                 <Animated.View style={[styles.toggleCircle, animatedStyle]}>
                 <Text allowFontScaling={false} style={styles.emoji}>{colorMode === 'dark' ? '🌙' : '🌞'}</Text>
                 </Animated.View>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={toggleNavTheme} style={styles.toggleContainer}>
+            <TouchableOpacity onPress={toggleNavTheme} style={[styles.toggleContainer, { opacity: navThemeCooldown ? 0.4 : 1 }]}>
                 <Animated.View style={[styles.toggleCircle, navAnimatedStyle]}>
                 <View style={[navColorMode === 'black' ? styles.emojiBlack : styles.emojiRed]}>
                     <Text allowFontScaling={false} style={styles.emoji}>

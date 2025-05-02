@@ -7,6 +7,7 @@ import { getMOTD } from '../database/dbFuncs';
 import { getAppStatus } from '../services/apiComms.js';
 import { Alert } from 'react-native';
 import { useColorScheme } from 'react-native';
+import { useGoogleConnectionMonitor } from '../services/useGoogleConnectionMonitor';
 
 const PageContext = createContext();
 
@@ -35,10 +36,14 @@ export const PageProvider = ({ children }) => {
   const lastWatchlistFetch = useRef(0); 
   const initStatusCheck = useRef(true);
   const alertedStatusDown = useRef(false);
+  useGoogleConnectionMonitor(setPage);
+
 
 
   useEffect(() => {
+    if (page === "offline") { return; }
     const appStatusChecker = async () => {
+      if (page === "offline") { return; }
       const status = await getAppStatus();
       // console.log("checking status ...")
       // console.log(initStatusCheck.current);
