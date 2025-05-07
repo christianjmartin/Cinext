@@ -2,30 +2,9 @@ import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 
-const checkGoogleReachable = async () => {
+const checkNetInfoOnly = async () => {
   const net = await NetInfo.fetch();
-
-  if (!net.isConnected || net.isInternetReachable === false) {
-    return false;
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, 7000);
-
-  try {
-    const res = await fetch("https://clients3.google.com/generate_204", {
-      method: "GET",
-      signal: controller.signal,
-      cache: "no-cache",
-    });
-    clearTimeout(timeout);
-    return res.status === 204;
-  } catch {
-    clearTimeout(timeout);
-    return false;
-  }
+  return net.isConnected && net.isInternetReachable !== false;
 };
 
 export const useGoogleConnectionMonitor = (setPage) => {
@@ -39,7 +18,7 @@ export const useGoogleConnectionMonitor = (setPage) => {
     intervalRef.current = setInterval(async () => {
       if (triggeredOffline.current) return;
 
-      const isOnline = await checkGoogleReachable();
+      const isOnline = await checkNetInfoOnly();
       if (!isOnline && lastStatus.current) {
         lastStatus.current = false;
         triggeredOffline.current = true;

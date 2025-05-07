@@ -28,8 +28,8 @@ const DATA = () => {
             </TouchableOpacity>
         </View>
         <View style={[styles.container, {backgroundColor: currentTheme.background}]}>
-            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>All film data used by Cinext, including Posters, Titles, Directors, Descriptions, Ratings and Dates is provided by TMDB (The Movie Database)</Text>
-            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>This product uses the TMDB API but is not endorsed or certified by TMDB</Text>
+            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>All film data used by Cinext, including Posters, Titles, Directors, Descriptions, Ratings and Dates is provided by TMDB (The Movie Database).</Text>
+            <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>This product uses the TMDB API but is not endorsed or certified by TMDB.</Text>
             <Image source={tmdbOfficial} style={styles.tmdbLogo}></Image>
         </View>
         </>

@@ -109,7 +109,7 @@ export const PageProvider = ({ children }) => {
                 return;
             }
 
-            // console.log("Loaded Preferences:");
+            // console.log("Loaded Preferencesss:");
             
             // Update context states safely
             if (preferences.navColor) setNavColorMode(preferences.navColor)
