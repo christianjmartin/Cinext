@@ -80,7 +80,6 @@ export const fetchMovieSearch = async (searchQuery) => {
     const response = await axios.get(`${BASE_URL}/movieSearch`, {
       params: { query: searchQuery },
     });
-    // console.log("the response is: ", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching movie data:');
@@ -97,4 +96,19 @@ export const getAppStatus = async () => {
     throw error;
   }
 }
+
+
+export const fetchStreaming = async (movieID) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Streaming`, {
+      params: { query: movieID },
+    });
+    // console.log("the response is: ", response.data);
+    return response.data
+  } catch (error) {
+    console.error('Error fetching movie data:', error);
+    throw error;
+  }
+};
+
 

@@ -9,17 +9,22 @@ import NetInfo from '@react-native-community/netinfo';
  */
 
 const checkInternetConnection = async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5 sec timeout
+  
     try {
-        const response = await fetch("https://clients3.google.com/generate_204", {
-            method: "GET",
-            cache: "no-cache"
-        });
-        return response.status === 204;
+      const response = await fetch("https://clients3.google.com/generate_204", {
+        method: "GET",
+        cache: "no-cache",
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      return response.status === 204;
     } catch (e) {
-        return false;
+      clearTimeout(timeout);
+      return false;
     }
 };
-
 
 export const createClient = async (colorScheme) => {
     try {
@@ -48,7 +53,7 @@ export const createClient = async (colorScheme) => {
                 return await fetchClientData(sessionData.session.user.id);
             } else {
                 console.warn("Session restoration failed, signing in anonymously...");
-                await SecureStore.deleteItemAsync("session"); // Clear invalid session
+                //await SecureStore.deleteItemAsync("session"); // Clear invalid session
             }
         }
 

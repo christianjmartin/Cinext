@@ -7,7 +7,7 @@ import { getMOTD } from '../database/dbFuncs';
 import { getAppStatus } from '../services/apiComms.js';
 import { Alert } from 'react-native';
 import { useColorScheme } from 'react-native';
-import { useGoogleConnectionMonitor } from '../services/useGoogleConnectionMonitor';
+import { useNetListener } from '../services/useGoogleConnectionMonitor';
 
 const PageContext = createContext();
 
@@ -36,7 +36,7 @@ export const PageProvider = ({ children }) => {
   const lastWatchlistFetch = useRef(0); 
   const initStatusCheck = useRef(true);
   const alertedStatusDown = useRef(false);
-  useGoogleConnectionMonitor(setPage);
+  useNetListener(setPage);
 
 
 
@@ -81,42 +81,44 @@ export const PageProvider = ({ children }) => {
 
     const initializeClient = async () => {
         try {
-            const preferences = await createClient(colorScheme);
+            if (page === "offline") { return; }
+            else {
+              const preferences = await createClient(colorScheme);
 
-            if (preferences?.offline) {
-              // console.log("App launched offline — skipping Supabase setup.");
-              setPage("offline");
-              return;
-            }
-
-            const today = new Date();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            const formattedDate = `${month}-${day}`;
-            const todaysFilm = await getMOTD(formattedDate);
-            setMovieOTD(todaysFilm);
-
-            if (preferences.id) setUserId(preferences.id);
-            const reqs = await getRequestsLeft();
-            setRequestCount(reqs);
-            const todayCST = new Date().toLocaleDateString('en-CA', {
-              timeZone: 'America/Chicago',
-            });
-            setRequestCountDate(todayCST);
-
-            if (!preferences) {
-                console.error("Error: createClient() returned null or undefined.");
+              if (preferences?.offline) {
+                // console.log("App launched offline — skipping Supabase setup.");
+                setPage("offline");
                 return;
+              }
+
+              const today = new Date();
+              const month = String(today.getMonth() + 1).padStart(2, '0');
+              const day = String(today.getDate()).padStart(2, '0');
+              const formattedDate = `${month}-${day}`;
+              const todaysFilm = await getMOTD(formattedDate);
+              setMovieOTD(todaysFilm);
+
+              if (preferences.id) setUserId(preferences.id);
+              const reqs = await getRequestsLeft();
+              setRequestCount(reqs);
+              const todayCST = new Date().toLocaleDateString('en-CA', {
+                timeZone: 'America/Chicago',
+              });
+              setRequestCountDate(todayCST);
+
+              if (!preferences) {
+                  console.error("Error: createClient() returned null or undefined.");
+                  return;
+              }
+
+              // console.log("Loaded Preferencesss:");
+              
+              // Update context states safely
+              if (preferences.navColor) setNavColorMode(preferences.navColor)
+              if (preferences.color) setColorMode(preferences.color);
+              if (preferences.suggestSeen !== undefined) setSuggestSeen(preferences.suggestSeen);
+              if (preferences.suggestWatchlist !== undefined) setSuggestWatchlist(preferences.suggestWatchlist);
             }
-
-            // console.log("Loaded Preferencesss:");
-            
-            // Update context states safely
-            if (preferences.navColor) setNavColorMode(preferences.navColor)
-            if (preferences.color) setColorMode(preferences.color);
-            if (preferences.suggestSeen !== undefined) setSuggestSeen(preferences.suggestSeen);
-            if (preferences.suggestWatchlist !== undefined) setSuggestWatchlist(preferences.suggestWatchlist);
-
             // setInitialLoad(false);
         } catch (error) {
             console.error("Error initializing client:", error);

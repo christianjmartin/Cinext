@@ -42,6 +42,9 @@ export const fetchMovieDetails = async (query) => {
     else if (query === "Gladiator ^ 2000") {
       movie = movies.find(m=>m.release_date === "2000-05-04" || null);
     }
+    else if (query === "The Hunt ^ 2012") {
+      movie = movies.find(m=>m.original_title === "Jagten" || null);
+    }
     else {
       movie = exactMatch || movies[0];
     }

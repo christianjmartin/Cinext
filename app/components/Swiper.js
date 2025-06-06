@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native';
+import React, { useContext, useState, useEffect, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList, Linking } from 'react-native';
 import PageContext from '../context/PageContext';
 import imdb from '../assets/IMDB.svg.png';
 import tmdb2 from '../assets/tmdb2.png';
@@ -7,7 +7,9 @@ import { addToSeen, addToWatchlist } from '../database/dbFuncs';
 import Disclaimer from './Disclaimer';
 import theme from '../services/theme';
 import check from '../assets/checkmark.png';
+import justWatch from '../assets/JustWatch_Logo.svg.png'
 import { useNavigation } from '@react-navigation/native';
+import { fetchStreaming } from '../services/apiComms';
 import SwiperErrScreen from './SwiperErrScreen';
 
 const MovieList = () => {
@@ -17,12 +19,102 @@ const MovieList = () => {
   const [seenMovies, setSeenMovies] = useState({});
   const [watchlistMovies, setWatchlistMovies] = useState({});
 
+  const [openStreamingById, setOpenStreamingById] = useState({});
+  const [streamingById, setStreamingById] = useState({});
+  const [servicesRenderedById, setServicesRenderedById] = useState({});
+  const cachedStreaming = useRef({});
+
   const currentTheme = theme[colorMode];
   const itemWidth = Dimensions.get('window').width * 0.8;
   const spacing = Dimensions.get('window').width * 0.1;
   const noRatingCase = 'N/A';
   const navigation = useNavigation();
 
+
+
+
+
+  const serviceColors = {
+    'Netflix': '#C55151',
+    'Max': '#6690FF',
+    'Hulu': '#1CE783',
+    'Paramount Plus': '#4F92FF',
+    'Disney+': '#51B7E3',
+    'Amazon Prime': '#69BED3',
+    'Apple TV+': '#000000',
+    'Peacock': '#FFC800',
+    'MGM Plus': '#d6b256',
+    'Fubo TV': '#E66B31',
+    'Starz': '#308AA0',
+    'Not available to stream on our list of services': '#838383'
+  };
+
+  const providerKeywords = {
+    'Netflix': 'Netflix',
+    'Max': 'Max',
+    'Hulu': 'Hulu',
+    'Paramount': 'Paramount Plus',
+    'Disney': 'Disney+',
+    'Amazon': 'Amazon Prime',
+    'Apple': 'Apple TV+',
+    'Peacock': 'Peacock',
+    'MGM': 'MGM Plus',
+    'Fubo': 'Fubo TV',
+    'Starz': 'Starz',
+  };
+
+  const getServiceColor = (name) => {
+    for (const key in serviceColors) {
+      if (name.toLowerCase().includes(key.toLowerCase())) {
+        return serviceColors[key];
+      }
+    }
+    return null;
+  };
+
+
+  const normalizeAndFilterServices = (services) => {
+    const unique = new Set();
+    services.forEach((service) => {
+      for (const keyword in providerKeywords) {
+        if (service.toLowerCase().includes(keyword.toLowerCase())) {
+          unique.add(providerKeywords[keyword]);
+          break;
+        }
+      }
+    });
+  
+    return [...unique];
+  };
+
+  const handleShowStreaming = async (tmdbID) => {
+    setOpenStreamingById(prev => ({
+      ...prev,
+      [tmdbID]: !prev[tmdbID]
+    }));
+  
+    // Only fetch if not cached
+    if (!cachedStreaming.current[tmdbID]) {
+      // console.log("need to fetch")
+      const currServices = await fetchStreaming(tmdbID);
+      const finalList = normalizeAndFilterServices(currServices.streamingServices.map(s => s.trim()));
+      const result = finalList.length > 0 ? finalList : ["Not available to stream on our list of services"];
+      cachedStreaming.current[tmdbID] = result;
+  
+      setStreamingById(prev => ({
+        ...prev,
+        [tmdbID]: result
+      }));
+      
+      setTimeout(() => {
+        setServicesRenderedById(prev => ({
+          ...prev,
+          [tmdbID]: true
+        }));
+      }, 0);
+    }
+  };
+    
 
   const handleAddToSeen = async (movie) => {
     setSeenMovies(prev => ({ ...prev, [movie.tmdbID]: true }));
@@ -113,7 +205,58 @@ const MovieList = () => {
                     style={styles.poster}
                   />
                 )}
-                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>
+                <View>
+                  <TouchableOpacity onPress={() => {
+                    // console.log(item.Title)
+                    handleShowStreaming(item.tmdbID)
+                  }
+                  }>
+                    <Text style={{textAlign: "center", alignItems: "flex-start", color: "#838383", fontSize: 17, marginTop: 3}}>Where to watch ▽</Text>
+                  </TouchableOpacity>
+                </View>
+                {openStreamingById[item.tmdbID] && servicesRenderedById[item.tmdbID] && (
+                  <>
+                  <View>
+                    {streamingById[item.tmdbID]?.map((service, index) => (
+                      <Text
+                        key={index}
+                        style={{
+                          textAlign: 'center',
+                          marginBottom: 2.5,
+                          fontWeight: 'bold',
+                          color: getServiceColor(service)
+                        }}
+                      >
+                        {service}
+                      </Text>
+                    )) || null}
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 7}}>
+                    <Text
+                      style={{ color: currentTheme.textColorSecondary, fontSize: 13.1 }}
+                      allowFontScaling={false}
+                    >
+                      Link to full list here:
+                    </Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`https://www.themoviedb.org/movie/${item.tmdbID}/watch`)}>
+                      <Image
+                        source={justWatch}
+                        style={{ width: 72, height: 15, resizeMode: 'contain', marginTop: 2, marginLeft: 5 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  </>
+                )}
+                <View style={{
+                    width: Dimensions.get('window').width * 0.5,
+                    height: 3,
+                    backgroundColor: currentTheme.textColor,
+                    opacity: 0.2,
+                    borderRadius: 3,
+                    marginTop: 2,
+                    alignSelf: 'center',
+                  }} />
+                <Text style={[styles.cardText, {color: currentTheme.textColorSecondary, marginTop: 12}]}>
                   Directed by: <Text style={[styles.bold, styles.cardText, {color: currentTheme.textColor}]}>{item.Director}</Text>
                 </Text>
                 <Text style={[styles.cardText, {color: currentTheme.textColorSecondary}]}>

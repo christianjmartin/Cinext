@@ -31,7 +31,7 @@ const ABOUT = () => {
             <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>
                     Cinext was created with the inspiration of scrolling through streaming service after streaming service, 
                     day after day, taking hours to find a new movie to see. Reminiscing on the hours spent shuffling through
-                    these movies I had already seen, the idea of Cinext was conspired.
+                    these movies I had already seen, I was inspired to create Cinext.
             </Text>
         </View>
         </>

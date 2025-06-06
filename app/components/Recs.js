@@ -597,6 +597,7 @@ export default function Recs() {
             style={[styles.textInputBox, {backgroundColor: currentTheme.searchBar}]}
             placeholder="Create a request..."
             placeholderTextColor="#888"
+            autoCorrect={false}
             value={text}
             onChangeText={setText}
             maxLength={200}

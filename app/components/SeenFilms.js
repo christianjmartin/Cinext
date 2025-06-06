@@ -306,6 +306,7 @@ const SeenFilms = () => {
                 <View>
                     <TextInput
                         style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
+                        autoCorrect={false}
                         placeholder="Search for movies to add..."
                         placeholderTextColor="#888"
                         value={searchQuery}

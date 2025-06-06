@@ -308,6 +308,7 @@ const Watchlist = () => {
                         style={[styles.searchBar, {backgroundColor: currentTheme.searchBar}]}
                         placeholder="Search for movies to add..."
                         placeholderTextColor="#888"
+                        autoCorrect={false}
                         value={searchQuery}
                         onChangeText={handleSearch}
                     />

@@ -35,7 +35,7 @@ const theme = {
         headerColor: "#000000",
         shadowColor: "#000000",
         shadowColor2: "#999999",
-        gridItemColor: "#444444", // general cards
+        gridItemColor: "#353535", // general cards
         swiperBackground: '#171717',
         editBtn: "#888888",
         seenBtn: "#57CB32",
