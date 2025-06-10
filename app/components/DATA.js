@@ -37,7 +37,7 @@ const DATA = () => {
                 </View>
                 <View style={{marginTop: 80, alignItems: 'center'}}>
                     <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary, marginTop: -80}]}>Streaming data provided by JustWatch.</Text>
-                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Supported streaming services are: Netflix, Max, Hulu, Paramount Plus, Disney+, Amazon Prime, Apple TV+, Peacock, MGM Plus, Starz, and Fubo TV.</Text>
+                    <Text style={[styles.infoContainer, {color: currentTheme.textColorSecondary}]}>Supported streaming services are: Netflix, Max, Hulu, Paramount Plus, Disney+, Amazon Prime, Apple TV+, Peacock, MGM Plus, Crunchyroll, Starz, Fubo TV, Pluto TV, Tubi, AMC+, and Criterion Channel.</Text>
                     <Image source={justWatch} style={styles.jwLogo}></Image>
                 </View>
             </View>

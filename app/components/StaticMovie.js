@@ -60,6 +60,9 @@ const StaticMovie = () => {
       'Tubi': '#AA51D7',
       'Crunchyroll': '#F28116',
       'Pluto TV': '#ECE104',
+      'Criterion Channel': '#838383',
+      'AMC+': '#26D4D6',
+      'Roku Channel': '#A475BB',
       'Not available to stream on our list of services': '#838383'
     };
 
@@ -67,17 +70,20 @@ const StaticMovie = () => {
       'Netflix': 'Netflix',
       'Max': 'Max',
       'Hulu': 'Hulu',
-      'Paramount': 'Paramount Plus',
-      'Disney': 'Disney+',
-      'Amazon': 'Amazon Prime',
-      'Apple': 'Apple TV+',
-      'Peacock': 'Peacock',
-      'MGM': 'MGM Plus',
-      'Fubo': 'Fubo TV',
+      'Paramount Plus': 'Paramount Plus',
+      'Disney Plus': 'Disney+',
+      'Amazon Prime Video': 'Amazon Prime',
+      'Apple TV+': 'Apple TV+',
+      'Peacock Premium': 'Peacock',
+      'MGM Plus': 'MGM Plus',
+      'FuboTV': 'Fubo TV',
       'Starz': 'Starz',
-      'Tubi': 'Tubi',
-      'Pluto': 'Pluto TV',
+      'Tubi TV': 'Tubi',
+      'Pluto TV': 'Pluto TV',
       'Crunchyroll': 'Crunchyroll',
+      'Criterion Channel': 'Criterion Channel',
+      'AMC+': 'AMC+',
+      'The Roku Channel': 'Roku Channel',
     };
 
     const getServiceColor = (name) => {
@@ -91,10 +97,11 @@ const StaticMovie = () => {
 
 
     const normalizeAndFilterServices = (services) => {
+      // console.log(services);
       const unique = new Set();
       services.forEach((service) => {
         for (const keyword in providerKeywords) {
-          if (service.toLowerCase().includes(keyword.toLowerCase())) {
+          if (service.toLowerCase() === keyword.toLowerCase()) {
             unique.add(providerKeywords[keyword]);
             break;
           }
