@@ -36,7 +36,7 @@ const MovieList = () => {
 
   const serviceColors = {
     'Netflix': '#C55151',
-    'Max': '#6690FF',
+    'HBO Max': '#88959C',
     'Hulu': '#1CE783',
     'Paramount Plus': '#4F92FF',
     'Disney+': '#51B7E3',
@@ -57,7 +57,7 @@ const MovieList = () => {
 
   const providerKeywords = {
     'Netflix': 'Netflix',
-    'Max': 'Max',
+    'HBO Max': 'HBO Max',
     'Hulu': 'Hulu',
     'Paramount Plus': 'Paramount Plus',
     'Disney Plus': 'Disney+',
