@@ -67,6 +67,9 @@ export const fetchMovieDetails = async (query) => {
     };
   } catch (error) {
     console.error('Error fetching movie details:');
+    if (error.fatal) {
+      throw { fatal: true, message: "Unauthorized - app update required" };
+    }
     throw error;
   }
 };
@@ -95,6 +98,9 @@ export const searchMovies = async (query) => {
     }));
   } catch (error) {
     console.error('Error searching movies:');
+    if (error.fatal) {
+      throw { fatal: true, message: "Unauthorized - app update required" };
+    }
     throw error;
   }
 };

@@ -372,6 +372,9 @@ export default function Recs() {
     
         const responseText1 = result1?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
+        // // groq
+        // const responseText1 = result1?.choices?.[0]?.message?.content || 'No valid response';
+
         
         // what the user asked for 
         // console.log("The user said: ", text);
@@ -400,7 +403,15 @@ export default function Recs() {
                 detailedMovies.push(detailedMovie || { Title: movie.trim(), error: true });
             } catch (error) {
                 console.error(`Error fetching details for ${movie}:`);
+                console.log(error.fatal)
+                console.log(error.message)
                 detailedMovies.push({ Title: movie.trim(), error: true });
+                if (error.fatal && error.message == "Unauthorized - app update required") {
+                  setLoading(false);
+                  setText('');
+                  Keyboard.dismiss();
+                  return;
+                }
             }
         }
 
@@ -461,6 +472,9 @@ export default function Recs() {
         
             const responseText2 = result2?.candidates?.[0]?.content?.parts?.[0]?.text || 'No valid response';
 
+            // // groq
+            // const responseText2 = result2?.choices?.[0]?.message?.content || 'No valid response';
+
             // raw second response
             // console.log("the second api response: ", responseText2);
 
@@ -475,6 +489,14 @@ export default function Recs() {
                     } catch (error) {
                         console.error(`Error fetching details for ${movie}:`);
                         detailedMovies2.push({ Title: movie.trim(), error: true });
+                        console.log(error.fatal)
+                        console.log(error.message)
+                        if (error.fatal && error.message == "Unauthorized - app update required") {
+                          setLoading(false);
+                          setText('');
+                          Keyboard.dismiss();
+                          return;
+                        }
                     }
                 }
 
