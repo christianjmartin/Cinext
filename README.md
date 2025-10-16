@@ -1,6 +1,8 @@
 # Cinext
 A place to get recommendations on any movie, based on anything you want.
 
+**Available now in the apple App Store!**
+
 # Privacy Policy
 Cinext does not collect personally identifiable information. We use anonymous authentication to allow users to access features such as saving watchlists, marking films as seen, and limiting daily requests.
 
